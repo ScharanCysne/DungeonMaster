@@ -1,0 +1,2 @@
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ar qc libSource.a CMakeFiles/Source.dir/decision_tree/decision_tree.cpp.o CMakeFiles/Source.dir/dungeon/dungeon.cpp.o CMakeFiles/Source.dir/npc/npc.cpp.o CMakeFiles/Source.dir/quest/quest.cpp.o CMakeFiles/Source.dir/state/state.cpp.o CMakeFiles/Source.dir/world/world.cpp.o
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ranlib libSource.a
