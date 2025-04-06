@@ -131,6 +131,30 @@ dungeon_master/fast:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/build
 .PHONY : dungeon_master/fast
 
+Game/Game.o: Game/Game.cpp.o
+.PHONY : Game/Game.o
+
+# target to build an object file
+Game/Game.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o
+.PHONY : Game/Game.cpp.o
+
+Game/Game.i: Game/Game.cpp.i
+.PHONY : Game/Game.i
+
+# target to preprocess a source file
+Game/Game.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.i
+.PHONY : Game/Game.cpp.i
+
+Game/Game.s: Game/Game.cpp.s
+.PHONY : Game/Game.s
+
+# target to generate assembly for a file
+Game/Game.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.s
+.PHONY : Game/Game.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -164,6 +188,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... dungeon_master"
+	@echo "... Game/Game.o"
+	@echo "... Game/Game.i"
+	@echo "... Game/Game.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/Users/dungeon_master/src/Game/Game.cpp" "src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o.d"
   "/Users/dungeon_master/src/main.cpp" "src/CMakeFiles/dungeon_master.dir/main.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/main.cpp.o.d"
   )
 
