@@ -155,6 +155,30 @@ Game/Game.cpp.s:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.s
 .PHONY : Game/Game.cpp.s
 
+GameObject/GameObject.o: GameObject/GameObject.cpp.o
+.PHONY : GameObject/GameObject.o
+
+# target to build an object file
+GameObject/GameObject.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o
+.PHONY : GameObject/GameObject.cpp.o
+
+GameObject/GameObject.i: GameObject/GameObject.cpp.i
+.PHONY : GameObject/GameObject.i
+
+# target to preprocess a source file
+GameObject/GameObject.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.i
+.PHONY : GameObject/GameObject.cpp.i
+
+GameObject/GameObject.s: GameObject/GameObject.cpp.s
+.PHONY : GameObject/GameObject.s
+
+# target to generate assembly for a file
+GameObject/GameObject.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s
+.PHONY : GameObject/GameObject.cpp.s
+
 Player/Player.o: Player/Player.cpp.o
 .PHONY : Player/Player.o
 
@@ -239,6 +263,9 @@ help:
 	@echo "... Game/Game.o"
 	@echo "... Game/Game.i"
 	@echo "... Game/Game.s"
+	@echo "... GameObject/GameObject.o"
+	@echo "... GameObject/GameObject.i"
+	@echo "... GameObject/GameObject.s"
 	@echo "... Player/Player.o"
 	@echo "... Player/Player.i"
 	@echo "... Player/Player.s"

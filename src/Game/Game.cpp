@@ -1,15 +1,9 @@
 #include "Game.h"
 #include "TextureManager/TextureManager.h"
-struct Player {
-    int x, y;
-    int width, height;
-    int speed;
-};
+#include "GameObject/GameObject.h"
 
-SDL_Texture* player_texture = nullptr;
 
-// Initialize player
-Player player = {100, 100, 40, 40, 10};
+GameObject *playerObject = nullptr;
 
 Game::Game() {
 
@@ -44,11 +38,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         isRunning = true;
     }
 
-    player_texture = TextureManager::LoadTexture("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", renderer);
-    if (!player_texture) {
-        std::cerr << "Failed to load player texture! " << SDL_GetError() << "\n";
-        isRunning = false;
-    }
+    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", renderer, 0, 0);
 }
 
 void Game::handleEvents() {
@@ -60,14 +50,14 @@ void Game::handleEvents() {
             isRunning = false;
             break;
 
-        case SDL_KEYDOWN:
-            switch (e.key.keysym.sym) {
-                case SDLK_w: player.y -= player.speed; break;
-                case SDLK_s: player.y += player.speed; break;
-                case SDLK_a: player.x -= player.speed; break;
-                case SDLK_d: player.x += player.speed; break;
-            }
-            break;
+        // case SDL_KEYDOWN:
+        //     switch (e.key.keysym.sym) {
+        //         case SDLK_w: playerObject.y -= playerObject.speed; break;
+        //         case SDLK_s: playerObject.y += playerObject.speed; break;
+        //         case SDLK_a: playerObject.x -= playerObject.speed; break;
+        //         case SDLK_d: playerObject.x += playerObject.speed; break;
+        //     }
+        //     break;
 
         default:
             break;
@@ -75,7 +65,7 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-
+    playerObject->Update();
 }
 
 void Game::render() {
@@ -83,18 +73,19 @@ void Game::render() {
     SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
     SDL_RenderClear(renderer);
 
-    // // Draw the player
-    SDL_Rect playerRect = { player.x, player.y, player.width, player.height };
-    SDL_RenderCopy(renderer, player_texture, nullptr, &playerRect);
+    // Draw the playerObject
+    playerObject->Render();
 
     SDL_RenderPresent(renderer);
 }
 
 void Game::clear() {
+    isRunning = false;
+
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
     SDL_Quit();
-    isRunning = false;
+
     std::cout << "Game cleared and resources released." << std::endl;
 }
 
