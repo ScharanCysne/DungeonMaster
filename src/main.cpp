@@ -1,6 +1,40 @@
 #include <SDL2/SDL.h>
 #include <iostream>
 
+struct Player {
+    int x, y;
+    int width, height;
+    int speed;
+};
+
+void handleInput(Player &player, SDL_Event &e) {
+    if (e.type == SDL_KEYDOWN) {
+        switch (e.key.keysym.sym) {
+            case SDLK_w: player.y -= player.speed; break;
+            case SDLK_s: player.y += player.speed; break;
+            case SDLK_a: player.x -= player.speed; break;
+            case SDLK_d: player.x += player.speed; break;
+        }
+    }
+}
+
+void update() {
+
+}
+
+void render(SDL_Renderer* renderer, const Player& player) {
+    // Clear the screen
+    SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+    SDL_RenderClear(renderer);
+
+    // Draw the player
+    SDL_Rect playerRect = { player.x, player.y, player.width, player.height };
+    SDL_SetRenderDrawColor(renderer, 200, 100, 50, 255);
+    SDL_RenderFillRect(renderer, &playerRect);
+
+    SDL_RenderPresent(renderer);
+}
+
 int main() {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         std::cerr << "SDL could not initialize! " << SDL_GetError() << "\n";
@@ -30,6 +64,9 @@ int main() {
         return 1;
     }
 
+    // Initialize player
+    Player player = {100, 100, 40, 40, 10};
+
     // Basic game loop to keep window open
     bool running = true;
     SDL_Event e;
@@ -38,11 +75,11 @@ int main() {
         while (SDL_PollEvent(&e)) {
             if (e.type == SDL_QUIT)
                 running = false;
+            handleInput(player, e);
         }
 
-        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-        SDL_RenderClear(renderer);
-        SDL_RenderPresent(renderer);
+        update();
+        render(renderer, player);
     }
 
     SDL_DestroyRenderer(renderer);
