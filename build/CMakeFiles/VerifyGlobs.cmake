@@ -5,10 +5,9 @@ cmake_policy(SET CMP0009 NEW)
 # SOURCES at src/CMakeLists.txt:4 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/Users/dungeon_master/src/*.cpp")
 set(OLD_GLOB
-  "/Users/dungeon_master/src/Components/Position.cpp"
-  "/Users/dungeon_master/src/Components/Sprite.cpp"
+  "/Users/dungeon_master/src/ECS/Components/Position.cpp"
+  "/Users/dungeon_master/src/ECS/Components/Sprite.cpp"
   "/Users/dungeon_master/src/Game/Game.cpp"
-  "/Users/dungeon_master/src/GameObject/GameObject.cpp"
   "/Users/dungeon_master/src/Map/Map.cpp"
   "/Users/dungeon_master/src/Player/Player.cpp"
   "/Users/dungeon_master/src/TextureManager/TextureManager.cpp"

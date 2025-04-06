@@ -69,33 +69,33 @@ include src/CMakeFiles/dungeon_master.dir/progress.make
 # Include the compile flags for this target's objects.
 include src/CMakeFiles/dungeon_master.dir/flags.make
 
-src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
-src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o: /Users/dungeon_master/src/Components/Position.cpp
-src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o -MF CMakeFiles/dungeon_master.dir/Components/Position.cpp.o.d -o CMakeFiles/dungeon_master.dir/Components/Position.cpp.o -c /Users/dungeon_master/src/Components/Position.cpp
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o: /Users/dungeon_master/src/ECS/Components/Position.cpp
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o -MF CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o.d -o CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o -c /Users/dungeon_master/src/ECS/Components/Position.cpp
 
-src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/Components/Position.cpp.i"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/Components/Position.cpp > CMakeFiles/dungeon_master.dir/Components/Position.cpp.i
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.i"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/ECS/Components/Position.cpp > CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.i
 
-src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/Components/Position.cpp.s"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/Components/Position.cpp -o CMakeFiles/dungeon_master.dir/Components/Position.cpp.s
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.s"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/ECS/Components/Position.cpp -o CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.s
 
-src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
-src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o: /Users/dungeon_master/src/Components/Sprite.cpp
-src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o -MF CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o.d -o CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o -c /Users/dungeon_master/src/Components/Sprite.cpp
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o: /Users/dungeon_master/src/ECS/Components/Sprite.cpp
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o -MF CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o.d -o CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o -c /Users/dungeon_master/src/ECS/Components/Sprite.cpp
 
-src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.i"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/Components/Sprite.cpp > CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.i
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.i"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/ECS/Components/Sprite.cpp > CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.i
 
-src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.s"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/Components/Sprite.cpp -o CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.s
+src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.s"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/ECS/Components/Sprite.cpp -o CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.s
 
 src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o: /Users/dungeon_master/src/Game/Game.cpp
@@ -111,24 +111,10 @@ src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/Game/Game.cpp.s"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/Game/Game.cpp -o CMakeFiles/dungeon_master.dir/Game/Game.cpp.s
 
-src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
-src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o: /Users/dungeon_master/src/GameObject/GameObject.cpp
-src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o -MF CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o.d -o CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o -c /Users/dungeon_master/src/GameObject/GameObject.cpp
-
-src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.i"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/GameObject/GameObject.cpp > CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.i
-
-src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s"
-	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/GameObject/GameObject.cpp -o CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s
-
 src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o: /Users/dungeon_master/src/Map/Map.cpp
 src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o -MF CMakeFiles/dungeon_master.dir/Map/Map.cpp.o.d -o CMakeFiles/dungeon_master.dir/Map/Map.cpp.o -c /Users/dungeon_master/src/Map/Map.cpp
 
 src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.i: cmake_force
@@ -142,7 +128,7 @@ src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.s: cmake_force
 src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o: /Users/dungeon_master/src/Player/Player.cpp
 src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o -MF CMakeFiles/dungeon_master.dir/Player/Player.cpp.o.d -o CMakeFiles/dungeon_master.dir/Player/Player.cpp.o -c /Users/dungeon_master/src/Player/Player.cpp
 
 src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.i: cmake_force
@@ -156,7 +142,7 @@ src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.s: cmake_force
 src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: /Users/dungeon_master/src/TextureManager/TextureManager.cpp
 src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o -MF CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o.d -o CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o -c /Users/dungeon_master/src/TextureManager/TextureManager.cpp
 
 src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.i: cmake_force
@@ -170,7 +156,7 @@ src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.s: cmake_for
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: /Users/dungeon_master/src/main.cpp
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Building CXX object src/CMakeFiles/dungeon_master.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object src/CMakeFiles/dungeon_master.dir/main.cpp.o"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/main.cpp.o -MF CMakeFiles/dungeon_master.dir/main.cpp.o.d -o CMakeFiles/dungeon_master.dir/main.cpp.o -c /Users/dungeon_master/src/main.cpp
 
 src/CMakeFiles/dungeon_master.dir/main.cpp.i: cmake_force
@@ -183,10 +169,9 @@ src/CMakeFiles/dungeon_master.dir/main.cpp.s: cmake_force
 
 # Object files for target dungeon_master
 dungeon_master_OBJECTS = \
-"CMakeFiles/dungeon_master.dir/Components/Position.cpp.o" \
-"CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o" \
+"CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o" \
+"CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o" \
 "CMakeFiles/dungeon_master.dir/Game/Game.cpp.o" \
-"CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o" \
 "CMakeFiles/dungeon_master.dir/Map/Map.cpp.o" \
 "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o" \
 "CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o" \
@@ -195,17 +180,16 @@ dungeon_master_OBJECTS = \
 # External object files for target dungeon_master
 dungeon_master_EXTERNAL_OBJECTS =
 
-src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o
-src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o
+src/dungeon_master: src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o
+src/dungeon_master: src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o
-src/dungeon_master: src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/main.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/build.make
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_9) "Linking CXX executable dungeon_master"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX executable dungeon_master"
 	cd /Users/dungeon_master/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/dungeon_master.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

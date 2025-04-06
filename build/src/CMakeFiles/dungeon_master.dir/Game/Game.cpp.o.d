@@ -1026,7 +1026,7 @@ src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o: \
   /opt/homebrew/include/SDL2/close_code.h \
   /Users/dungeon_master/src/TextureManager/TextureManager.h \
   /Users/dungeon_master/src/Map/Map.h \
-  /Users/dungeon_master/src/Components/Components.h \
+  /Users/dungeon_master/src/ECS/Components/Components.h \
   /Users/dungeon_master/src/ECS/ECS.h \
-  /Users/dungeon_master/src/Components/Position.h \
-  /Users/dungeon_master/src/Components/Sprite.h
+  /Users/dungeon_master/src/ECS/Components/Position.h \
+  /Users/dungeon_master/src/ECS/Components/Sprite.h

@@ -13,8 +13,10 @@ public:
     void draw() override;
     void update() override;
 
+    void setTexture(const char* path);
+
 private:
-    Position* position;
+    Transform* transform;
     SDL_Texture* texture;
 
     SDL_Rect srcRect;

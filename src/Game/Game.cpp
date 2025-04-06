@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "TextureManager/TextureManager.h"
 #include "Map/Map.h"
-#include "Components/Components.h"
+#include "ECS/Components/Components.h"
 
 SDL_Renderer* Game::renderer = nullptr;
 
@@ -45,7 +45,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     map = new Map();
 
     // Create player
-    player.addComponent<Position>(300, 50);
+    player.addComponent<Transform>(300, 50);
     player.addComponent<Sprite>("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png");
 }
 

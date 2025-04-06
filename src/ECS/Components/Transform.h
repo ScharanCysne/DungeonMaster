@@ -2,10 +2,10 @@
 
 #include "ECS/ECS.h"
 
-class Position : public Component {
+class Transform : public Component {
 public:
-    Position() = default;
-    Position(int x, int y) : xPos(x), yPos(y) {}
+    Transform() = default;
+    Transform(int x, int y) : xPos(x), yPos(y) {}
 
     void init() override;
     void update() override;

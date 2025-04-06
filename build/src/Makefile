@@ -131,53 +131,53 @@ dungeon_master/fast:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/build
 .PHONY : dungeon_master/fast
 
-Components/Position.o: Components/Position.cpp.o
-.PHONY : Components/Position.o
+ECS/Components/Position.o: ECS/Components/Position.cpp.o
+.PHONY : ECS/Components/Position.o
 
 # target to build an object file
-Components/Position.cpp.o:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o
-.PHONY : Components/Position.cpp.o
+ECS/Components/Position.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.o
+.PHONY : ECS/Components/Position.cpp.o
 
-Components/Position.i: Components/Position.cpp.i
-.PHONY : Components/Position.i
+ECS/Components/Position.i: ECS/Components/Position.cpp.i
+.PHONY : ECS/Components/Position.i
 
 # target to preprocess a source file
-Components/Position.cpp.i:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.i
-.PHONY : Components/Position.cpp.i
+ECS/Components/Position.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.i
+.PHONY : ECS/Components/Position.cpp.i
 
-Components/Position.s: Components/Position.cpp.s
-.PHONY : Components/Position.s
+ECS/Components/Position.s: ECS/Components/Position.cpp.s
+.PHONY : ECS/Components/Position.s
 
 # target to generate assembly for a file
-Components/Position.cpp.s:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.s
-.PHONY : Components/Position.cpp.s
+ECS/Components/Position.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Position.cpp.s
+.PHONY : ECS/Components/Position.cpp.s
 
-Components/Sprite.o: Components/Sprite.cpp.o
-.PHONY : Components/Sprite.o
+ECS/Components/Sprite.o: ECS/Components/Sprite.cpp.o
+.PHONY : ECS/Components/Sprite.o
 
 # target to build an object file
-Components/Sprite.cpp.o:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o
-.PHONY : Components/Sprite.cpp.o
+ECS/Components/Sprite.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.o
+.PHONY : ECS/Components/Sprite.cpp.o
 
-Components/Sprite.i: Components/Sprite.cpp.i
-.PHONY : Components/Sprite.i
+ECS/Components/Sprite.i: ECS/Components/Sprite.cpp.i
+.PHONY : ECS/Components/Sprite.i
 
 # target to preprocess a source file
-Components/Sprite.cpp.i:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.i
-.PHONY : Components/Sprite.cpp.i
+ECS/Components/Sprite.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.i
+.PHONY : ECS/Components/Sprite.cpp.i
 
-Components/Sprite.s: Components/Sprite.cpp.s
-.PHONY : Components/Sprite.s
+ECS/Components/Sprite.s: ECS/Components/Sprite.cpp.s
+.PHONY : ECS/Components/Sprite.s
 
 # target to generate assembly for a file
-Components/Sprite.cpp.s:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.s
-.PHONY : Components/Sprite.cpp.s
+ECS/Components/Sprite.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/ECS/Components/Sprite.cpp.s
+.PHONY : ECS/Components/Sprite.cpp.s
 
 Game/Game.o: Game/Game.cpp.o
 .PHONY : Game/Game.o
@@ -202,30 +202,6 @@ Game/Game.s: Game/Game.cpp.s
 Game/Game.cpp.s:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.s
 .PHONY : Game/Game.cpp.s
-
-GameObject/GameObject.o: GameObject/GameObject.cpp.o
-.PHONY : GameObject/GameObject.o
-
-# target to build an object file
-GameObject/GameObject.cpp.o:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o
-.PHONY : GameObject/GameObject.cpp.o
-
-GameObject/GameObject.i: GameObject/GameObject.cpp.i
-.PHONY : GameObject/GameObject.i
-
-# target to preprocess a source file
-GameObject/GameObject.cpp.i:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.i
-.PHONY : GameObject/GameObject.cpp.i
-
-GameObject/GameObject.s: GameObject/GameObject.cpp.s
-.PHONY : GameObject/GameObject.s
-
-# target to generate assembly for a file
-GameObject/GameObject.cpp.s:
-	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s
-.PHONY : GameObject/GameObject.cpp.s
 
 Map/Map.o: Map/Map.cpp.o
 .PHONY : Map/Map.o
@@ -332,18 +308,15 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... dungeon_master"
-	@echo "... Components/Position.o"
-	@echo "... Components/Position.i"
-	@echo "... Components/Position.s"
-	@echo "... Components/Sprite.o"
-	@echo "... Components/Sprite.i"
-	@echo "... Components/Sprite.s"
+	@echo "... ECS/Components/Position.o"
+	@echo "... ECS/Components/Position.i"
+	@echo "... ECS/Components/Position.s"
+	@echo "... ECS/Components/Sprite.o"
+	@echo "... ECS/Components/Sprite.i"
+	@echo "... ECS/Components/Sprite.s"
 	@echo "... Game/Game.o"
 	@echo "... Game/Game.i"
 	@echo "... Game/Game.s"
-	@echo "... GameObject/GameObject.o"
-	@echo "... GameObject/GameObject.i"
-	@echo "... GameObject/GameObject.s"
 	@echo "... Map/Map.o"
 	@echo "... Map/Map.i"
 	@echo "... Map/Map.s"

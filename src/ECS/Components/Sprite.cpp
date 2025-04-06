@@ -2,6 +2,10 @@
 #include "TextureManager/TextureManager.h"
 
 Sprite::Sprite(const char* path) {
+    setTexture(path);
+}
+
+void Sprite::setTexture(const char* path) {
     texture = TextureManager::LoadTexture(path);
 }
 
@@ -16,7 +20,7 @@ void Sprite::init() {
     destRect.w = 64;
     destRect.h = 64;
 
-    position = &entity->getComponent<Position>();
+    transform = &entity->getComponent<Transform>();
 }
 
 void Sprite::draw() {
@@ -24,6 +28,6 @@ void Sprite::draw() {
 }
 
 void Sprite::update() {
-    destRect.x = position->x();
-    destRect.y = position->y();
+    destRect.x = transform->x();
+    destRect.y = transform->y();
 }
