@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/dungeon_master.dir/Game/Game.cpp.o.d"
   "CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o"
   "CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o.d"
+  "CMakeFiles/dungeon_master.dir/Map/Map.cpp.o"
+  "CMakeFiles/dungeon_master.dir/Map/Map.cpp.o.d"
   "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o"
   "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o.d"
   "CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o"

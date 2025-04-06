@@ -179,6 +179,30 @@ GameObject/GameObject.cpp.s:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.s
 .PHONY : GameObject/GameObject.cpp.s
 
+Map/Map.o: Map/Map.cpp.o
+.PHONY : Map/Map.o
+
+# target to build an object file
+Map/Map.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.o
+.PHONY : Map/Map.cpp.o
+
+Map/Map.i: Map/Map.cpp.i
+.PHONY : Map/Map.i
+
+# target to preprocess a source file
+Map/Map.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.i
+.PHONY : Map/Map.cpp.i
+
+Map/Map.s: Map/Map.cpp.s
+.PHONY : Map/Map.s
+
+# target to generate assembly for a file
+Map/Map.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Map/Map.cpp.s
+.PHONY : Map/Map.cpp.s
+
 Player/Player.o: Player/Player.cpp.o
 .PHONY : Player/Player.o
 
@@ -266,6 +290,9 @@ help:
 	@echo "... GameObject/GameObject.o"
 	@echo "... GameObject/GameObject.i"
 	@echo "... GameObject/GameObject.s"
+	@echo "... Map/Map.o"
+	@echo "... Map/Map.i"
+	@echo "... Map/Map.s"
 	@echo "... Player/Player.o"
 	@echo "... Player/Player.i"
 	@echo "... Player/Player.s"

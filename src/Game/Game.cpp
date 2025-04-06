@@ -1,11 +1,12 @@
 #include "Game.h"
 #include "TextureManager/TextureManager.h"
 #include "GameObject/GameObject.h"
-
-
-GameObject *playerObject = nullptr;
+#include "Map/Map.h"
 
 SDL_Renderer* Game::renderer = nullptr;
+
+GameObject *playerObject = nullptr;
+Map *map = nullptr;
 
 Game::Game() {
 
@@ -41,6 +42,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     }
 
     playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", 0, 0);
+    map = new Map();
 }
 
 void Game::handleEvents() {
@@ -76,6 +78,7 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
     // Draw the playerObject
+    map->DrawMap();
     playerObject->Render();
 
     SDL_RenderPresent(renderer);

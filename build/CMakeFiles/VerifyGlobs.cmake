@@ -7,6 +7,7 @@ file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/Users/dungeon_master/src/*.c
 set(OLD_GLOB
   "/Users/dungeon_master/src/Game/Game.cpp"
   "/Users/dungeon_master/src/GameObject/GameObject.cpp"
+  "/Users/dungeon_master/src/Map/Map.cpp"
   "/Users/dungeon_master/src/Player/Player.cpp"
   "/Users/dungeon_master/src/TextureManager/TextureManager.cpp"
   "/Users/dungeon_master/src/main.cpp"
