@@ -12,13 +12,14 @@ class Entity;
 
 using ComponentID = std::size_t;
 
-inline ComponentID getComponentID() {
+inline ComponentID getComponentTypeID() {
     static ComponentID lastID = 0;
     return lastID++;
 }
 
 template <typename T> inline ComponentID getComponentTypeID() noexcept {
-    static ComponentID typeID = getComponentID();
+    static_assert (std::is_base_of<Component, T>::value, "");
+    static ComponentID typeID = getComponentTypeID();
     return typeID;
 }
 
@@ -34,7 +35,6 @@ public:
     virtual void init() {};
     virtual void update() {};
     virtual void draw() {};
-
     virtual ~Component() {};
 };
 
@@ -48,6 +48,7 @@ public:
     template <typename T> bool hasComponent() const {
         return componentBitSet[getComponentTypeID<T>()];
     };
+
     template <typename T, typename... TArgs> T& addComponent(TArgs&&... mArgs) {
         T* c(new T(std::forward<TArgs>(mArgs)...));
         c->entity = this;
@@ -61,6 +62,7 @@ public:
         c->init();
         return *c;
     };
+
     template <typename T> T& getComponent() const {
         auto ptr = componentArray[getComponentTypeID<T>()];
         return *static_cast<T*>(ptr);

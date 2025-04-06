@@ -1,16 +1,13 @@
 #include "Game.h"
 #include "TextureManager/TextureManager.h"
-#include "GameObject/GameObject.h"
 #include "Map/Map.h"
-#include "ECS/ECS.h"
-#include "Components/Position.h"
+#include "Components/Components.h"
 
 SDL_Renderer* Game::renderer = nullptr;
 
-GameObject *playerObject = nullptr;
 Map *map = nullptr;
 Manager manager;
-auto& newPlayer(manager.addEntity());
+auto& player(manager.addEntity());
 
 Game::Game() {
 
@@ -46,9 +43,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     }
 
     map = new Map();
-    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", 0, 0);
-    newPlayer.addComponent<Position>();
-    newPlayer.getComponent<Position>().setPos(100, 100);
+
+    // Create player
+    player.addComponent<Position>(300, 50);
+    player.addComponent<Sprite>("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png");
 }
 
 void Game::handleEvents() {
@@ -75,18 +73,15 @@ void Game::handleEvents() {
 }
 
 void Game::update() {
-    playerObject->Update();
+    manager.refresh();
     manager.update();
 }
 
 void Game::render() {
-    // Clear the screen
-    SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
     SDL_RenderClear(renderer);
 
-    // Draw the playerObject
     map->DrawMap();
-    playerObject->Render();
+    manager.draw();
 
     SDL_RenderPresent(renderer);
 }

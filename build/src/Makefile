@@ -155,6 +155,30 @@ Components/Position.cpp.s:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.s
 .PHONY : Components/Position.cpp.s
 
+Components/Sprite.o: Components/Sprite.cpp.o
+.PHONY : Components/Sprite.o
+
+# target to build an object file
+Components/Sprite.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.o
+.PHONY : Components/Sprite.cpp.o
+
+Components/Sprite.i: Components/Sprite.cpp.i
+.PHONY : Components/Sprite.i
+
+# target to preprocess a source file
+Components/Sprite.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.i
+.PHONY : Components/Sprite.cpp.i
+
+Components/Sprite.s: Components/Sprite.cpp.s
+.PHONY : Components/Sprite.s
+
+# target to generate assembly for a file
+Components/Sprite.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Sprite.cpp.s
+.PHONY : Components/Sprite.cpp.s
+
 Game/Game.o: Game/Game.cpp.o
 .PHONY : Game/Game.o
 
@@ -311,6 +335,9 @@ help:
 	@echo "... Components/Position.o"
 	@echo "... Components/Position.i"
 	@echo "... Components/Position.s"
+	@echo "... Components/Sprite.o"
+	@echo "... Components/Sprite.i"
+	@echo "... Components/Sprite.s"
 	@echo "... Game/Game.o"
 	@echo "... Game/Game.i"
 	@echo "... Game/Game.s"
