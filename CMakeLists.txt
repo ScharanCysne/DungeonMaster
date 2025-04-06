@@ -10,7 +10,17 @@ set(CMAKE_CXX_EXTENSIONS NO)
 
 # Find SDL2 package
 find_package(SDL2 REQUIRED)
-include_directories(${SDL2_INCLUDE_DIRS})
+find_package(SDL2_image REQUIRED)
+find_package(SDL2_ttf REQUIRED)
+
+include_directories(
+    ${SDL2_INCLUDE_DIRS}
+    ${SDL2_IMAGE_INCLUDE_DIRS}
+    ${SDL2_TTF_INCLUDE_DIRS}
+    /opt/homebrew/Cellar
+    /opt/homebrew/include
+    /opt/homebrew/include/SDL2
+)
 
 # Add subdirectories
 add_subdirectory(src)

@@ -1,5 +1,14 @@
 #include "Game.h"
 
+struct Player {
+    int x, y;
+    int width, height;
+    int speed;
+};
+
+// Initialize player
+Player player = {100, 100, 40, 40, 10};
+
 Game::Game() {
 
 }
@@ -43,14 +52,14 @@ void Game::handleEvents() {
             isRunning = false;
             break;
 
-        // case SDL_KEYDOWN:
-        //     switch (e.key.keysym.sym) {
-        //         case SDLK_w: player.y -= player.speed; break;
-        //         case SDLK_s: player.y += player.speed; break;
-        //         case SDLK_a: player.x -= player.speed; break;
-        //         case SDLK_d: player.x += player.speed; break;
-        //     }
-        //     break;
+        case SDL_KEYDOWN:
+            switch (e.key.keysym.sym) {
+                case SDLK_w: player.y -= player.speed; break;
+                case SDLK_s: player.y += player.speed; break;
+                case SDLK_a: player.x -= player.speed; break;
+                case SDLK_d: player.x += player.speed; break;
+            }
+            break;
 
         default:
             break;
@@ -67,9 +76,9 @@ void Game::render() {
     SDL_RenderClear(renderer);
 
     // // Draw the player
-    // SDL_Rect playerRect = { player.x, player.y, player.width, player.height };
-    // SDL_SetRenderDrawColor(renderer, 200, 100, 50, 255);
-    // SDL_RenderFillRect(renderer, &playerRect);
+    SDL_Rect playerRect = { player.x, player.y, player.width, player.height };
+    SDL_SetRenderDrawColor(renderer, 200, 100, 50, 255);
+    SDL_RenderFillRect(renderer, &playerRect);
 
     SDL_RenderPresent(renderer);
 }

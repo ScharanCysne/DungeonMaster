@@ -1020,7 +1020,14 @@ src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o: /Users/dungeon_master/src/Gam
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_version.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_video.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/begin_code.h \
-  /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/close_code.h
+  /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/close_code.h \
+  /opt/homebrew/include/SDL2/SDL.h \
+  /opt/homebrew/include/SDL2/SDL_image.h \
+  /opt/homebrew/include/SDL2/SDL_version.h \
+  /opt/homebrew/include/SDL2/begin_code.h \
+  /opt/homebrew/include/SDL2/close_code.h
+
+src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o: /Users/dungeon_master/src/Player/Player.cpp
 
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: /Users/dungeon_master/src/main.cpp \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/Availability.h \
@@ -2041,8 +2048,25 @@ src/CMakeFiles/dungeon_master.dir/main.cpp.o: /Users/dungeon_master/src/main.cpp
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_version.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_video.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/begin_code.h \
-  /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/close_code.h
+  /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/close_code.h \
+  /opt/homebrew/include/SDL2/SDL.h \
+  /opt/homebrew/include/SDL2/SDL_image.h \
+  /opt/homebrew/include/SDL2/SDL_version.h \
+  /opt/homebrew/include/SDL2/begin_code.h \
+  /opt/homebrew/include/SDL2/close_code.h
 
+
+/Users/dungeon_master/src/Player/Player.cpp:
+
+/opt/homebrew/include/SDL2/close_code.h:
+
+/opt/homebrew/include/SDL2/begin_code.h:
+
+/opt/homebrew/include/SDL2/SDL_version.h:
+
+/opt/homebrew/include/SDL2/SDL_image.h:
+
+/opt/homebrew/include/SDL2/SDL.h:
 
 /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/close_code.h:
 

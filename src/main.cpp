@@ -1,17 +1,15 @@
-#include <iostream>
-#include <SDL2/SDL.h>
-
 #include "Game/Game.h"
-
-struct Player {
-    int x, y;
-    int width, height;
-    int speed;
-};
 
 Game *game = nullptr;
 
 int main(int argc, const char *argv[]) {
+
+    const int FPS = 60;
+    const int frameDelay = 1000 / FPS;
+
+    Uint32 frameStart;
+    int frameTime;
+
     // Create Game object
     game = new Game();
     game->init(
@@ -20,17 +18,21 @@ int main(int argc, const char *argv[]) {
         SDL_WINDOWPOS_CENTERED,
         800,
         600,
-        true
+        false
     );
 
-
-    // // Initialize player
-    // Player player = {100, 100, 40, 40, 10};
-
     while (game->running()) {
+        frameStart = SDL_GetTicks();    // ms
+
         game->handleEvents();
         game->update();
         game->render();
+
+        frameTime = SDL_GetTicks() - frameStart;
+
+        if(frameDelay > frameTime) {    // moved too fast, wait until delay
+            SDL_Delay(frameDelay - frameTime);
+        }
     }
 
     game->clear();

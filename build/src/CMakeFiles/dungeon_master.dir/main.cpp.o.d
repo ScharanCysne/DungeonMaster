@@ -1,5 +1,6 @@
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: \
   /Users/dungeon_master/src/main.cpp \
+  /Users/dungeon_master/src/Game/Game.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__assert \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__assertion_handler \
@@ -1018,4 +1019,8 @@ src/CMakeFiles/dungeon_master.dir/main.cpp.o: \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_version.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_locale.h \
   /opt/homebrew/Cellar/sdl2/2.32.4/include/SDL2/SDL_misc.h \
-  /Users/dungeon_master/src/Game/Game.h
+  /opt/homebrew/include/SDL2/SDL_image.h \
+  /opt/homebrew/include/SDL2/SDL.h \
+  /opt/homebrew/include/SDL2/SDL_version.h \
+  /opt/homebrew/include/SDL2/begin_code.h \
+  /opt/homebrew/include/SDL2/close_code.h

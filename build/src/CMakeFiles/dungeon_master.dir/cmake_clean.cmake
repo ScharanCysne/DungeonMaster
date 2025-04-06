@@ -1,6 +1,8 @@
 file(REMOVE_RECURSE
   "CMakeFiles/dungeon_master.dir/Game/Game.cpp.o"
   "CMakeFiles/dungeon_master.dir/Game/Game.cpp.o.d"
+  "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o"
+  "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o.d"
   "CMakeFiles/dungeon_master.dir/main.cpp.o"
   "CMakeFiles/dungeon_master.dir/main.cpp.o.d"
   "dungeon_master"

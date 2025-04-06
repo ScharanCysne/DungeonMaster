@@ -8,7 +8,9 @@ add_executable(dungeon_master ${SOURCES})
 
 # Link SDL2
 target_link_libraries(dungeon_master
-    SDL2::SDL2
+    ${SDL2_LIBRARIES}
+    ${SDL2_IMAGE_LIBRARIES}
+    ${SDL2_TTF_LIBRARIES}
 )
 
 # Add include directories
