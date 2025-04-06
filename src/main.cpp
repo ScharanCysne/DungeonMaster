@@ -1,54 +1,52 @@
-#include "crow_all.h"
-
-#include "decision_tree/decision_tree.h"
-#include "dungeon/dungeon.h"
-#include "npc/npc.h"
-#include "quest/quest.h"
-#include "world/world.h"
-
-
-// Simple Game Master AI class
-
+#include <SDL2/SDL.h>
+#include <iostream>
 
 int main() {
-    WorldGenerator generator(20, 10, 12345);
-    DecisionTree decisionTree;
-    GameMaster gameMaster;
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        std::cerr << "SDL could not initialize! " << SDL_GetError() << "\n";
+        return 1;
+    }
 
-    crow::SimpleApp app;
+    SDL_Window* window = SDL_CreateWindow(
+        "Dungeon Master",
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
+        800,
+        600,
+        SDL_WINDOW_SHOWN
+    );
 
-    CROW_ROUTE(app, "/world").methods("GET"_method)([&generator]() {
-        return crow::response(generator.getWorldJSON());
-    });
+    if (!window) {
+        std::cerr << "Window could not be created! " << SDL_GetError() << "\n";
+        SDL_Quit();
+        return 1;
+    }
 
-    CROW_ROUTE(app, "/decisions").methods("GET"_method)([&decisionTree]() {
-        return crow::response(decisionTree.getDecisionTreeJSON());
-    });
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, 0);
+    if (!renderer) {
+        std::cerr << "Renderer could not be created! " << SDL_GetError() << "\n";
+        SDL_DestroyWindow(window);
+        SDL_Quit();
+        return 1;
+    }
 
-    CROW_ROUTE(app, "/npcs").methods("GET"_method)([&generator]() {
-        return crow::response(generator.getNPCsJSON());
-    });
+    // Basic game loop to keep window open
+    bool running = true;
+    SDL_Event e;
 
-    CROW_ROUTE(app, "/quests").methods("GET"_method)([&generator]() {
-        return crow::response(generator.getQuestsJSON());
-    });
+    while (running) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_QUIT)
+                running = false;
+        }
 
-    CROW_ROUTE(app, "/chat").methods("POST"_method)([&gameMaster, &decisionTree](const crow::request& req) {
-        auto data = crow::json::load(req.body);
-        if (!data)
-            return crow::response(400, "Invalid JSON");
+        SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
+        SDL_RenderClear(renderer);
+        SDL_RenderPresent(renderer);
+    }
 
-        std::string input = data["message"].s();
-        std::string response = gameMaster.getResponse(input);
-        int decisionId = decisionTree.addDecision(0, input);
-
-        crow::json::wvalue res;
-        res["response"] = response;
-        res["decisionId"] = decisionId;
-        return crow::response(res);
-    });
-
-    app.port(18080).multithreaded().run();
-
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
     return 0;
 }
