@@ -96,12 +96,12 @@ src/clean: src/CMakeFiles/dungeon_master.dir/clean
 src/CMakeFiles/dungeon_master.dir/all:
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/depend
 	$(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=1,2,3,4 "Built target dungeon_master"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=1,2,3,4,5 "Built target dungeon_master"
 .PHONY : src/CMakeFiles/dungeon_master.dir/all
 
 # Build rule for subdir invocation for target.
 src/CMakeFiles/dungeon_master.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/dungeon_master/build/CMakeFiles 4
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/dungeon_master/build/CMakeFiles 5
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 src/CMakeFiles/dungeon_master.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /Users/dungeon_master/build/CMakeFiles 0
 .PHONY : src/CMakeFiles/dungeon_master.dir/rule

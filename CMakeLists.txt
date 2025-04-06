@@ -22,5 +22,9 @@ include_directories(
     /opt/homebrew/include/SDL2
 )
 
+link_directories(
+    /opt/homebrew/lib
+)
+
 # Add subdirectories
 add_subdirectory(src)

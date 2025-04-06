@@ -179,6 +179,30 @@ Player/Player.cpp.s:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.s
 .PHONY : Player/Player.cpp.s
 
+TextureManager/TextureManager.o: TextureManager/TextureManager.cpp.o
+.PHONY : TextureManager/TextureManager.o
+
+# target to build an object file
+TextureManager/TextureManager.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o
+.PHONY : TextureManager/TextureManager.cpp.o
+
+TextureManager/TextureManager.i: TextureManager/TextureManager.cpp.i
+.PHONY : TextureManager/TextureManager.i
+
+# target to preprocess a source file
+TextureManager/TextureManager.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.i
+.PHONY : TextureManager/TextureManager.cpp.i
+
+TextureManager/TextureManager.s: TextureManager/TextureManager.cpp.s
+.PHONY : TextureManager/TextureManager.s
+
+# target to generate assembly for a file
+TextureManager/TextureManager.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.s
+.PHONY : TextureManager/TextureManager.cpp.s
+
 main.o: main.cpp.o
 .PHONY : main.o
 
@@ -218,6 +242,9 @@ help:
 	@echo "... Player/Player.o"
 	@echo "... Player/Player.i"
 	@echo "... Player/Player.s"
+	@echo "... TextureManager/TextureManager.o"
+	@echo "... TextureManager/TextureManager.i"
+	@echo "... TextureManager/TextureManager.s"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"

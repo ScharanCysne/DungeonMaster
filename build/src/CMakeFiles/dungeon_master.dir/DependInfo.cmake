@@ -10,6 +10,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "/Users/dungeon_master/src/Game/Game.cpp" "src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o.d"
   "/Users/dungeon_master/src/Player/Player.cpp" "src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o.d"
+  "/Users/dungeon_master/src/TextureManager/TextureManager.cpp" "src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o.d"
   "/Users/dungeon_master/src/main.cpp" "src/CMakeFiles/dungeon_master.dir/main.cpp.o" "gcc" "src/CMakeFiles/dungeon_master.dir/main.cpp.o.d"
   )
 

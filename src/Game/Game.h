@@ -1,5 +1,4 @@
-#ifndef GAME_H
-#define GAME_H
+#pragma once
 
 #include <iostream>
 #include "SDL2/SDL.h"
@@ -25,5 +24,3 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
 };
-
-#endif

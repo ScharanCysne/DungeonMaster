@@ -1023,4 +1023,5 @@ src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o: \
   /opt/homebrew/include/SDL2/SDL.h \
   /opt/homebrew/include/SDL2/SDL_version.h \
   /opt/homebrew/include/SDL2/begin_code.h \
-  /opt/homebrew/include/SDL2/close_code.h
+  /opt/homebrew/include/SDL2/close_code.h \
+  /Users/dungeon_master/src/TextureManager/TextureManager.h

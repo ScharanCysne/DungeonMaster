@@ -1,10 +1,12 @@
 #include "Game.h"
-
+#include "TextureManager/TextureManager.h"
 struct Player {
     int x, y;
     int width, height;
     int speed;
 };
+
+SDL_Texture* player_texture = nullptr;
 
 // Initialize player
 Player player = {100, 100, 40, 40, 10};
@@ -40,6 +42,12 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         }
 
         isRunning = true;
+    }
+
+    player_texture = TextureManager::LoadTexture("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", renderer);
+    if (!player_texture) {
+        std::cerr << "Failed to load player texture! " << SDL_GetError() << "\n";
+        isRunning = false;
     }
 }
 
@@ -77,8 +85,7 @@ void Game::render() {
 
     // // Draw the player
     SDL_Rect playerRect = { player.x, player.y, player.width, player.height };
-    SDL_SetRenderDrawColor(renderer, 200, 100, 50, 255);
-    SDL_RenderFillRect(renderer, &playerRect);
+    SDL_RenderCopy(renderer, player_texture, nullptr, &playerRect);
 
     SDL_RenderPresent(renderer);
 }

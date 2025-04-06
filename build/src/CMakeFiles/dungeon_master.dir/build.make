@@ -97,10 +97,24 @@ src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/Player/Player.cpp.s"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/Player/Player.cpp -o CMakeFiles/dungeon_master.dir/Player/Player.cpp.s
 
+src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
+src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: /Users/dungeon_master/src/TextureManager/TextureManager.cpp
+src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o -MF CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o.d -o CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o -c /Users/dungeon_master/src/TextureManager/TextureManager.cpp
+
+src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.i"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/dungeon_master/src/TextureManager/TextureManager.cpp > CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.i
+
+src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.s"
+	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/dungeon_master/src/TextureManager/TextureManager.cpp -o CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.s
+
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: src/CMakeFiles/dungeon_master.dir/flags.make
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: /Users/dungeon_master/src/main.cpp
 src/CMakeFiles/dungeon_master.dir/main.cpp.o: src/CMakeFiles/dungeon_master.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object src/CMakeFiles/dungeon_master.dir/main.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object src/CMakeFiles/dungeon_master.dir/main.cpp.o"
 	cd /Users/dungeon_master/build/src && /Library/Developer/CommandLineTools/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT src/CMakeFiles/dungeon_master.dir/main.cpp.o -MF CMakeFiles/dungeon_master.dir/main.cpp.o.d -o CMakeFiles/dungeon_master.dir/main.cpp.o -c /Users/dungeon_master/src/main.cpp
 
 src/CMakeFiles/dungeon_master.dir/main.cpp.i: cmake_force
@@ -115,6 +129,7 @@ src/CMakeFiles/dungeon_master.dir/main.cpp.s: cmake_force
 dungeon_master_OBJECTS = \
 "CMakeFiles/dungeon_master.dir/Game/Game.cpp.o" \
 "CMakeFiles/dungeon_master.dir/Player/Player.cpp.o" \
+"CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o" \
 "CMakeFiles/dungeon_master.dir/main.cpp.o"
 
 # External object files for target dungeon_master
@@ -122,11 +137,11 @@ dungeon_master_EXTERNAL_OBJECTS =
 
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Game/Game.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/Player/Player.cpp.o
+src/dungeon_master: src/CMakeFiles/dungeon_master.dir/TextureManager/TextureManager.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/main.cpp.o
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/build.make
-src/dungeon_master: /opt/homebrew/Cellar/sdl2/2.32.4/lib/libSDL2.dylib
 src/dungeon_master: src/CMakeFiles/dungeon_master.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable dungeon_master"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/dungeon_master/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable dungeon_master"
 	cd /Users/dungeon_master/build/src && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/dungeon_master.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
