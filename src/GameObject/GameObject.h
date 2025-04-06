@@ -3,9 +3,11 @@
 #include "SDL2/SDL.h"
 #include "SDL2/SDL_image.h"
 
+#include "Game/Game.h"
+
 class GameObject {
 public:
-    GameObject(const char* texturesheet, SDL_Renderer* renderer, int x, int y);
+    GameObject(const char* texturesheet, int x, int y);
     ~GameObject();
 
     void Update();
@@ -19,5 +21,4 @@ private:
     SDL_Texture *objTexture;
     SDL_Rect srcRect;
     SDL_Rect destRect;
-    SDL_Renderer *renderer;
 };

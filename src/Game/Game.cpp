@@ -5,6 +5,8 @@
 
 GameObject *playerObject = nullptr;
 
+SDL_Renderer* Game::renderer = nullptr;
+
 Game::Game() {
 
 }
@@ -38,7 +40,7 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         isRunning = true;
     }
 
-    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", renderer, 0, 0);
+    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", 0, 0);
 }
 
 void Game::handleEvents() {

@@ -387,7 +387,6 @@ src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o: \
   /opt/homebrew/include/SDL2/SDL_version.h \
   /opt/homebrew/include/SDL2/begin_code.h \
   /opt/homebrew/include/SDL2/close_code.h \
-  /Users/dungeon_master/src/TextureManager/TextureManager.h \
   /Users/dungeon_master/src/Game/Game.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/iostream \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/ios \
@@ -1025,4 +1024,5 @@ src/CMakeFiles/dungeon_master.dir/GameObject/GameObject.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__format/formatter_string.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/__format/formatter_tuple.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/c++/v1/print \
-  /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/unistd.h
+  /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk/usr/include/unistd.h \
+  /Users/dungeon_master/src/TextureManager/TextureManager.h
