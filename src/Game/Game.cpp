@@ -2,11 +2,15 @@
 #include "TextureManager/TextureManager.h"
 #include "GameObject/GameObject.h"
 #include "Map/Map.h"
+#include "ECS/ECS.h"
+#include "Components/Position.h"
 
 SDL_Renderer* Game::renderer = nullptr;
 
 GameObject *playerObject = nullptr;
 Map *map = nullptr;
+Manager manager;
+auto& newPlayer(manager.addEntity());
 
 Game::Game() {
 
@@ -41,8 +45,10 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
         isRunning = true;
     }
 
-    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", 0, 0);
     map = new Map();
+    playerObject = new GameObject("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png", 0, 0);
+    newPlayer.addComponent<Position>();
+    newPlayer.getComponent<Position>().setPos(100, 100);
 }
 
 void Game::handleEvents() {
@@ -70,6 +76,7 @@ void Game::handleEvents() {
 
 void Game::update() {
     playerObject->Update();
+    manager.update();
 }
 
 void Game::render() {

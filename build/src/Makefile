@@ -131,6 +131,30 @@ dungeon_master/fast:
 	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/build
 .PHONY : dungeon_master/fast
 
+Components/Position.o: Components/Position.cpp.o
+.PHONY : Components/Position.o
+
+# target to build an object file
+Components/Position.cpp.o:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.o
+.PHONY : Components/Position.cpp.o
+
+Components/Position.i: Components/Position.cpp.i
+.PHONY : Components/Position.i
+
+# target to preprocess a source file
+Components/Position.cpp.i:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.i
+.PHONY : Components/Position.cpp.i
+
+Components/Position.s: Components/Position.cpp.s
+.PHONY : Components/Position.s
+
+# target to generate assembly for a file
+Components/Position.cpp.s:
+	cd /Users/dungeon_master/build && $(MAKE) $(MAKESILENT) -f src/CMakeFiles/dungeon_master.dir/build.make src/CMakeFiles/dungeon_master.dir/Components/Position.cpp.s
+.PHONY : Components/Position.cpp.s
+
 Game/Game.o: Game/Game.cpp.o
 .PHONY : Game/Game.o
 
@@ -284,6 +308,9 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... dungeon_master"
+	@echo "... Components/Position.o"
+	@echo "... Components/Position.i"
+	@echo "... Components/Position.s"
 	@echo "... Game/Game.o"
 	@echo "... Game/Game.i"
 	@echo "... Game/Game.s"
