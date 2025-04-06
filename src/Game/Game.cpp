@@ -4,8 +4,11 @@
 #include "Map/Map.h"
 #include "Vector2D/Vector2D.h"
 
+// Global variables
 SDL_Renderer* Game::renderer = nullptr;
+SDL_Event Game::event;
 
+// Initialization of static variables
 Map *map = nullptr;
 Manager manager;
 auto& player(manager.addEntity());
@@ -48,17 +51,16 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     // Create player
     player.addComponent<Transform>(300, 50);
     player.addComponent<Sprite>("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png");
+    player.addComponent<KeyboardController>();
 }
 
 void Game::handleEvents() {
-    SDL_Event e;
-    SDL_PollEvent(&e);
+    SDL_PollEvent(&event);
 
-    switch (e.type) {
+    switch (event.type) {
         case SDL_QUIT:
             isRunning = false;
             break;
-
         default:
             break;
     }
@@ -67,8 +69,6 @@ void Game::handleEvents() {
 void Game::update() {
     manager.refresh();
     manager.update();
-
-    player.getComponent<Transform>().position += Vector2D(0, 1);
 }
 
 void Game::render() {

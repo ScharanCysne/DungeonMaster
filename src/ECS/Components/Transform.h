@@ -9,6 +9,8 @@ public:
     Transform(float x, float y);
 
     Vector2D position;
+    Vector2D velocity;
+    int speed;
 
     void init() override;
     void update() override;
