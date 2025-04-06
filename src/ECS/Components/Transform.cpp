@@ -1,13 +1,19 @@
 #include "Transform.h"
 
-void Transform::init() {}
-
-void Transform::update() {
-    xPos++;
-    yPos++;
+Transform::Transform() {
+    position.x = 0.0f;
+    position.y = 0.0f;
 }
 
-void Transform::setPos(int x, int y) {
-    xPos = x;
-    yPos = y;
+Transform::Transform(float x, float y) {
+    position.x = x;
+    position.y = y;
+}
+
+void Transform::init() {
+
+}
+
+void Transform::update() {
+
 }

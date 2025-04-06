@@ -1,7 +1,8 @@
 #include "Game.h"
 #include "TextureManager/TextureManager.h"
-#include "Map/Map.h"
 #include "ECS/Components/Components.h"
+#include "Map/Map.h"
+#include "Vector2D/Vector2D.h"
 
 SDL_Renderer* Game::renderer = nullptr;
 
@@ -58,15 +59,6 @@ void Game::handleEvents() {
             isRunning = false;
             break;
 
-        // case SDL_KEYDOWN:
-        //     switch (e.key.keysym.sym) {
-        //         case SDLK_w: playerObject.y -= playerObject.speed; break;
-        //         case SDLK_s: playerObject.y += playerObject.speed; break;
-        //         case SDLK_a: playerObject.x -= playerObject.speed; break;
-        //         case SDLK_d: playerObject.x += playerObject.speed; break;
-        //     }
-        //     break;
-
         default:
             break;
     }
@@ -75,6 +67,8 @@ void Game::handleEvents() {
 void Game::update() {
     manager.refresh();
     manager.update();
+
+    player.getComponent<Transform>().position += Vector2D(0, 1);
 }
 
 void Game::render() {

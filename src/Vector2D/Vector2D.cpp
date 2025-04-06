@@ -50,19 +50,19 @@ Vector2D& operator/(Vector2D &v1, const Vector2D &v2) {
     return v1.Divide(v2);
 }
 
-Vector2D& Vector2D::operator+=(Vector2D &v) {
+Vector2D& Vector2D::operator+=(const Vector2D &v) {
     return this->Add(v);
 }
 
-Vector2D& Vector2D::operator-=(Vector2D &v) {
+Vector2D& Vector2D::operator-=(const Vector2D &v) {
     return this->Subtract(v);
 }
 
-Vector2D& Vector2D::operator*=(Vector2D &v) {
+Vector2D& Vector2D::operator*=(const Vector2D &v) {
     return this->Multiply(v);
 }
 
-Vector2D& Vector2D::operator/=(Vector2D &v) {
+Vector2D& Vector2D::operator/=(const Vector2D &v) {
     return this->Divide(v);
 }
 
