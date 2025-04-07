@@ -8,6 +8,7 @@ class Sprite : public Component {
 public:
     Sprite() = default;
     Sprite(const char* path);
+    ~Sprite();
 
     void init() override;
     void draw() override;

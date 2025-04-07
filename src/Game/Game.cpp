@@ -3,6 +3,7 @@
 #include "ECS/Components/Components.h"
 #include "Map/Map.h"
 #include "Vector2D/Vector2D.h"
+#include "Collision/Collision.h"
 
 // Global variables
 SDL_Renderer* Game::renderer = nullptr;
@@ -11,7 +12,9 @@ SDL_Event Game::event;
 // Initialization of static variables
 Map *map = nullptr;
 Manager manager;
+
 auto& player(manager.addEntity());
+auto& wall(manager.addEntity());
 
 Game::Game() {
 
@@ -52,6 +55,11 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
     player.addComponent<Transform>(300, 50);
     player.addComponent<Sprite>("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png");
     player.addComponent<KeyboardController>();
+    player.addComponent<Collider>("Player");
+
+    wall.addComponent<Transform>(300, 300, 64, 64, 1);
+    wall.addComponent<Sprite>("Shoom/PNGs/Shoom_Pop/Shoom_Pop1.png");
+    wall.addComponent<Collider>("Wall");
 }
 
 void Game::handleEvents() {
@@ -69,6 +77,13 @@ void Game::handleEvents() {
 void Game::update() {
     manager.refresh();
     manager.update();
+
+    if(Collision::AABB(
+        player.getComponent<Collider>().collider,
+        wall.getComponent<Collider>().collider
+    )) {
+        std::cout << "Hit!" << std::endl;
+    }
 }
 
 void Game::render() {
