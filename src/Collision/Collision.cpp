@@ -1,4 +1,5 @@
 #include "Collision.h"
+#include "ECS/Components/Collider.h"
 
 bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB) {
     return (
@@ -7,6 +8,10 @@ bool Collision::AABB(const SDL_Rect& rectA, const SDL_Rect& rectB) {
         rectA.y + rectA.h >= rectB.y &&
         rectA.y <= rectB.y + rectB.h
     );
+}
+
+bool Collision::AABB(const Collider& collA, const Collider& collB) {
+    return AABB(collA.collider, collB.collider);
 }
 
 bool Collision::PointInRect(int x, int y, const SDL_Rect& rect) {

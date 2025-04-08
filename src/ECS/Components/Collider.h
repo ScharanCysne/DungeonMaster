@@ -4,6 +4,7 @@
 #include "SDL2/SDL.h"
 #include "ECS/ECS.h"
 #include "Transform.h"
+#include "Game/Game.h"
 
 class Collider : public Component {
 public:

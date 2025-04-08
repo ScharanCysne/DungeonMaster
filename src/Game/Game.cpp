@@ -8,13 +8,18 @@
 // Global variables
 SDL_Renderer* Game::renderer = nullptr;
 SDL_Event Game::event;
+std::vector<Collider*> Game::colliders;
 
 // Initialization of static variables
 Map *map = nullptr;
 Manager manager;
 
-auto& player(manager.addEntity());
-auto& wall(manager.addEntity());
+auto& player = manager.addEntity();
+auto& wall = manager.addEntity();
+
+auto& tile0 = manager.addEntity();
+auto& tile1 = manager.addEntity();
+auto& tile2 = manager.addEntity();
 
 Game::Game() {
 
@@ -51,15 +56,18 @@ void Game::init(const char* title, int xpos, int ypos, int width, int height, bo
 
     map = new Map();
 
+    // Create tiles
+    tile0.addComponent<Tile>(0, 0, 64, 64, 0);
+    tile1.addComponent<Tile>(64, 0, 64, 64, 1);
+    tile2.addComponent<Tile>(128, 0, 64, 64, 2);
+
+    tile0.addComponent<Collider>("Pop");
+
     // Create player
     player.addComponent<Transform>(300, 50);
     player.addComponent<Sprite>("Shoom/PNGs/Shoom_Idle/Shoom_Idle1.png");
     player.addComponent<KeyboardController>();
     player.addComponent<Collider>("Player");
-
-    wall.addComponent<Transform>(300, 300, 64, 64, 1);
-    wall.addComponent<Sprite>("Shoom/PNGs/Shoom_Pop/Shoom_Pop1.png");
-    wall.addComponent<Collider>("Wall");
 }
 
 void Game::handleEvents() {
@@ -78,12 +86,11 @@ void Game::update() {
     manager.refresh();
     manager.update();
 
-    if(Collision::AABB(
-        player.getComponent<Collider>().collider,
-        wall.getComponent<Collider>().collider
-    )) {
-        player.getComponent<Transform>().velocity *= -1;
-        std::cout << "Hit!" << std::endl;
+    for (auto& cc : colliders) {
+        if(Collision::AABB(player.getComponent<Collider>(), *cc)) {
+            player.getComponent<Transform>().velocity *= -1;
+            std::cout << "Hit!" << std::endl;
+        }
     }
 }
 

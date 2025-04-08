@@ -13,6 +13,8 @@ void Collider::init() {
         entity->addComponent<Transform>();
 
     transform = &entity->getComponent<Transform>();
+
+    Game::colliders.push_back(this);
 }
 
 void Collider::update() {
