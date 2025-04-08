@@ -16,8 +16,8 @@ void Collider::init() {
 }
 
 void Collider::update() {
-    collider.x = (int) transform->position.x;
-    collider.y = (int) transform->position.y;
-    collider.w = (int) transform->width * transform->scale;
-    collider.h = (int) transform->height * transform->scale;
+    collider.x = static_cast<int>(transform->position.x);
+    collider.y = static_cast<int>(transform->position.y);
+    collider.w = static_cast<int>(transform->width * transform->scale);
+    collider.h = static_cast<int>(transform->height * transform->scale);
 }

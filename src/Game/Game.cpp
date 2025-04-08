@@ -82,6 +82,7 @@ void Game::update() {
         player.getComponent<Collider>().collider,
         wall.getComponent<Collider>().collider
     )) {
+        player.getComponent<Transform>().velocity *= -1;
         std::cout << "Hit!" << std::endl;
     }
 }

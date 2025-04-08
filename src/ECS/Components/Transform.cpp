@@ -1,8 +1,7 @@
 #include "Transform.h"
 
 Transform::Transform() {
-    position.x = 0.0f;
-    position.y = 0.0f;
+    position.zero();
 }
 
 Transform::Transform(float x, float y) {
@@ -19,8 +18,7 @@ Transform::Transform(float x, float y, int h, int w, int s) {
 }
 
 void Transform::init() {
-    velocity.x = 0.0f;
-    velocity.y = 0.0f;
+    velocity.zero();
 
     speed = 5;
     height = 64;

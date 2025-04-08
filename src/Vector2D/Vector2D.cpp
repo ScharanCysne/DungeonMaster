@@ -1,8 +1,7 @@
 #include "Vector2D.h"
 
 Vector2D::Vector2D() {
-    this->x = 0.0f;
-    this->y = 0.0f;
+    this->zero();
 }
 
 Vector2D::Vector2D(float x, float y) {
@@ -69,4 +68,43 @@ Vector2D& Vector2D::operator/=(const Vector2D &v) {
 std::ostream& operator<<(std::ostream &stream, const Vector2D &v) {
     stream << "(" << v.x << "," << v.y << ")";
     return stream;
+}
+
+Vector2D& Vector2D::operator*(const int &i) {
+    Vector2D *v = new Vector2D(this->x * i, this->y * i);
+    return *v;
+}
+
+Vector2D& Vector2D::operator*=(const int &i) {
+    this->x *= i;
+    this->y *= i;
+    return *this;
+}
+
+Vector2D& Vector2D::operator/(const int &i) {
+    Vector2D *v = new Vector2D(this->x / i, this->y / i);
+    return *v;
+}
+
+Vector2D& Vector2D::operator/=(const int &i) {
+    this->x /= i;
+    this->y /= i;
+    return *this;
+}
+
+Vector2D& Vector2D::zero() {
+    this->x = 0.0f;
+    this->y = 0.0f;
+    return *this;
+}
+
+Vector2D& Vector2D::normalize() {
+    float magnitude = sqrt((this->x * this->x) + (this->y * this->y));
+    if (magnitude > 0) {
+        this->x /= magnitude;
+        this->y /= magnitude;
+    } else {
+        this->zero();
+    }
+    return *this;
 }
