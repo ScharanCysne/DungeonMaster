@@ -8,7 +8,7 @@ and the plan gets fixed.
 
 ### Slices
 
-The work is split into 21 slices (0–20) grouped into 4 milestones. Each slice:
+The work is split into 22 slices (0–20, plus 1b) grouped into 4 milestones. Each slice:
 
 - has one clear goal, a list of deliverables, and tests that must pass;
 - is small enough to review in one sitting;
@@ -85,6 +85,22 @@ UI, and the Episode N seed loads into them.
   LLM output (prose around JSON, missing fields, wrong enums, out-of-range numbers).
 - **Done when:** the server and client packages can import every type, and the tests
   cover every schema.
+
+### Slice 1b — Schema amendments from the literature review
+
+- **Goal:** bring the shared schemas in line with the 2026-10-26 spec amendments.
+- **Spec:** the amendment note at the top of spec.md; [literature-review.md](literature-review.md)
+  "Proposed spec changes".
+- **Deliverables:**
+  - `SUPERSEDES` edge; `retractedAtBeat?` on `KNOWS`.
+  - `create_fact.supersedes?`.
+  - `voice_npc` tool input/output.
+  - `narrate.lines[]` as NPC `{lineId}` or peer `{speaker, text}`.
+  - `temporal_contradiction` critic issue type.
+  - `beat_progress` server message (peer line | map cue).
+  - `npc_voice` model role in config, plus the new limits (`voice_npc` per beat, tool
+    calls on an `unbacked_outcome` retry).
+- **Tests:** valid and invalid cases for every changed schema, in the existing style.
 
 ### Slice 2 — Engine core
 
@@ -223,7 +239,8 @@ text-only CLI before any UI exists.
   - `ToolDefinition` and the registry.
   - zod → JSON Schema conversion for tool definitions.
   - Engine tools wrapping slice 2–3 commands.
-  - Soft-state tools (`set_attitude`, `share_fact`, `create_fact`, `set_quest_status`).
+  - Soft-state tools (`set_attitude`, `share_fact`, `create_fact` with the
+    `questCritical` guard and `supersedes`, `set_quest_status`).
   - The `narrate` terminal tool.
   - Limit enforcement in the handlers.
   - Parse failures returned as `is_error` results with messages that name the bad value.
@@ -268,14 +285,17 @@ text-only CLI before any UI exists.
 
 ### Slice 11 — Peers and critic
 
-- **Goal:** peer agents with their own agendas, and the fidelity critic.
+- **Goal:** peer agents with their own agendas, NPC voices, and the fidelity critic.
 - **Spec:** §3 Peer agent, Critic; §2 leak check.
 - **Deliverables:**
   - Peer prompt (versioned) built from the knowledge slice.
   - `PeerTurn` parsing (invalid → pass).
   - The rotation (max 2 per beat, priority rules, nudge after 3 passes).
-  - Critic deterministic pre-check plus the LLM verdict.
-  - The retry-once flow and the neutral-summary fallback built from events.
+  - The `voice_npc` tool and NPC voice prompt (sees only the NPC's knowledge slice).
+  - Critic deterministic pre-check (including unspent receipts and `lineId` checks)
+    plus the claim-by-claim LLM verdict.
+  - The retry-once flow (up to 2 tool calls for `unbacked_outcome`) and the
+    neutral-summary fallback built from events.
 - **Tests:** rotation priority; invalid peer output → pass; each pre-check rule; the
   critic retry → fallback flow; **leak tests** for every peer and NPC in the seed.
 - **Your checkpoint:** you review the peer and critic prompts together with the DM

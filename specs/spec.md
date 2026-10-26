@@ -1,6 +1,6 @@
 # Dungeon — Episode N Design Spec
 
-Status: approved (2026-10-24).
+Status: approved (2026-10-24). Amended 2026-10-26 after the [literature review](literature-review.md).
 
 ## Contents
 
@@ -231,6 +231,7 @@ Browser                         Node server                               Docker
 | DM | Strong (Opus-class) | 1 tool loop, up to 8 tool calls; +1 retry if the critic rejects |
 | Peer intent | Fast (Haiku-class) | 1 per peer whose turn it is |
 | Generators (item, npc, story) | Fast, or mid-tier for story | 0..n, only when the DM calls them |
+| NPC voice | Fast | 1 per speaking NPC (via `voice_npc`) |
 | Critic | Fast | 1 (+1 after a retry) |
 
 Model ids live in one config file; changing a tier is a config change, not a code
@@ -245,16 +246,24 @@ so prompt caching can reuse it across beats.
 2. **Peer intents.** Each peer gets a short call with its knowledge slice, the player's
    intent and what just happened. It returns either `{intent}` or `{pass}`. Peers act
    in a fixed rotation, at most one or two per beat for Episode N, so turns stay fast.
+   A peer's spoken `say` line is sent to the client straight away as a provisional
+   `beat_progress` message (see [Mid-beat feedback](#mid-beat-feedback)).
 3. **DM tool loop.** The DM receives its context (ground truth around the player,
    recent events, all intents) and runs a tool-use loop. Each tool call is validated
    against its zod schema and executed by the engine or a generator. The result (facts
    + events) goes back to the DM. The loop is capped at 8 tool calls.
-4. **Narrate.** The DM ends the beat by calling `narrate {text, speaker_lines[]}`. If it
-   hits the cap without narrating, it is asked once more to narrate only.
+4. **Narrate.** The DM ends the beat by calling `narrate {text, lines[]}`. NPC dialogue
+   in `lines[]` must reference lines produced this beat by `voice_npc` (see
+   [NPC voices](#npc-voices)); the DM never writes an NPC's words itself. If the DM hits
+   the cap without narrating, it gets one more turn with the same tools and
+   `tool_choice: auto`, plus an instruction to narrate now. Changing `tool_choice` would
+   invalidate the prompt cache.
 5. **Critic.** A fast model receives the narration and the facts produced this beat,
    plus the ground-truth state of every entity mentioned. It returns
-   `{ok: true}` or `{ok: false, contradictions[]}`. On a rejection, the DM gets one
-   retry of the narration only (no new tool calls), with the contradictions attached.
+   `{ok: true}` or `{ok: false, issues[]}`. On a rejection, the DM gets one retry with
+   the issues attached. The retry is narration-only, except for `unbacked_outcome`
+   issues, where it may make up to 2 more tool calls (still validated by the engine)
+   so a missing state change can be made rather than just deleted.
    If the retry is also rejected, the narration is replaced by a neutral summary built
    from the events, and the incident is flagged in the beat trace.
 6. **Commit.** Events buffered during the beat are appended to the event log and
@@ -300,6 +309,7 @@ All messages are JSON, validated with zod on both ends.
 | S→C | `world_snapshot` | entities visible to the player, map id, party, inventory, recent narration |
 | C→S | `player_intent` | `{selection: EntityId[], text: string}` |
 | S→C | `beat_started` | `{beat}`, so the UI can show a "DM is thinking" state |
+| S→C | `beat_progress` | Provisional, uncommitted feedback during a beat: a peer's spoken line, or a map cue (a character turns to look at something). Never rolls, movement or narration |
 | S→C | `beat_result` | `{beat, events, narration, rolls, traceId}`. `events` contains only events the player witnessed (plus a ground-truth overlay in dev mode) |
 | S→C | `episode_ended` | `{beat, holder: EntityId, summary}` |
 | C→S | `debug_request` | `{kind: 'trace'\|'knowledge'\|'graph', target?}` |
@@ -451,7 +461,8 @@ payload stays in the event log.
 | `HAS_SECRET` | Character → Fact | | graph | seed, `generate_npc` |
 | `ABOUT` | Fact → any node | | graph | whoever creates the fact |
 | `ORIGIN_OF` | Fact → Item \| Character | | graph | `generate_item`, `generate_npc` |
-| `KNOWS` | Character → Fact | `since` (beat), `source` (`seed \| witnessed \| told \| deduced \| read`), `confidence` (0–1) | graph | seed, `share_fact`, perception |
+| `KNOWS` | Character → Fact | `since` (beat), `source` (`seed \| witnessed \| told \| deduced \| read`), `confidence` (0–1), `retractedAtBeat?` | graph | seed, `share_fact`, perception |
+| `SUPERSEDES` | Fact → Fact | | graph | `create_fact`, `generate_story` (a new fact that corrects or replaces an older one) |
 | `WITNESSED` | Character → Event | | engine | perception rule on commit |
 | `INVOLVES` | Event → any node | `role` (`actor \| target \| item \| location`) | engine | on commit |
 
@@ -504,6 +515,9 @@ one record:
 `witnesses` is computed by the perception rule at commit time and stored, so replay
 never has to recompute it.
 
+Projection is idempotent: every graph write is a `MERGE` keyed on the event id
+(`event:<beat>-<seq>`), so retrying a projection never duplicates anything.
+
 A beat is committed atomically. Its events are appended with one write and an
 `fsync`, followed by a `BeatCommitted` marker. On replay, a beat without its marker is
 discarded. Neo4j projection happens after the log write; if it fails, the log is still
@@ -527,7 +541,7 @@ correct and the projection is retried or rebuilt.
 | `CombatStarted` / `CombatEnded` | hard | `Event` node |
 | `EntityCreated` | both | New node + edges (from a generator) |
 | `FactCreated` | soft | `Fact` node + `ABOUT` / `ORIGIN_OF` |
-| `FactLearned` | soft | `KNOWS` edge |
+| `FactLearned` | soft | `KNOWS` edge. If the learned fact `SUPERSEDES` a fact the character already knows, the old `KNOWS` edge gets `retractedAtBeat` |
 | `AttitudeChanged` | soft | Upsert `ATTITUDE` |
 | `QuestStatusChanged` | soft (episode quest: hard) | Update `status` |
 | `NarrationCommitted` | — | `Event` node with narration summary |
@@ -574,19 +588,20 @@ Every agent prompt is built from one of three queries. The per-agent knowledge v
 the debug panel calls the same functions, so what you see is exactly what the agent was
 given.
 
-**Knowledge slice** (peers and NPCs):
+**Knowledge slice** (peers and NPCs). Three queries, run in one read transaction; they
+can't be combined with `UNION` because they return different columns:
 
 ```cypher
-// Facts the character knows
+// 1. Facts the character knows (retracted ones are rendered as "used to believe")
 MATCH (c:Character {id: $id})-[k:KNOWS]->(f:Fact)
 RETURN f, k
-UNION
-// Recent events they witnessed
+
+// 2. Recent events they witnessed
 MATCH (c:Character {id: $id})-[:WITNESSED]->(e:Event)
 WHERE e.beat >= $sinceBeat
 RETURN e ORDER BY e.beat DESC, e.seq DESC LIMIT $recent
-UNION
-// What they can see right now
+
+// 3. What they can see right now
 MATCH (c:Character {id: $id})-[:LOCATED_IN]->(room:Location)<-[:LOCATED_IN]-(x)
 WHERE coalesce(x.hidden, false) = false
 RETURN x
@@ -697,9 +712,12 @@ Deliberately left out of the Episode N graph:
 
 - **Time:** no in-world clock, day/night or calendar. Beats are the only timeline.
 - **Space:** a single building; no regions, routes or travel edges.
-- **History:** facts can't be versioned. A fact that stops being true is replaced by a
-  new fact, not given a validity interval.
-- **Retrieval:** no embeddings or semantic search. Context is built only from graph
+- **History:** no validity intervals on facts. A correcting fact `SUPERSEDES` the old
+  one and retracts the old `KNOWS` edges as characters learn it (a scaled-down version
+  of Zep's edge invalidation); a full bi-temporal model comes later.
+- **Forking:** no "fork from beat N" for replaying a session's history with changed
+  prompts. Planned after Episode N.
+- **Retrieval:** no embeddings or semantic search (hybrid BM25 + graph retrieval is the planned next step). Context is built only from graph
   queries.
 - **Relationships:** a single numeric `ATTITUDE`. No reputation, debts or bonds as
   first-class nodes.
@@ -717,17 +735,22 @@ new projections without migrating stored history.
 
 | Agent | Tier | Sees | Can do |
 |---|---|---|---|
-| **DM** | Strong | Ground truth around the party, all intents, recent events, the knowledge slice of every NPC present | Call engine, soft-state, generator and terminal tools. Voices every NPC. |
+| **DM** | Strong | Ground truth around the party, all intents, recent events, the knowledge slice of every NPC present | Call engine, soft-state, generator, `voice_npc` and terminal tools. Decides when NPCs speak and what they're after, but never writes their words. |
+| **NPC voice** | Fast | One NPC's knowledge slice, persona and the DM's direction only | Return one line of dialogue for that NPC |
 | **Peer** (×3) | Fast | Its own knowledge slice only | Return one intent or pass. No tools. |
 | **Item / NPC / Feature generator** | Fast | The DM's brief plus a small graph excerpt | Return one schema-valid entity with its backstory facts |
 | **Story generator** | Mid | The DM's brief plus related facts | Return new facts consistent with existing lore |
 | **Critic** | Fast | Narration, this beat's events, ground truth of mentioned entities, the player's and speaking NPCs' knowledge | Return OK or a list of issues |
 
-NPCs are not separate agents in Episode N. The DM voices them, but each line of NPC
-dialogue is tagged with its speaker, and the critic checks those lines against that
-NPC's knowledge slice (see [Critic](#critic)). This keeps the call count per beat low
-while still preventing NPCs from knowing things they shouldn't. Promoting key NPCs to
-full agents is a later step.
+#### NPC voices
+
+NPCs are not full agents in Episode N, but they speak through their own calls. The DM
+calls `voice_npc {npc, direction}` with what the NPC is trying to do ("Brann deflects,
+hints at the old stock"). A fast model that sees **only that NPC's knowledge slice and
+persona** writes the line. The DM can't leak what the NPC doesn't know, because the
+call that writes the words never sees it. Prompted secrecy leaks often (39–57% in
+ConfAIde); isolation does not. The critic still checks the line. Promoting key NPCs
+to full agents with their own intents is a later step.
 
 ### Tool registry
 
@@ -771,6 +794,8 @@ Rules that apply to every tool call:
 | Rarity of generated items | `rare` at most (seed items are exempt) |
 | Value of generated items | 500 gp at most |
 | Attitude change per call | −30..+30 |
+| `voice_npc` calls per beat | 4 (not counted toward the tool-call cap) |
+| Tool calls on a critic retry | 0, or 2 for `unbacked_outcome` |
 
 Limits live in one config object and are enforced by the handlers, not by prompts.
 They are deliberately loose for Episode N, to see what the DM does with room to
@@ -806,7 +831,7 @@ The engine refuses to move a `questCritical` item except through an actor-driven
 |---|---|---|---|
 | `set_attitude` | `from`, `to`, `delta`, `reason` | Both characters exist; delta within limits | `AttitudeChanged` |
 | `share_fact` | `from?`, `to[]`, `factId`, `source` (`told\|deduced\|read\|witnessed`) | The fact exists; `from` knows it (if given); recipients are present | `FactLearned` per recipient |
-| `create_fact` | `statement`, `truth`, `kind` (`rumour\|observation\|lore`), `about[]`, `knownBy[]` | Referenced entities exist; `kind` is not `secret` or `backstory` (those come from generators) | `FactCreated`, `FactLearned` |
+| `create_fact` | `statement`, `truth`, `kind` (`rumour\|observation\|lore`), `about[]`, `knownBy[]`, `supersedes?` (fact id) | Referenced entities exist; `kind` is not `secret` or `backstory` (those come from generators); **`about` may not include a `questCritical` entity**: facts about the quill come only from the seed, so the DM can share them but not invent them | `FactCreated`, `FactLearned` |
 | `set_quest_status` | `quest`, `status` | Personal quests only; the episode quest is closed by the engine | `QuestStatusChanged` |
 
 `create_fact` is how the DM writes story freely, as agreed: rumours, observations and
@@ -826,25 +851,35 @@ by the critic, not by the engine.
 
 | Tool | Input | Effect |
 |---|---|---|
-| `narrate` | `text` (≤ 180 words, second person for the player), `lines[]` (`{speaker: EntityId, text, private?}`), `mood?` (`calm\|tense\|comic\|ominous`) | Ends the tool loop and hands off to the critic |
+| `voice_npc` | `npc`, `direction` (what the NPC is trying to do or say, ≤ 40 words) | Returns `{lineId, text}`, written by the NPC voice agent from the NPC's knowledge slice. Doesn't count toward the tool cap; at most 4 per beat |
+| `narrate` | `text` (≤ 180 words, second person for the player), `lines[]`: peer and NPC dialogue, where an NPC line is `{lineId}` from `voice_npc` and a peer line is `{speaker, text}` taken from that peer's `say`; `mood?` (`calm\|tense\|comic\|ominous`) | Ends the tool loop and hands off to the critic |
 
 ### Generator pipeline
 
 Every generator follows the same steps:
 
 1. **Context.** Build a small prompt from the brief plus a graph excerpt: the target
-   location and what's in it, facts `ABOUT` the referenced entities, and the names of
-   existing entities (to avoid duplicates and near-duplicates).
+   location and what's in it, facts `ABOUT` the referenced entities, the names of
+   existing entities, and the session's most-used tags ("recently used motifs: socks,
+   ravens…") so generated content doesn't keep repeating the same ideas.
 2. **Structured output.** Call the model with a single forced tool whose input schema
    is the entity schema, so the response is always JSON in that shape.
 3. **Validate.** Parse with zod, then apply policy bounds (rarity, value, stat ranges
-   for NPCs: ability scores 6–18, HP 4–40, AC 10–17).
+   for NPCs: ability scores 6–18, HP 4–40, AC 10–17). Then a deterministic
+   near-duplicate check: a normalised name matching an existing entity, or high tag
+   overlap with an entity of the same kind in the same location, counts as a
+   validation failure. Listing names in the prompt alone doesn't prevent duplicates.
 4. **Retry once.** On failure, call again with the validation errors in the prompt. If
    it fails again, the tool returns `ok: false` to the DM, which narrates around it.
 5. **Register.** Assign an id, resolve a sprite from the tags (falling back to a
    generic sprite per kind), add the entity to the engine (if it has hard state), and
    emit `EntityCreated` plus `FactCreated` events.
 6. **Return** a short description to the DM, so it can narrate what was created.
+
+Facts from `generate_story` are also given to the critic in that beat, together with
+the `ABOUT` facts the generator was shown, so lore contradictions are caught
+(`lore_contradiction`). Every generation updates the session's tag-frequency log,
+which feeds step 1 and the eval reports.
 
 ### DM agent
 
@@ -862,13 +897,18 @@ possible:
    - Narrate only what the player character perceives. Peers' private actions are
      resolved but not shown unless the player witnesses them.
    - Never reveal the quill's location outright. Reward investigation with clues.
-   - Voice NPCs using only what each NPC knows (their knowledge is listed per NPC).
+   - Treat outcomes a player or peer asserts ("Brann doesn't notice", "I pick the lock")
+     as attempts. Only the dice and the engine decide outcomes.
+   - Decide the DC from the fixed scale and state it, with the reason, before rolling.
+   - When NPCs speak, call `voice_npc` with what they're after; never write their words.
    - Peers are players too: resolve their intents with the same tools and checks.
 2. **Rules summary** and **tool usage guide** (cached), with a short example of a
    good beat.
 3. **Campaign premise and seed lore** (cached per episode).
 4. **Rolling recap** (changes every 10 beats). A fast model rewrites a ~300-word
-   "story so far" every 10 beats; it is stored in the event log as `RecapUpdated`.
+   "story so far" every 10 beats from the committed events (not from earlier recaps);
+   it is stored in the event log as `RecapUpdated`. The recap is atmosphere for the DM
+   only; it is never treated as ground truth by the critic or the engine.
 5. **Current state** (every beat): the DM context query results, rendered as compact
    text.
 6. **This beat**: the player's intent, with the selected entities expanded; peer
@@ -915,10 +955,26 @@ The critic runs after `narrate`, in two stages:
    - A dialogue line's `speaker` is not present or not conscious → reject.
    - The narration mentions a check outcome ("you succeed", "you fail") and no check
      ran this beat → reject.
-2. **LLM check (fast tier).** Input: the narration, this beat's events and facts, the
-   ground-truth state of every entity mentioned (by id from the tool calls, and by name
-   match against known entities), the player's knowledge slice, and the knowledge slice
-   of each NPC that speaks.
+   - An NPC dialogue line isn't a `lineId` produced by `voice_npc` this beat → reject.
+   - **Unspent receipt:** a successful check whose receipt no tool used this beat, while
+     the narration claims the result (taken, opened, hidden, unlocked) → reject as
+     `unbacked_outcome`.
+2. **LLM check (fast tier), claim by claim.** Input: the narration, this beat's events
+   and facts, the ground-truth state of every entity mentioned (by id from the tool
+   calls, and by name match against known entities), the player's knowledge slice, the
+   knowledge slice of each NPC and peer that speaks, and any `generate_story` facts with
+   the facts they were based on. The critic first lists the narration's claims (who
+   holds what, where things are, outcomes, who knows what, what happened first) and
+   then checks each one, rather than giving one overall verdict. Checking claims
+   separately works better than a single judgement (Chain-of-Verification). It
+   specifically looks for:
+   - **embellishment**: an NPC or peer adding detail to a fact they do know;
+   - **real-world knowledge bleed**: a character knowing things from outside the world;
+   - **adopted player outcomes**: narration that treats an outcome the player asserted
+     as fact without a check;
+   - **peer self-leak**: a peer revealing one of its own secrets. That isn't rejected
+     (peers may confide); instead it becomes a `FactLearned` for the witnesses and is
+     flagged in the trace.
 
    Output (forced tool):
 
@@ -926,12 +982,14 @@ The critic runs after `narrate`, in two stages:
    type CriticVerdict =
      | { ok: true }
      | { ok: false; issues: { type: 'state_contradiction' | 'unbacked_outcome' | 'invented_content'
-                                     | 'perspective_leak' | 'npc_knowledge_leak' | 'lore_contradiction';
+                                     | 'perspective_leak' | 'npc_knowledge_leak' | 'lore_contradiction'
+                                     | 'temporal_contradiction';
                               quote: string; explanation: string }[] };
    ```
 
-On rejection, the DM retries the narration once (no new tool calls) with the issues
-attached. If the retry is also rejected, a neutral narration is built from event
+On rejection, the DM retries once with the issues attached. The retry is
+narration-only, except that `unbacked_outcome` issues allow up to 2 more validated
+tool calls. If the retry is also rejected, a neutral narration is built from event
 summaries and the beat is flagged in the trace. Rejected text is never shown to the
 player.
 
@@ -940,7 +998,7 @@ player.
 ```ts
 interface LlmProvider {
   complete(request: {
-    role: 'dm' | 'peer' | 'generator' | 'story' | 'critic' | 'recap';
+    role: 'dm' | 'peer' | 'npc_voice' | 'generator' | 'story' | 'critic' | 'recap';
     system: { text: string; cache: boolean }[];
     messages: LlmMessage[];
     tools?: ToolSchema[];
@@ -957,8 +1015,18 @@ interface LlmProvider {
 - **Retries:** HTTP 429, 5xx and network errors are retried twice with exponential
   backoff and jitter. That's safe because LLM calls don't change state; state changes
   only happen in tool handlers, which run once per tool call.
-- **Tracing:** a wrapper records the role, model, token usage (including cache hits),
-  latency and the full request and response into
+- **Prompt caching:**
+  - The DM's stable prefix (principles, rules, tools, seed lore) uses the **1-hour
+    cache TTL**, because players pause longer than the 5-minute default.
+  - The tool list and `tool_choice` never change within a DM loop; changing either
+    invalidates the cache.
+  - Every call logs cache read and write tokens, and the trace flags a DM call whose
+    prefix missed the cache.
+  - Prompts shorter than the model's minimum cacheable length are silently not cached,
+    so generator prompts are checked against it.
+- **Tracing:** a wrapper records the role, model, parameters, a hash of the prompt and
+  of the knowledge slice used, token usage (including cache hits), latency and the full
+  request and response into
   `data/sessions/<sessionId>/traces/beat-<n>.json`. API keys are never written to logs.
 - `AnthropicProvider` is the only file that imports `@anthropic-ai/sdk`.
   `ScriptedProvider` replays canned responses for tests.
@@ -1105,9 +1173,35 @@ zod schemas.
 - One text line (≤ 500 characters) with the chips above it. **Enter** or *Write*
   submits `player_intent {selection, text}`. Text without a selection is fine (e.g. "I
   order a round for the room").
-- While a beat is running the line is disabled and the journal shows "The Dungeon
-  Master's quill scratches…". The selection is cleared after submitting.
+- While a beat is running the line is disabled. The selection is cleared after
+  submitting.
 - **↑** recalls the previous intent for editing.
+- **Example verbs.** When chips are selected and the line is empty, the placeholder
+  suggests two or three verbs that fit the selection (e.g. a container: "search, open,
+  force"; an NPC: "ask, bribe, distract"). They come from a static table by entity kind,
+  not an LLM. This helps with the "blank canvas" problem players report in open-input
+  games.
+
+### Mid-beat feedback
+
+A beat can take 10–15 s. A passive "thinking" indicator doesn't help much; in a study
+of LLM agents, a spinner had no measurable effect while natural fillers did. So the
+wait is filled with things happening in the world:
+
+- **Peer lines.** As soon as a peer agent returns a spoken `say` line, the server sends
+  it as `beat_progress` and the journal shows it in a lighter, provisional ink. It
+  becomes normal ink when the beat commits. If the beat is rolled back, provisional
+  lines are struck through, with the pause note.
+- **Map cues.** `beat_progress` can also carry harmless cues (a character turns
+  toward the selected entity, an NPC glances up), which `MapView` plays as small
+  animations.
+- **Nothing committal.** Rolls, movement, event notes and narration still appear only
+  after commit, so a rolled-back or re-run beat never shows dice that later change.
+- If there's no peer line yet, the journal falls back to "The Dungeon Master's quill
+  scratches…".
+
+The client measures **time to first feedback** (intent sent → first `beat_progress` or
+`beat_result`) and reports it in the beat trace.
 
 ### Journal
 
@@ -1350,7 +1444,9 @@ Every bug fix comes with a test that fails before the fix and passes after it.
 ### Scenario evals
 
 `npm run eval` (all scenarios) or `npm run eval -- --scenario steal-the-key`. It
-runs against the real models and a fresh session from the Episode N seed.
+runs against the real models and a fresh session from the Episode N seed. Each scenario
+runs **3 times** by default (`--runs N`), because single runs of non-deterministic
+models are noise. Reports show pass rates per check, not a single pass/fail.
 
 **Scenario file** (`evals/scenarios/<name>.yaml`): a list of player intents (text plus
 selected ids) to play in order, an optional beat limit, and the checks to apply.
@@ -1365,7 +1461,7 @@ selected ids) to play in order, an optional beat limit, and the checks to apply.
 **Checks per scenario:** e.g. "the quill is obtained within 30 beats", "no item is
 created without a generator call", "Brann never states the quill's location".
 
-**Initial scenarios (about 15):**
+**Initial scenarios (about 17):**
 
 | Scenario | What it tests |
 |---|---|
@@ -1378,6 +1474,8 @@ created without a generator call", "Brann never states the quill's location".
 | `peer-grabs-quill` | The end condition fires when a peer holds the quill; the hook is recorded |
 | `open-everything` | Generator limits, item quality, no duplicate names |
 | `cheat-success` | "I succeed at picking the lock": the DM must still roll |
+| `assert-outcome` | "Brann doesn't notice me take the key": treated as an attempt with a check |
+| `rewrite-history` | The player insists on things that never happened ("you already gave me the key"); established facts must hold |
 | `conjure-quill` | "I find the quill in my pocket": the engine must refuse |
 | `probe-npc-knowledge` | Ask Wren about the cellar: no NPC knowledge leak |
 | `probe-peer-secret` | Ask Ilsa about her debt: she can lie or deflect, but never reveals the secret by accident |
@@ -1387,12 +1485,27 @@ created without a generator call", "Brann never states the quill's location".
 
 **Report:** `data/evals/<timestamp>/report.md` plus `report.json` with pass/fail per
 check, and metrics:
-- tool error rate
-- critic rejection and fallback rates
-- leak count
+- tool error rate, parameter-validation failure rate, generator `ok: false` rate
+- tool calls per beat compared with the cap
+- critic rejection and fallback rates, unspent-receipt count
+- leak count (NPC, peer, embellishment)
+- DC distribution (how generous the DM is)
+- fact spread: `KNOWS` edges per fact over the session
+- generated-content repetition (tag frequency) and sprite fallback rate
 - beats to the quill
-- tokens, cache hit %, cost
-- p50/p95 beat latency
+- tokens, cache hit % (DM prefix misses called out), cost
+- p50/p95 beat latency and time to first feedback
+
+**Critic calibration.** A small set of beats with human labels ("this narration
+contradicts the state" / "this is fine") is kept in `evals/critic-labels/`. Each eval
+run reports the critic's precision and recall on it, because LLM judges are much less
+reliable on single items than on aggregates. Any judge of narrative *quality* is used
+only to compare versions across many beats, never as a gate on a single beat.
+
+**Tool-selection regression cases.** `evals/tool-selection/` holds small cases (state +
+intent → expected tool calls), built from recorded traces. They run against the real
+DM in evals, and their recorded transcripts run through `ScriptedProvider` in CI, so
+tool-description changes that break tool choice show up quickly.
 
 When there's a previous report, it shows the difference, so prompt or model changes can
 be compared.
@@ -1474,8 +1587,9 @@ Episode N is done when all of these hold:
 4. The graph visibly grows during play (generated items, NPCs, facts, attitudes) and can
    be inspected in the appendix and in Neo4j Browser.
 5. Any session can be replayed beat by beat from its event log.
-6. Median beat latency is under 15 s and median session cost is under the default
-   budget, as measured by the `long-session` eval.
+6. Median beat latency is under 15 s, median time to first feedback is under 4 s, and
+   median session cost is under the default budget, as measured by the `long-session`
+   eval.
 
 ## Next steps
 
