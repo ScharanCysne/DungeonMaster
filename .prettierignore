@@ -1,0 +1,9 @@
+node_modules/
+dist/
+build/
+coverage/
+data/
+.env
+package-lock.json
+specs/
+mocks/
