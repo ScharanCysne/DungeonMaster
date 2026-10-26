@@ -33,7 +33,7 @@ export interface LogReadResult {
   droppedRecords: number;
 }
 
-function logPath(dataDir: string, sessionId: string): string {
+export function logPath(dataDir: string, sessionId: string): string {
   if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]*$/.test(sessionId))
     throw new Error(`Invalid session directory name: ${sessionId}`);
   return join(dataDir, 'sessions', sessionId, 'events.jsonl');
@@ -90,14 +90,20 @@ export async function readEventLog(
   dataDir: string,
   sessionId: string,
 ): Promise<LogReadResult> {
-  let contents: string;
   try {
-    contents = await fs.readFile(logPath(dataDir, sessionId), 'utf8');
+    return await readExistingEventLog(dataDir, sessionId);
   } catch (error) {
     if (error instanceof Error && 'code' in error && error.code === 'ENOENT')
       return { records: [], droppedRecords: 0 };
     throw error;
   }
+}
+
+export async function readExistingEventLog(
+  dataDir: string,
+  sessionId: string,
+): Promise<LogReadResult> {
+  const contents = await fs.readFile(logPath(dataDir, sessionId), 'utf8');
   const result = parseLog(contents);
   if (result.records.some((record) => record.sessionId !== sessionId))
     throw new Error(`Event log does not belong to session ${sessionId}.`);

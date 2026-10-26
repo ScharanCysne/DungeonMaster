@@ -1,5 +1,11 @@
 import type { Edge, EntityId } from '@dungeon/shared';
-import { edgeKey, matchesEdge } from './mutations.js';
+import {
+  compareEdges,
+  compareNodes,
+  edgeKey,
+  matchesEdge,
+} from './mutations.js';
+import { OntologyStoreError } from './neo4jErrors.js';
 import type { EdgeFilter, GraphMutation, GraphNode } from './mutations.js';
 import type { OntologyReader, OntologyStore } from './OntologyStore.js';
 
@@ -11,12 +17,16 @@ export class MemoryStore implements OntologyStore {
     return Promise.resolve(structuredClone(this.#nodes.get(id)));
   }
   nodes(): Promise<GraphNode[]> {
-    return Promise.resolve(structuredClone([...this.#nodes.values()]));
+    return Promise.resolve(
+      structuredClone([...this.#nodes.values()].sort(compareNodes)),
+    );
   }
   edges(filter: EdgeFilter = {}): Promise<Edge[]> {
     return Promise.resolve(
       structuredClone(
-        [...this.#edges.values()].filter((edge) => matchesEdge(edge, filter)),
+        [...this.#edges.values()]
+          .filter((edge) => matchesEdge(edge, filter))
+          .sort(compareEdges),
       ),
     );
   }
@@ -62,7 +72,10 @@ export class MemoryStore implements OntologyStore {
       case 'setNodeProps': {
         const node = this.#nodes.get(mutation.id);
         if (!node)
-          throw new Error(`Cannot update missing node ${mutation.id}.`);
+          throw new OntologyStoreError(
+            'missing_node',
+            `Cannot update missing node ${mutation.id}.`,
+          );
         this.#nodes.set(mutation.id, { ...node, ...mutation.props });
         break;
       }
@@ -71,9 +84,14 @@ export class MemoryStore implements OntologyStore {
         this.#apply({ type: 'removeEdges', filter: { touching: mutation.id } });
         break;
       case 'upsertEdge': {
-        const key = edgeKey(mutation.edge);
-        const prior = this.#edges.get(key);
         const edge = mutation.edge;
+        if (!this.#nodes.has(edge.from) || !this.#nodes.has(edge.to))
+          throw new OntologyStoreError(
+            'missing_endpoint',
+            `Cannot create ${edge.type} edge: missing endpoint (${edge.from}, ${edge.to}).`,
+          );
+        const key = edgeKey(edge);
+        const prior = this.#edges.get(key);
         if (prior) {
           edge.createdBy = prior.createdBy;
           edge.createdAtBeat = prior.createdAtBeat;

@@ -119,7 +119,7 @@ export const eventNode = {
   roll,
 };
 export const npcLine = { lineId: 'npc-line-1', text: 'Just an old box.' };
-export const peerLine = { speaker: 'char:kael', text: 'A clue.' };
+export const peerLine = { speaker: 'char:player', text: 'A clue.' };
 export const narration = {
   text: 'You spot scratches beneath the box.',
   lines: [{ lineId: npcLine.lineId }, peerLine],

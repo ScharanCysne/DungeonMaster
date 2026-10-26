@@ -16,6 +16,7 @@ export default defineConfig({
           name: 'server',
           environment: 'node',
           include: ['packages/server/src/**/*.test.ts'],
+          exclude: ['**/*.integration.test.ts'],
         },
       },
       {

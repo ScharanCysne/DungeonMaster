@@ -9,7 +9,7 @@ import { seedFixture } from '../../engine/testing/fixtures.js';
 import { MemoryStore } from '../MemoryStore.js';
 import { project } from '../projector.js';
 import type { OntologyReader } from '../OntologyStore.js';
-import { edgeKey } from '../mutations.js';
+import { compareEdges, compareNodes } from '../mutations.js';
 
 export function record<T extends GameEvent['type']>(
   type: T,
@@ -143,9 +143,7 @@ export async function seededStore(): Promise<MemoryStore> {
 }
 export async function graphSnapshot(store: OntologyReader) {
   return {
-    nodes: (await store.nodes()).sort((a, b) => a.id.localeCompare(b.id)),
-    edges: (await store.edges()).sort((a, b) =>
-      edgeKey(a).localeCompare(edgeKey(b)),
-    ),
+    nodes: (await store.nodes()).sort(compareNodes),
+    edges: (await store.edges()).sort(compareEdges),
   };
 }

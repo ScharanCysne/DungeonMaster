@@ -1,8 +1,25 @@
 import { describe, expect, it } from 'vitest';
-import { seededStore, graphSnapshot } from './testing/fixtures.js';
+import { seededStore, seedRecord } from './testing/fixtures.js';
+import { project } from './projector.js';
 
 describe('MemoryStore transactions', () => {
-  it('isolates caller-owned nodes and edges, and clears all state', async () => {
+  it('isolates stored state from caller mutation of input objects', async () => {
+    const store = await seededStore();
+    const mutations = project(seedRecord());
+    await store.apply(mutations);
+    const node = mutations.find((mutation) => mutation.type === 'upsertNode');
+    const edge = mutations.find((mutation) => mutation.type === 'upsertEdge');
+    if (!node || !edge) throw new Error('Missing seed mutations');
+    node.node.name = 'Changed externally';
+    edge.edge.createdAtBeat = 99;
+    expect((await store.getNode(node.node.id))?.name).not.toBe(
+      'Changed externally',
+    );
+    expect(
+      (await store.edges()).every((edge) => edge.createdAtBeat === 0),
+    ).toBe(true);
+  });
+  it('isolates caller-owned nodes and edges', async () => {
     const store = await seededStore();
     const node = await store.getNode('char:player');
     if (node) node.name = 'Changed externally';
@@ -10,19 +27,6 @@ describe('MemoryStore transactions', () => {
     if (edges[0]) edges[0].createdAtBeat = 99;
     expect((await store.getNode('char:player'))?.name).toBe('Player');
     expect((await store.edges({ types: ['KNOWS'] }))[0]?.createdAtBeat).toBe(0);
-    await store.clear();
-    expect(await graphSnapshot(store)).toEqual({ nodes: [], edges: [] });
-  });
-  it('rolls back the entire mutation batch on failure', async () => {
-    const store = await seededStore();
-    const before = await graphSnapshot(store);
-    await expect(
-      store.apply([
-        { type: 'setNodeProps', id: 'char:player', props: { hp: 1 } },
-        { type: 'setNodeProps', id: 'char:missing', props: { hp: 1 } },
-      ]),
-    ).rejects.toThrow('Cannot update missing node char:missing.');
-    expect(await graphSnapshot(store)).toEqual(before);
   });
   it('keeps all reads in a query on one snapshot during concurrent writes', async () => {
     const store = await seededStore();

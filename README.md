@@ -33,8 +33,21 @@ npm run lint
 npm run format
 npm run typecheck
 npm test
+npm run test:integration
+npm run graph:rebuild -- <sessionId>
 npm run build -w @dungeon/client
 ```
+
+`test:integration` loads `.env` and runs the store contract against Neo4j; it
+clears the configured graph before each test. `graph:rebuild` loads `.env`, reads
+and validates `data/sessions/<sessionId>/events.jsonl`, then connects, clears the
+graph, and projects the committed records. A missing log exits non-zero, naming
+the session and expected path, without changing the graph. An existing empty log
+clears the graph. Set
+`DUNGEON_DATA_DIR` to override the data directory (relative paths resolve from the
+repo root). Both commands require Neo4j; `npm test` does not. See the
+[ontology README](packages/server/src/ontology/README.md) for encoding, transaction
+semantics and rebuild details.
 
 The npm workspaces are `packages/shared` (protocol and future schemas),
 `packages/server` (server foundation), and `packages/client` (Vite and React).
@@ -43,5 +56,5 @@ Shared exports point directly at TypeScript source, so no shared build is requir
 See [specs/](specs/) for the source of truth and
 [the implementation plan](specs/implementation-plan.md) for slice boundaries. The
 full developer command list is in [the spec](specs/spec.md#developer-commands);
-combined server/client development, integration tests, end-to-end tests, evals,
-replay, and graph tools arrive in later slices.
+combined server/client development, end-to-end tests, evals, engine replay and
+graph verification arrive in later slices.

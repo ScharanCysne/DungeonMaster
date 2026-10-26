@@ -6,5 +6,9 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["eslint.config.js", "vitest.config.ts"]
+  "include": [
+    "eslint.config.js",
+    "vitest*.config.ts",
+    "packages/server/scripts/*.mjs"
+  ]
 }

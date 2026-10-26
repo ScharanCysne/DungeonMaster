@@ -4,9 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "graph:rebuild": "node --env-file=../../.env scripts/graph-rebuild.mjs"
   },
   "dependencies": {
-    "@dungeon/shared": "*"
+    "@dungeon/shared": "*",
+    "neo4j-driver": "^6.2.0"
   }
 }

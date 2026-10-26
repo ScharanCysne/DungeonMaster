@@ -115,5 +115,9 @@ export function projectSeed(seed: EpisodeSeed): GraphMutation[] {
         provenance,
       ),
     );
-  return mutations;
+  // Seeds can reference locations or facts declared later in the same seed.
+  return [
+    ...mutations.filter((mutation) => mutation.type === 'upsertNode'),
+    ...mutations.filter((mutation) => mutation.type !== 'upsertNode'),
+  ];
 }

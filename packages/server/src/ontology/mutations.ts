@@ -51,6 +51,15 @@ export function edgeKey(edge: Edge): string {
         : '';
   return JSON.stringify([edge.type, edge.from, edge.to, qualifier]);
 }
+export function compareStrings(a: string, b: string): number {
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+export function compareNodes(a: GraphNode, b: GraphNode): number {
+  return compareStrings(a.id, b.id);
+}
+export function compareEdges(a: Edge, b: Edge): number {
+  return compareStrings(edgeKey(a), edgeKey(b));
+}
 export function matchesEdge(edge: Edge, filter: EdgeFilter): boolean {
   return (
     (!filter.types || filter.types.includes(edge.type)) &&
