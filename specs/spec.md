@@ -296,13 +296,15 @@ All messages are JSON, validated with zod on both ends.
 
 | Direction | Message | Payload |
 |---|---|---|
-| C→S | `hello` | `{episodeId}` |
+| C→S | `hello` | `{episodeId, lastSeenBeat?}`; `lastSeenBeat` lets a reconnecting client receive what it missed |
 | S→C | `world_snapshot` | entities visible to the player, map id, party, inventory, recent narration |
 | C→S | `player_intent` | `{selection: EntityId[], text: string}` |
 | S→C | `beat_started` | `{beat}`, so the UI can show a "DM is thinking" state |
 | S→C | `beat_result` | `{beat, events, narration, rolls, traceId}`. `events` contains only events the player witnessed (plus a ground-truth overlay in dev mode) |
 | S→C | `episode_ended` | `{beat, holder: EntityId, summary}` |
 | C→S | `debug_request` | `{kind: 'trace'\|'knowledge'\|'graph', target?}` |
+| C→S | `session_command` | `{command: 'retry_now'\|'save_and_quit'\|'raise_budget'}`, the player's answer to a pause |
+| S→C | `paused` / `resumed` | Pause reason, beat, attempt and time to the next automatic retry / the beat being resumed (see Section 5) |
 | S→C | `debug_response` | the requested trace, knowledge slice or subgraph |
 | S→C | `error` | `{code, message}` |
 
@@ -341,7 +343,7 @@ Every node has:
 | `name` | string | Display name |
 | `summary` | string | One or two sentences, used in prompts |
 | `tags` | string[] | Free-form; also used to pick a sprite (`["quill","magical","feather"]`) |
-| `createdBy` | `seed \| engine \| dm \| generator:item \| generator:npc \| generator:story` | Provenance |
+| `createdBy` | `seed \| engine \| dm \| generator:item \| generator:npc \| generator:feature \| generator:story` | Provenance |
 | `createdAtBeat` | int | 0 for seed |
 
 ### Node labels
@@ -463,9 +465,9 @@ The engine keeps hard state in a plain in-memory structure for speed and simplic
 interface EngineState {
   beat: number;
   rngSeed: string;
-  characters: Map<EntityId, { locationId; tile; hp; maxHp; ac; abilities; proficiencies; conscious; hidden; inventory: EntityId[]; equipped: Record<Slot, EntityId> }>;
-  containers: Map<EntityId, { locationId; tile; locked; lockDc?; opened; hidden; contents: EntityId[] }>;
-  items: Map<EntityId, { hidden; questCritical; holder: { kind: 'character' | 'container' | 'location'; id: EntityId } }>;
+  characters: Map<EntityId, { locationId; tile; hp; maxHp; ac; abilities; proficiencies; conscious; hidden; gold; inventory: EntityId[]; equipped: Record<Slot, EntityId> }>;
+  containers: Map<EntityId, { locationId; tile; locked; lockDc?; opened; hidden; findDc?; contents: EntityId[] }>;
+  items: Map<EntityId, { hidden; findDc?; questCritical; holder: { kind: 'character' | 'container' | 'location'; id: EntityId } }>;
   combat: null | { order: EntityId[]; turn: number; round: number };
 }
 ```
@@ -792,7 +794,7 @@ special because of its story and its `questCritical` flag, not its price.
 | `hide` | `actor`, `checkId` | Successful Stealth check | `EntityHidden` |
 | `attack` | `attacker`, `target`, `weaponId?` | Both present; starts combat if none is active; it must be the attacker's turn in combat | `CombatStarted?`, `AttackResolved`, `DamageApplied?` |
 | `apply_damage` | `target`, `dice`, `cause` | For environmental harm only (falls, fire, poison); not usable as an attack | `DamageApplied` |
-| `heal` | `target`, `dice`, `source` (item id or `rest`) | Source is a consumable carried by someone present, or the cleric's narrative ability with a check | `Healed` |
+| `heal` | `target`, `dice`, `source` (item id, `rest`, or `{checkId}`) | An item source must be a consumable carried by someone present; a `{checkId}` source is the cleric's narrative healing ability and needs a successful check by the healer this beat | `Healed` |
 | `end_combat` | `reason` (`fled\|surrendered\|defeated\|talked_down`) | Combat is active | `CombatEnded` |
 
 The engine refuses to move a `questCritical` item except through an actor-driven
