@@ -29,6 +29,62 @@ export default defineConfig(
     },
   },
   {
+    files: ['packages/server/src/engine/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: [
+                'node:*',
+                'fs',
+                'fs/*',
+                'net',
+                'http',
+                'https',
+                'http2',
+                'child_process',
+                'cluster',
+                'dgram',
+                'dns',
+                'dns/*',
+                'tls',
+                'readline',
+                'readline/*',
+                'worker_threads',
+                '@anthropic-ai/sdk',
+                '@anthropic-ai/sdk/*',
+              ],
+              message:
+                'The engine must remain pure; I/O and LLM clients belong outside it.',
+            },
+          ],
+        },
+      ],
+      'no-restricted-properties': [
+        'error',
+        {
+          object: 'Date',
+          property: 'now',
+          message: 'The engine must not read wall-clock time.',
+        },
+        {
+          object: 'Math',
+          property: 'random',
+          message: 'Use the engine seeded PRNG.',
+        },
+      ],
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: "NewExpression[callee.name='Date']",
+          message: 'The engine must not construct wall-clock dates.',
+        },
+      ],
+    },
+  },
+  {
     files: ['packages/client/src/**/*.{ts,tsx}'],
     languageOptions: {
       globals: globals.browser,

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { gameEventSchema } from './events.js';
+import type { GameEvent } from './events.js';
 import { narrationSchema } from './narration.js';
 import * as engine from './tools/engine-inputs.js';
 import * as soft from './tools/soft-inputs.js';
@@ -24,9 +25,15 @@ export function toolResultSchema<S extends z.ZodType>(value: S) {
     }),
   ]);
 }
-export type ToolResult<T> = z.infer<
+type ValidatedToolResult<T> = z.infer<
   ReturnType<typeof toolResultSchema<z.ZodType<T>>>
 >;
+// The engine produces drafts before the event log supplies the envelope.
+export type ToolResult<T, E = GameEvent> =
+  | (Omit<Extract<ValidatedToolResult<T>, { ok: true }>, 'events'> & {
+      events: E[];
+    })
+  | Extract<ValidatedToolResult<T>, { ok: false }>;
 export const narrateInputSchema = narrationSchema;
 export type NarrateInput = z.infer<typeof narrateInputSchema>;
 export const narrateOutputSchema = narrationSchema;
