@@ -104,8 +104,9 @@ machine.
   that the DM picks from a fixed scale: 5 / 10 / 15 / 20 / 25. Advantage and
   disadvantage mean rolling 2d20 and keeping the highest or lowest.
 - **Opposed checks** for contests (e.g. Stealth vs. Perception, Deception vs. Insight).
-- **Combat mode** starts when hostilities begin: roll initiative, one action plus
-  movement per turn, attack roll against AC, weapon damage dice. Combat ends when one
+- **Combat mode** starts when hostilities begin: roll initiative (d20 + DEX, everyone
+  conscious in the room), one action plus one move per turn (using the action ends the
+  turn; `pass_turn` ends it without one), attack roll against AC, weapon damage dice. Combat ends when one
   side flees, surrenders or is out of the fight.
 - **Spells** are narrative abilities resolved with a check, with no slots.
 - **All dice are rolled by the engine** with a seedable random number generator, and
@@ -539,6 +540,7 @@ correct and the projection is retried or rebuilt.
 | `AttackResolved` | hard | `Event` node with `roll` |
 | `DamageApplied` / `Healed` | hard | Update `hp`, `conscious` |
 | `CombatStarted` / `CombatEnded` | hard | `Event` node |
+| `TurnAdvanced` | hard | None in the graph; it keeps combat turn order reconstructible when the engine replays the log |
 | `EntityCreated` | both | New node + edges (from a generator) |
 | `FactCreated` | soft | `Fact` node + `ABOUT` / `ORIGIN_OF` |
 | `FactLearned` | soft | `KNOWS` edge. If the learned fact `SUPERSEDES` a fact the character already knows, the old `KNOWS` edge gets `retractedAtBeat` |
@@ -820,6 +822,7 @@ special because of its story and its `questCritical` flag, not its price.
 | `attack` | `attacker`, `target`, `weaponId?` | Both present; starts combat if none is active; it must be the attacker's turn in combat | `CombatStarted?`, `AttackResolved`, `DamageApplied?` |
 | `apply_damage` | `target`, `dice`, `cause` | For environmental harm only (falls, fire, poison); not usable as an attack | `DamageApplied` |
 | `heal` | `target`, `dice`, `source` (item id, `rest`, or `{checkId}`) | An item source must be a consumable carried by someone present; a `{checkId}` source is the cleric's narrative healing ability and needs a successful check by the healer this beat | `Healed` |
+| `pass_turn` | `actor` | Combat is active and it is `actor`'s turn; ends the turn without an action | `TurnAdvanced` |
 | `end_combat` | `reason` (`fled\|surrendered\|defeated\|talked_down`) | Combat is active | `CombatEnded` |
 
 The engine refuses to move a `questCritical` item except through an actor-driven
