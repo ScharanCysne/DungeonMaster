@@ -1,8 +1,10 @@
 import { expect, test } from 'vitest';
 import * as p from './protocol.js';
-import { without } from './testing/fixtures.js';
+import { narration, without } from './testing/fixtures.js';
 import {
   clientMessages as client,
+  mapCueProgress,
+  peerLineProgress,
   serverMessages as server,
 } from './testing/protocol-fixtures.js';
 import { schemaCases } from './testing/schema-cases.js';
@@ -44,6 +46,24 @@ schemaCases([
     p.beatStartedSchema,
     server.beat_started,
     { ...server.beat_started, beat: '1' },
+  ],
+  [
+    'peer line progress',
+    p.beatProgressPayloadSchema,
+    peerLineProgress,
+    { ...peerLineProgress, text: '' },
+  ],
+  [
+    'map cue progress',
+    p.beatProgressPayloadSchema,
+    mapCueProgress,
+    { ...mapCueProgress, cue: 'wave' },
+  ],
+  [
+    'beat progress',
+    p.beatProgressSchema,
+    server.beat_progress,
+    { ...server.beat_progress, beat: -1 },
   ],
   [
     'beat result',
@@ -173,4 +193,70 @@ test('beat_result validates the optional ground truth graph', () => {
       groundTruth: { nodes: [], edges: [] },
     }).success,
   ).toBe(true);
+});
+test.each(['look_at', 'turn', 'glance_up'])(
+  'beat_progress accepts map cue %s without a target',
+  (cue) => {
+    expect(
+      p.beatProgressSchema.safeParse({
+        ...server.beat_progress,
+        progress: { ...without(mapCueProgress, 'target'), cue },
+      }).success,
+    ).toBe(true);
+  },
+);
+test.each([
+  ['a roll', { kind: 'roll', expr: '1d20', total: 15 }],
+  ['an unknown map cue', { ...mapCueProgress, cue: 'wave' }],
+  ['a non-character speaker', { ...peerLineProgress, speaker: 'item:quill' }],
+  [
+    'a non-character cue entity',
+    { ...mapCueProgress, entity: 'container:box' },
+  ],
+  ['a malformed cue target', { ...mapCueProgress, target: 'box' }],
+  ['a null cue target', { ...mapCueProgress, target: null }],
+  ['a peer line without a speaker', without(peerLineProgress, 'speaker')],
+  ['a map cue without an entity', without(mapCueProgress, 'entity')],
+  ['mixed progress branches', { ...peerLineProgress, ...mapCueProgress }],
+  ['a nested movement path', { ...mapCueProgress, path: [{ x: 2, y: 1 }] }],
+])('beat_progress rejects %s', (_name, progress) => {
+  expect(
+    p.serverMessageSchema.safeParse({ ...server.beat_progress, progress })
+      .success,
+  ).toBe(false);
+});
+test.each([1.5, '1'])('beat_progress rejects beat %s', (beat) => {
+  expect(
+    p.beatProgressSchema.safeParse({ ...server.beat_progress, beat }).success,
+  ).toBe(false);
+});
+test('beat_progress requires progress', () => {
+  expect(
+    p.beatProgressSchema.safeParse(without(server.beat_progress, 'progress'))
+      .success,
+  ).toBe(false);
+});
+test('beat_progress rejects committed events as extra fields', () => {
+  expect(
+    p.beatProgressSchema.safeParse({ ...server.beat_progress, events: [] })
+      .success,
+  ).toBe(false);
+});
+test('client messages reject beat_progress', () => {
+  expect(p.clientMessageSchema.safeParse(server.beat_progress).success).toBe(
+    false,
+  );
+});
+test('beat_result rejects unresolved NPC dialogue', () => {
+  expect(
+    p.beatResultSchema.safeParse({ ...server.beat_result, narration }).success,
+  ).toBe(false);
+});
+test('world_snapshot rejects unresolved recent narration', () => {
+  expect(
+    p.worldSnapshotSchema.safeParse({
+      ...server.world_snapshot,
+      recentNarration: [narration],
+    }).success,
+  ).toBe(false);
 });

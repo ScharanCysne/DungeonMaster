@@ -103,7 +103,14 @@ export const edgeSchemas = {
       since: beatSchema,
       source: knowledgeSourceSchema,
       confidence: confidenceSchema,
+      retractedAtBeat: beatSchema.optional(),
     }),
+  }),
+  SUPERSEDES: provenanceSchema.extend({
+    type: z.literal('SUPERSEDES'),
+    from: factIdSchema,
+    to: factIdSchema,
+    properties: z.strictObject({}),
   }),
   WITNESSED: provenanceSchema.extend({
     type: z.literal('WITNESSED'),
@@ -134,6 +141,7 @@ export const edgeSchema = z.discriminatedUnion('type', [
   edgeSchemas.ABOUT,
   edgeSchemas.ORIGIN_OF,
   edgeSchemas.KNOWS,
+  edgeSchemas.SUPERSEDES,
   edgeSchemas.WITNESSED,
   edgeSchemas.INVOLVES,
 ]);

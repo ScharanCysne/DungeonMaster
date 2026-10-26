@@ -1,13 +1,15 @@
 import { z } from 'zod';
-import { entityIdSchema } from './ids.js';
+import { characterIdSchema } from './ids.js';
 
 export const moodSchema = z.enum(['calm', 'tense', 'comic', 'ominous']);
 export type Mood = z.infer<typeof moodSchema>;
-export const dialogueLineSchema = z.strictObject({
-  speaker: entityIdSchema,
-  text: z.string(),
-  private: z.boolean().optional(),
-});
+export const dialogueLineSchema = z.union([
+  z.strictObject({ lineId: z.string().min(1) }),
+  z.strictObject({
+    speaker: characterIdSchema,
+    text: z.string().min(1),
+  }),
+]);
 export type DialogueLine = z.infer<typeof dialogueLineSchema>;
 export const narrationSchema = z.strictObject({
   text: z
@@ -19,3 +21,13 @@ export const narrationSchema = z.strictObject({
   mood: moodSchema.optional(),
 });
 export type Narration = z.infer<typeof narrationSchema>;
+export const resolvedDialogueLineSchema = z.strictObject({
+  speaker: characterIdSchema,
+  text: z.string().min(1),
+  lineId: z.string().min(1).optional(),
+});
+export type ResolvedDialogueLine = z.infer<typeof resolvedDialogueLineSchema>;
+export const resolvedNarrationSchema = narrationSchema.extend({
+  lines: z.array(resolvedDialogueLineSchema),
+});
+export type ResolvedNarration = z.infer<typeof resolvedNarrationSchema>;

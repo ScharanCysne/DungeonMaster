@@ -8,7 +8,7 @@ import {
 import { positionSchema } from './event-payloads.js';
 import { gameEventSchema } from './events.js';
 import { characterIdSchema, entityIdSchema, itemIdSchema } from './ids.js';
-import { narrationSchema } from './narration.js';
+import { resolvedNarrationSchema } from './narration.js';
 import { nodeSchema } from './ontology.js';
 import { beatSchema, rollSchema } from './primitives.js';
 
@@ -52,7 +52,7 @@ export const worldSnapshotSchema = z.strictObject({
   party: z.array(characterIdSchema),
   inventory: z.array(itemIdSchema),
   gold: z.int().nonnegative(),
-  recentNarration: z.array(narrationSchema),
+  recentNarration: z.array(resolvedNarrationSchema),
 });
 export type WorldSnapshot = z.infer<typeof worldSnapshotSchema>;
 export const beatStartedSchema = z.strictObject({
@@ -60,11 +60,31 @@ export const beatStartedSchema = z.strictObject({
   beat: beatSchema,
 });
 export type BeatStarted = z.infer<typeof beatStartedSchema>;
+export const beatProgressPayloadSchema = z.discriminatedUnion('kind', [
+  z.strictObject({
+    kind: z.literal('peer_line'),
+    speaker: characterIdSchema,
+    text: z.string().min(1),
+  }),
+  z.strictObject({
+    kind: z.literal('map_cue'),
+    entity: characterIdSchema,
+    cue: z.enum(['look_at', 'turn', 'glance_up']),
+    target: entityIdSchema.optional(),
+  }),
+]);
+export type BeatProgressPayload = z.infer<typeof beatProgressPayloadSchema>;
+export const beatProgressSchema = z.strictObject({
+  type: z.literal('beat_progress'),
+  beat: beatSchema,
+  progress: beatProgressPayloadSchema,
+});
+export type BeatProgress = z.infer<typeof beatProgressSchema>;
 export const beatResultSchema = z.strictObject({
   type: z.literal('beat_result'),
   beat: beatSchema,
   events: z.array(gameEventSchema),
-  narration: narrationSchema,
+  narration: resolvedNarrationSchema,
   rolls: z.array(rollSchema),
   traceId: z.string().min(1),
   groundTruth: graphSchema.optional(),
@@ -124,6 +144,7 @@ export type Resumed = z.infer<typeof resumedSchema>;
 export const serverMessageSchema = z.discriminatedUnion('type', [
   worldSnapshotSchema,
   beatStartedSchema,
+  beatProgressSchema,
   beatResultSchema,
   episodeEndedSchema,
   debugResponseSchema,

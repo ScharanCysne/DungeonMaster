@@ -1,6 +1,12 @@
 import { expect, test } from 'vitest';
 import { edgeSchema, edgeSchemas } from './edges.js';
-import { provenance, without } from './testing/fixtures.js';
+import {
+  knowsEdge,
+  provenance,
+  supersedesEdge,
+  without,
+} from './testing/fixtures.js';
+import { schemaCases } from './testing/schema-cases.js';
 
 const cases = [
   ['PART_OF', 'loc:room', 'loc:tavern', {}],
@@ -26,6 +32,7 @@ const cases = [
     'fact:quill',
     { since: 0, source: 'seed', confidence: 0.6 },
   ],
+  ['SUPERSEDES', 'fact:quill-correction', 'fact:quill', {}],
   ['WITNESSED', 'char:player', 'event:1-0', {}],
   ['INVOLVES', 'event:1-0', 'char:player', { role: 'actor' }],
 ] as const;
@@ -48,6 +55,59 @@ for (const [type, from, to, properties] of cases) {
     ).toBe(false);
   });
 }
+schemaCases([
+  [
+    'retracted knowledge',
+    edgeSchemas.KNOWS,
+    {
+      ...knowsEdge,
+      properties: { ...knowsEdge.properties, retractedAtBeat: 1 },
+    },
+    {
+      ...knowsEdge,
+      properties: { ...knowsEdge.properties, retractedAtBeat: -1 },
+    },
+  ],
+]);
+test('KNOWS accepts retraction at beat zero', () => {
+  expect(
+    edgeSchemas.KNOWS.safeParse({
+      ...knowsEdge,
+      properties: { ...knowsEdge.properties, retractedAtBeat: 0 },
+    }).success,
+  ).toBe(true);
+});
+test.each([1.5, '1', null])(
+  'KNOWS rejects retractedAtBeat %s',
+  (retractedAtBeat) => {
+    expect(
+      edgeSchemas.KNOWS.safeParse({
+        ...knowsEdge,
+        properties: { ...knowsEdge.properties, retractedAtBeat },
+      }).success,
+    ).toBe(false);
+  },
+);
+test('SUPERSEDES rejects a non-fact target', () => {
+  expect(
+    edgeSchemas.SUPERSEDES.safeParse({ ...supersedesEdge, to: 'item:quill' })
+      .success,
+  ).toBe(false);
+});
+test('SUPERSEDES rejects nonempty properties', () => {
+  expect(
+    edgeSchemas.SUPERSEDES.safeParse({
+      ...supersedesEdge,
+      properties: { reason: 'A correction.' },
+    }).success,
+  ).toBe(false);
+});
+test('SUPERSEDES requires its creation beat', () => {
+  expect(
+    edgeSchemas.SUPERSEDES.safeParse(without(supersedesEdge, 'createdAtBeat'))
+      .success,
+  ).toBe(false);
+});
 test('ATTITUDE rejects value 150', () => {
   expect(
     edgeSchemas.ATTITUDE.safeParse({

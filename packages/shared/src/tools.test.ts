@@ -39,6 +39,91 @@ for (const name of Object.keys(toolSchemas) as (keyof typeof toolSchemas)[]) {
   });
 }
 schemaCases([['check id', checkIdSchema, 'check:1-0', '']]);
+schemaCases([
+  [
+    'create_fact supersedes',
+    toolSchemas.create_fact.input,
+    { ...toolInputs.create_fact, supersedes: 'fact:old-clue' },
+    { ...toolInputs.create_fact, supersedes: 'container:box' },
+  ],
+]);
+test('create_fact rejects null for optional supersedes', () => {
+  expect(
+    toolSchemas.create_fact.input.safeParse({
+      ...toolInputs.create_fact,
+      supersedes: null,
+    }).success,
+  ).toBe(false);
+});
+test('create_fact leaves questCritical subject checks to the handler', () => {
+  expect(
+    toolSchemas.create_fact.input.safeParse({
+      ...toolInputs.create_fact,
+      about: ['item:quill'],
+    }).success,
+  ).toBe(true);
+});
+test('voice_npc accepts exactly 40 whitespace-separated words', () => {
+  expect(
+    toolSchemas.voice_npc.input.safeParse({
+      ...toolInputs.voice_npc,
+      direction: `  ${Array.from({ length: 40 }, () => 'word').join('\n\t ')}  `,
+    }).success,
+  ).toBe(true);
+});
+test('voice_npc rejects a direction of 41 words', () => {
+  expect(
+    toolSchemas.voice_npc.input.safeParse({
+      ...toolInputs.voice_npc,
+      direction: Array.from({ length: 41 }, () => 'word').join(' '),
+    }).success,
+  ).toBe(false);
+});
+test('voice_npc rejects an empty direction', () => {
+  expect(
+    toolSchemas.voice_npc.input.safeParse({
+      ...toolInputs.voice_npc,
+      direction: '',
+    }).success,
+  ).toBe(false);
+});
+test('voice_npc rejects a non-character NPC id', () => {
+  expect(
+    toolSchemas.voice_npc.input.safeParse({
+      ...toolInputs.voice_npc,
+      npc: 'item:quill',
+    }).success,
+  ).toBe(false);
+});
+test.each(['lineId', 'text'])(
+  'voice_npc output rejects an empty %s',
+  (field) => {
+    expect(
+      toolSchemas.voice_npc.output.safeParse({
+        ...toolOutputs.voice_npc,
+        [field]: '',
+      }).success,
+    ).toBe(false);
+  },
+);
+test('voice_npc output rejects extra fields', () => {
+  expect(
+    toolSchemas.voice_npc.output.safeParse({
+      ...toolOutputs.voice_npc,
+      speaker: 'char:brann',
+    }).success,
+  ).toBe(false);
+});
+test('voice_npc result preserves the generated line', () => {
+  expect(
+    toolResultSchema(toolSchemas.voice_npc.output).parse({
+      ok: true,
+      value: toolOutputs.voice_npc,
+      events: [],
+      facts: [],
+    }),
+  ).toEqual({ ok: true, value: toolOutputs.voice_npc, events: [], facts: [] });
+});
 test.each([12, '15', null])('skill_check rejects invalid DC %s', (dc) => {
   expect(
     toolSchemas.skill_check.input.safeParse({ ...toolInputs.skill_check, dc })

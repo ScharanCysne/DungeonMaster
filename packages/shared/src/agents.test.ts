@@ -10,8 +10,16 @@ import {
   dialogueLineSchema,
   moodSchema,
   narrationSchema,
+  resolvedDialogueLineSchema,
+  resolvedNarrationSchema,
 } from './narration.js';
-import { criticIssue, narration } from './testing/fixtures.js';
+import {
+  criticIssue,
+  narration,
+  npcLine,
+  peerLine,
+  resolvedNarration,
+} from './testing/fixtures.js';
 import { schemaCases } from './testing/schema-cases.js';
 
 schemaCases([
@@ -52,15 +60,34 @@ schemaCases([
     { ok: false, issues: [criticIssue] },
     { ok: false, issues: [] },
   ],
-  ['model role', modelRoleSchema, 'story', 'npc'],
+  ['model role', modelRoleSchema, 'npc_voice', 'npc'],
   ['mood', moodSchema, 'ominous', 'happy'],
   [
-    'dialogue line',
+    'peer dialogue line',
     dialogueLineSchema,
-    { speaker: 'char:brann', text: 'Welcome.', private: true },
-    { speaker: 'Brann', text: 'Welcome.' },
+    peerLine,
+    { ...peerLine, speaker: 'Kael' },
+  ],
+  [
+    'NPC dialogue reference',
+    dialogueLineSchema,
+    { lineId: npcLine.lineId },
+    { lineId: '' },
   ],
   ['narration', narrationSchema, narration, { ...narration, mood: 'happy' }],
+  [
+    'resolved NPC dialogue line',
+    resolvedDialogueLineSchema,
+    { speaker: 'char:brann', ...npcLine },
+    { ...npcLine, speaker: 'item:quill' },
+  ],
+  [
+    'resolved peer dialogue line',
+    resolvedDialogueLineSchema,
+    peerLine,
+    { text: peerLine.text },
+  ],
+  ['resolved narration', resolvedNarrationSchema, resolvedNarration, narration],
 ]);
 test.each(criticIssueTypeSchema.options)(
   'critic accepts issue type %s',
@@ -112,4 +139,56 @@ test('narrate rejects null for optional mood', () => {
   expect(narrationSchema.safeParse({ ...narration, mood: null }).success).toBe(
     false,
   );
+});
+test.each([
+  ['an NPC line with text instead of lineId', { text: npcLine.text }],
+  ['an NPC reference with inline text', npcLine],
+  ['a peer line missing its speaker', { text: peerLine.text }],
+  [
+    'a peer line with a non-character speaker',
+    { ...peerLine, speaker: 'item:quill' },
+  ],
+  ['a peer line with empty text', { ...peerLine, text: '' }],
+  ['the removed private field', { ...peerLine, private: true }],
+  [
+    'a mixed NPC reference and peer line',
+    { ...peerLine, lineId: npcLine.lineId },
+  ],
+])('narrate rejects %s', (_name, line) => {
+  expect(
+    narrationSchema.safeParse({ ...narration, lines: [line] }).success,
+  ).toBe(false);
+});
+test.each([
+  ['an unresolved NPC reference', { lineId: npcLine.lineId }],
+  ['empty dialogue text', { ...peerLine, text: '' }],
+  ['an empty optional lineId', { ...peerLine, lineId: '' }],
+  ['a null optional lineId', { ...peerLine, lineId: null }],
+  ['the removed private field', { ...peerLine, private: true }],
+])('resolved narration rejects %s', (_name, line) => {
+  expect(
+    resolvedNarrationSchema.safeParse({ ...resolvedNarration, lines: [line] })
+      .success,
+  ).toBe(false);
+});
+test('resolved narration accepts exactly 180 whitespace-separated words', () => {
+  expect(
+    resolvedNarrationSchema.safeParse({
+      ...resolvedNarration,
+      text: `  ${Array.from({ length: 180 }, () => 'word').join('\n\t ')}  `,
+    }).success,
+  ).toBe(true);
+});
+test('resolved narration rejects 181 words', () => {
+  expect(
+    resolvedNarrationSchema.safeParse({
+      ...resolvedNarration,
+      text: Array.from({ length: 181 }, () => 'word').join(' '),
+    }).success,
+  ).toBe(false);
+});
+test('critic issue types reject a misspelled temporal contradiction', () => {
+  expect(
+    criticIssueTypeSchema.safeParse('temporal_contradiciton').success,
+  ).toBe(false);
 });

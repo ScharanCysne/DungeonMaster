@@ -1,4 +1,4 @@
-import { character, narration, roll } from './fixtures.js';
+import { character, peerLine, resolvedNarration, roll } from './fixtures.js';
 import { movedEvent } from './event-fixtures.js';
 
 export const graph = { nodes: [character], edges: [] };
@@ -46,6 +46,13 @@ export const clientMessages = {
   debug_request: { type: 'debug_request', kind: 'trace', target: 'beat-1' },
   session_command: { type: 'session_command', command: 'retry_now' },
 };
+export const peerLineProgress = { kind: 'peer_line', ...peerLine };
+export const mapCueProgress = {
+  kind: 'map_cue',
+  entity: 'char:brann',
+  cue: 'look_at',
+  target: 'container:box',
+};
 export const serverMessages = {
   world_snapshot: {
     type: 'world_snapshot',
@@ -58,14 +65,20 @@ export const serverMessages = {
     party: ['char:player'],
     inventory: [],
     gold: 20,
-    recentNarration: [narration],
+    recentNarration: [resolvedNarration],
   },
   beat_started: { type: 'beat_started', beat: 1 },
+  beat_progress: { type: 'beat_progress', beat: 1, progress: peerLineProgress },
+  beat_progress_map_cue: {
+    type: 'beat_progress',
+    beat: 1,
+    progress: mapCueProgress,
+  },
   beat_result: {
     type: 'beat_result',
     beat: 1,
     events: [movedEvent],
-    narration,
+    narration: resolvedNarration,
     rolls: [roll],
     traceId: 'beat-1',
   },

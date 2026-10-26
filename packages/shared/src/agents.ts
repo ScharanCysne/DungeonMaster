@@ -19,6 +19,7 @@ export const criticIssueTypeSchema = z.enum([
   'perspective_leak',
   'npc_knowledge_leak',
   'lore_contradiction',
+  'temporal_contradiction',
 ]);
 export type CriticIssueType = z.infer<typeof criticIssueTypeSchema>;
 export const criticIssueSchema = z.strictObject({
@@ -38,6 +39,7 @@ export type CriticVerdict = z.infer<typeof criticVerdictSchema>;
 export const modelRoleSchema = z.enum([
   'dm',
   'peer',
+  'npc_voice',
   'generator',
   'story',
   'critic',

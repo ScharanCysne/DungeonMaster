@@ -4,6 +4,7 @@ import {
   envelope,
   fact,
   narration,
+  resolvedNarration,
   roll,
   seed,
 } from './fixtures.js';
@@ -107,7 +108,7 @@ export const eventPayloads = {
     reason: 'A gift.',
   },
   QuestStatusChanged: { questId: 'quest:quill', status: 'complete' },
-  NarrationCommitted: narration,
+  NarrationCommitted: resolvedNarration,
   CriticRejected: { issues: [criticIssue], narration },
   RecapUpdated: { text: 'You have found a box.' },
   EpisodeEnded: {

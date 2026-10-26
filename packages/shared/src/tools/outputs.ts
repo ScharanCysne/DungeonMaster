@@ -53,3 +53,8 @@ export const createFactOutputSchema = z.strictObject({ factId: factIdSchema });
 export type CreateFactOutput = z.infer<typeof createFactOutputSchema>;
 export const setQuestStatusOutputSchema = payloads.QuestStatusChanged;
 export type SetQuestStatusOutput = z.infer<typeof setQuestStatusOutputSchema>;
+export const voiceNpcOutputSchema = z.strictObject({
+  lineId: z.string().min(1),
+  text: z.string().min(1),
+});
+export type VoiceNpcOutput = z.infer<typeof voiceNpcOutputSchema>;

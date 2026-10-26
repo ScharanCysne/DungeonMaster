@@ -26,6 +26,8 @@ test('empty config supplies all per-beat defaults', () => {
   expect(c.defaultConfig.limits).toEqual({
     toolCalls: 8,
     generatorCalls: 3,
+    voiceNpcPerBeat: 4,
+    retryToolCallsForUnbackedOutcome: 2,
     newNpcsPerEpisode: 12,
     generatedItemMaxRarity: 'rare',
     generatedItemMaxValueGp: 500,
@@ -51,11 +53,12 @@ test('empty config supplies input and context limits', () => {
     contextBudgetTokens: 12_000,
   });
 });
-test('empty config assigns the specified models to all six roles', () => {
+test('empty config assigns the specified models to all seven roles', () => {
   expect(c.defaultConfig.models).toEqual({
     dm: 'claude-opus-5-5',
     story: 'claude-sonnet-5-5',
     peer: 'claude-haiku-5-5',
+    npc_voice: 'claude-haiku-5-5',
     generator: 'claude-haiku-5-5',
     critic: 'claude-haiku-5-5',
     recap: 'claude-haiku-5-5',
@@ -100,3 +103,40 @@ test('config rejects a selection limit beyond the protocol ceiling', () => {
     false,
   );
 });
+schemaCases([
+  [
+    'NPC voice model override',
+    c.modelMapSchema,
+    { npc_voice: 'test-voice-model' },
+    { npc_voice: '' },
+  ],
+]);
+test('config preserves an NPC voice model override', () => {
+  expect(
+    c.configSchema.parse({ models: { npc_voice: 'test-voice-model' } }).models,
+  ).toEqual({
+    ...c.defaultConfig.models,
+    npc_voice: 'test-voice-model',
+  });
+});
+for (const limit of ['voiceNpcPerBeat', 'retryToolCallsForUnbackedOutcome']) {
+  test.each([0, 1])(
+    'config accepts ' + limit + ' override %s and preserves other defaults',
+    (value) => {
+      expect(
+        c.configSchema.parse({ limits: { [limit]: value } }).limits,
+      ).toEqual({
+        ...c.defaultConfig.limits,
+        [limit]: value,
+      });
+    },
+  );
+  test.each([-1, 1.5, '2', null])(
+    'config rejects ' + limit + ' override %s',
+    (value) => {
+      expect(
+        c.configSchema.safeParse({ limits: { [limit]: value } }).success,
+      ).toBe(false);
+    },
+  );
+}

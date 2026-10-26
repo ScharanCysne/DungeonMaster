@@ -8,7 +8,15 @@ import {
   usage,
 } from './testing/protocol-fixtures.js';
 import { schemaCases } from './testing/schema-cases.js';
-import { fact, provenance } from './testing/fixtures.js';
+import {
+  envelope,
+  fact,
+  knowsEdge,
+  narration,
+  provenance,
+  supersedesEdge,
+} from './testing/fixtures.js';
+import { eventPayloads } from './testing/event-fixtures.js';
 
 schemaCases([
   ['graph', d.graphSchema, graph, { nodes: [], edges: [{ type: 'LIKES' }] }],
@@ -52,6 +60,75 @@ test('knowledge slices reject confidence outside the allowed range', () => {
           },
         },
       ],
+    }).success,
+  ).toBe(false);
+});
+schemaCases([
+  [
+    'NPC voice trace call',
+    d.traceCallSchema,
+    { ...traceCall, role: 'npc_voice' },
+    { ...traceCall, role: 'voice_npc' },
+  ],
+  [
+    'graph with superseding facts',
+    d.graphSchema,
+    { ...graph, edges: [supersedesEdge] },
+    { ...graph, edges: [{ ...supersedesEdge, from: 'char:brann' }] },
+  ],
+  [
+    'knowledge with a retraction beat',
+    d.knowledgeSliceSchema,
+    {
+      ...knowledge,
+      facts: [
+        {
+          fact,
+          knowledge: {
+            ...knowsEdge,
+            properties: { ...knowsEdge.properties, retractedAtBeat: 1 },
+          },
+        },
+      ],
+    },
+    {
+      ...knowledge,
+      facts: [
+        {
+          fact,
+          knowledge: {
+            ...knowsEdge,
+            properties: { ...knowsEdge.properties, retractedAtBeat: -1 },
+          },
+        },
+      ],
+    },
+  ],
+]);
+test('beat traces accept committed resolved narration alongside rejected references', () => {
+  expect(
+    d.beatTraceSchema.safeParse({
+      ...trace,
+      events: [
+        {
+          ...envelope,
+          type: 'CriticRejected',
+          payload: eventPayloads.CriticRejected,
+        },
+        {
+          ...envelope,
+          type: 'NarrationCommitted',
+          payload: eventPayloads.NarrationCommitted,
+        },
+      ],
+    }).success,
+  ).toBe(true);
+});
+test('beat traces reject committed unresolved narration', () => {
+  expect(
+    d.beatTraceSchema.safeParse({
+      ...trace,
+      events: [{ ...envelope, type: 'NarrationCommitted', payload: narration }],
     }).success,
   ).toBe(false);
 });

@@ -1,6 +1,7 @@
 import {
   container,
   narration,
+  npcLine,
   registeredItem,
   registeredNpc,
   registeredStory,
@@ -72,6 +73,10 @@ export const toolInputs = {
     about: ['container:box'],
     kind: 'backstory',
   },
+  voice_npc: {
+    npc: 'char:brann',
+    direction: 'Deflect questions about the box.',
+  },
   narrate: narration,
 };
 export const toolOutputs = {
@@ -102,5 +107,6 @@ export const toolOutputs = {
   generate_npc: registeredNpc,
   generate_feature: container,
   generate_story: registeredStory,
+  voice_npc: npcLine,
   narrate: narration,
 };

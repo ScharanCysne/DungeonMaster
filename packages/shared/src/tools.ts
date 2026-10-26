@@ -108,6 +108,10 @@ export const toolSchemas = {
     input: generator.generateStoryInputSchema,
     output: generated.generateStoryOutputSchema,
   },
+  voice_npc: {
+    input: soft.voiceNpcInputSchema,
+    output: output.voiceNpcOutputSchema,
+  },
   narrate: { input: narrateInputSchema, output: narrateOutputSchema },
 };
 export * from './tools/engine-inputs.js';

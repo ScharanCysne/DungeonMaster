@@ -4,6 +4,8 @@ import { raritySchema } from './primitives.js';
 export const perBeatLimitsSchema = z.strictObject({
   toolCalls: z.int().positive().default(8),
   generatorCalls: z.int().nonnegative().default(3),
+  voiceNpcPerBeat: z.int().nonnegative().default(4),
+  retryToolCallsForUnbackedOutcome: z.int().nonnegative().default(2),
   newNpcsPerEpisode: z.int().nonnegative().default(12),
   generatedItemMaxRarity: raritySchema.default('rare'),
   generatedItemMaxValueGp: z.number().nonnegative().default(500),
@@ -48,6 +50,7 @@ export const modelMapSchema = z.strictObject({
   dm: z.string().min(1).default('claude-opus-5-5'),
   story: z.string().min(1).default('claude-sonnet-5-5'),
   peer: z.string().min(1).default('claude-haiku-5-5'),
+  npc_voice: z.string().min(1).default('claude-haiku-5-5'),
   generator: z.string().min(1).default('claude-haiku-5-5'),
   critic: z.string().min(1).default('claude-haiku-5-5'),
   recap: z.string().min(1).default('claude-haiku-5-5'),

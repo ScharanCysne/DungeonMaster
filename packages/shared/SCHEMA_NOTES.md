@@ -44,6 +44,10 @@ examples or prose instead of a complete wire format.
 - Edges use `{type, from, to, properties, createdBy, createdAtBeat}`. Endpoint labels
   follow the table. Propertyless edges have an explicit empty `properties` object.
   Attitude values/deltas are integers; confidence is fractional.
+- `SUPERSEDES` points from the correcting Fact to the older Fact and has empty
+  properties. `KNOWS.retractedAtBeat?` is a nonnegative integer. Learning a
+  superseding fact retracts the learner's older knowledge during projection;
+  `FactLearned` still records the new learning, without a retraction payload.
 - Fact truth is boolean `true`/`false` or the string `'unknown'`, following the
   example seed's JSON boolean rather than interpreting all table values as strings.
 
@@ -67,9 +71,9 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
 | `DamageApplied`, `Healed`               | Target, amount, resulting HP/consciousness, roll and cause/source.                                                                                                                                   |
 | `CombatStarted`, `CombatEnded`          | Initiative rolls/order, turn and round; ending reason, respectively.                                                                                                                                 |
 | `EntityCreated`                         | Complete node and edges, plus optional location/tile position for engine registration.                                                                                                               |
-| `FactCreated`, `FactLearned`            | Fact with ABOUT/ORIGIN_OF targets; learner/fact IDs and KNOWS properties, respectively.                                                                                                              |
+| `FactCreated`, `FactLearned`            | Fact with ABOUT/ORIGIN_OF targets; learner/fact IDs and KNOWS learning fields (`since`, `source`, `confidence`), respectively.                                                                       |
 | `AttitudeChanged`, `QuestStatusChanged` | Resulting attitude plus delta/reason; quest ID and new status, respectively.                                                                                                                         |
-| `NarrationCommitted`, `CriticRejected`  | Narration; rejected narration and a nonempty issue list, respectively.                                                                                                                               |
+| `NarrationCommitted`, `CriticRejected`  | Resolved narration; rejected reference-form narration and a nonempty issue list, respectively.                                                                                                       |
 | `RecapUpdated`                          | Recap text, as required by §3 despite omission from the §2 catalogue.                                                                                                                                |
 | `EpisodeEnded`                          | Character holding the quill, episode quest ID and summary.                                                                                                                                           |
 
@@ -91,9 +95,24 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
   confidence. Generator NPC `hints.role` is free-form social role text (e.g.
   merchant), while generated Character.role is always `npc`. `attitudeToParty` is
   an attitude number. These nested input shapes were not fully specified.
+- `create_fact.supersedes?` is a FactId. Kinds remain `rumour | observation | lore`;
+  entity existence and the ban on `questCritical` subjects are handler checks.
+- `voice_npc` takes a CharacterId and a nonempty direction of at most 40
+  whitespace-separated words, counted like narration. It returns nonempty
+  `{lineId, text}` strings. NPC role, knowledge isolation and per-beat line identity
+  are runtime checks.
+- `narrationSchema` is the DM submission: each strict dialogue object is an NPC
+  `{lineId}` reference or a peer `{speaker: CharacterId, text}`. `narrate` input and
+  output, and `CriticRejected` in traces, preserve this form. The separate
+  `resolvedNarrationSchema` carries `{speaker: CharacterId, text, lineId?}` for
+  `NarrationCommitted`, `beat_result` and `world_snapshot.recentNarration`, so replay
+  and clients have the actual words without looking up transient voice results.
+  Dialogue text and line IDs are nonempty; dialogue has no `private` field.
+  Resolving NPC references and matching peer speech remain runtime checks.
 - Narration's 180-word ceiling counts nonempty whitespace-separated words in
   `text` only; dialogue lines have no specified word cap. No schema attempts to
-  verify second-person prose. Critic rejection requires at least one issue.
+  verify second-person prose. Critic rejection requires at least one issue and
+  accepts `temporal_contradiction` for inconsistent event ordering.
 
 ## Generators
 
@@ -139,8 +158,12 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
 - Message fields are flat next to `type`. Snapshot fields are `beat`, `mapId`,
   `entities`, separate `positions`, party/inventory IDs, gold and recent narration.
   The separate positions avoid inventing graph node properties. Narration payloads
-  reuse the terminal-tool shape. An optional `groundTruth` graph on beat results
+  use resolved dialogue. An optional `groundTruth` graph on beat results
   represents the dev overlay; visibility/dev authorization belongs to the server.
+- `beat_progress` carries `beat` and a strict `progress` union: a `peer_line` has a
+  CharacterId `speaker` and nonempty `text`; a `map_cue` has a CharacterId `entity`,
+  a `look_at | turn | glance_up` cue and optional EntityId `target`. These are
+  provisional feedback only; rolls, movement and narration are excluded.
 - `hello.lastSeenBeat?` supports §5 reconnect recovery, though absent from the §1
   table. `debug_request.target` remains an opaque string because trace targets need
   not be entity IDs. `debug_response` discriminates on `kind` as well as the outer
@@ -160,6 +183,11 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
   item value is gp. Nested config objects support partial overrides and defaults.
   Fixed input ceilings (500 characters, 6 selected entities, 30 attitude delta)
   permit stricter configuration, not values exceeding the requested input schemas.
+- The `npc_voice` model role defaults to `claude-haiku-5-5` and is valid in traces.
+  `voiceNpcPerBeat` defaults to 4; `retryToolCallsForUnbackedOutcome` defaults to 2.
+  Both accept nonnegative integer overrides, including zero. Handlers exclude
+  voice calls from the ordinary tool cap and allow retry tool calls only for
+  `unbacked_outcome`; other critic retries remain narration-only.
 - Added configurable NPC stat policy defaults from the generator pipeline. The
   price-table schema defaults to an empty table until real prices are filled in.
   Consumers must distinguish missing prices from zero cost.

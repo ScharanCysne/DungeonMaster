@@ -10,7 +10,7 @@ import {
   locationIdSchema,
   questIdSchema,
 } from './ids.js';
-import { narrationSchema } from './narration.js';
+import { narrationSchema, resolvedNarrationSchema } from './narration.js';
 import { factSchema, nodeSchema } from './ontology.js';
 import {
   abilitySchema,
@@ -185,7 +185,7 @@ export const eventPayloadSchemas = {
     questId: questIdSchema,
     status: questStatusSchema,
   }),
-  NarrationCommitted: narrationSchema,
+  NarrationCommitted: resolvedNarrationSchema,
   CriticRejected: z.strictObject({
     issues: z.array(criticIssueSchema).min(1),
     narration: narrationSchema,

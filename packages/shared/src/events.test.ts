@@ -12,7 +12,13 @@ import {
 import type { GameEventOf } from './events.js';
 import { eventTypeSchema } from './primitives.js';
 import type { Tile } from './primitives.js';
-import { envelope, roll, without } from './testing/fixtures.js';
+import {
+  envelope,
+  narration,
+  resolvedNarration,
+  roll,
+  without,
+} from './testing/fixtures.js';
 import { eventPayloads, movedEvent } from './testing/event-fixtures.js';
 import { schemaCases } from './testing/schema-cases.js';
 
@@ -117,5 +123,28 @@ test('event envelopes reject string beat numbers', () => {
 test('event envelopes require witnesses', () => {
   expect(
     eventEnvelopeSchema.safeParse(without(envelope, 'witnesses')).success,
+  ).toBe(false);
+});
+test('NarrationCommitted rejects unresolved NPC dialogue', () => {
+  expect(
+    gameEventSchema.safeParse({
+      ...envelope,
+      type: 'NarrationCommitted',
+      payload: narration,
+    }).success,
+  ).toBe(false);
+});
+test('CriticRejected preserves rejected NPC references', () => {
+  expect(
+    eventPayloadSchemas.CriticRejected.parse(eventPayloads.CriticRejected)
+      .narration,
+  ).toEqual(narration);
+});
+test('CriticRejected rejects resolved NPC dialogue in place of the submission', () => {
+  expect(
+    eventPayloadSchemas.CriticRejected.safeParse({
+      ...eventPayloads.CriticRejected,
+      narration: resolvedNarration,
+    }).success,
   ).toBe(false);
 });

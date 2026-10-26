@@ -31,6 +31,7 @@ export const createFactInputSchema = z.strictObject({
   kind: z.enum(['rumour', 'observation', 'lore']),
   about: z.array(entityIdSchema),
   knownBy: z.array(characterIdSchema),
+  supersedes: factIdSchema.optional(),
 });
 export type CreateFactInput = z.infer<typeof createFactInputSchema>;
 export const setQuestStatusInputSchema = z.strictObject({
@@ -38,3 +39,13 @@ export const setQuestStatusInputSchema = z.strictObject({
   status: questStatusSchema,
 });
 export type SetQuestStatusInput = z.infer<typeof setQuestStatusInputSchema>;
+export const voiceNpcInputSchema = z.strictObject({
+  npc: characterIdSchema,
+  direction: z
+    .string()
+    .min(1)
+    .refine((text) => text.trim().split(/\s+/u).filter(Boolean).length <= 40, {
+      message: 'NPC direction must contain at most 40 words',
+    }),
+});
+export type VoiceNpcInput = z.infer<typeof voiceNpcInputSchema>;

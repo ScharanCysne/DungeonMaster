@@ -87,6 +87,20 @@ export const fact = {
   truth: true,
   kind: 'lore',
 };
+export const knowsEdge = {
+  ...provenance,
+  type: 'KNOWS',
+  from: 'char:player',
+  to: 'fact:quill',
+  properties: { since: 0, source: 'seed', confidence: 0.6 },
+};
+export const supersedesEdge = {
+  ...provenance,
+  type: 'SUPERSEDES',
+  from: 'fact:quill-correction',
+  to: 'fact:quill',
+  properties: {},
+};
 export const roll = {
   expr: '1d20+2',
   rolls: [13],
@@ -104,10 +118,16 @@ export const eventNode = {
   private: false,
   roll,
 };
+export const npcLine = { lineId: 'npc-line-1', text: 'Just an old box.' };
+export const peerLine = { speaker: 'char:kael', text: 'A clue.' };
 export const narration = {
   text: 'You spot scratches beneath the box.',
-  lines: [{ speaker: 'char:player', text: 'A clue.' }],
+  lines: [{ lineId: npcLine.lineId }, peerLine],
   mood: 'calm',
+};
+export const resolvedNarration = {
+  ...narration,
+  lines: [{ speaker: 'char:brann', ...npcLine }, peerLine],
 };
 export const criticIssue = {
   type: 'invented_content',
