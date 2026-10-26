@@ -198,3 +198,11 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
 - Added configurable NPC stat policy defaults from the generator pipeline. The
   price-table schema defaults to an empty table until real prices are filled in.
   Consumers must distinguish missing prices from zero cost.
+
+## Projection amendment
+
+`FactCreated.supersedes?` carries the correcting Fact's target so log replay can
+create SUPERSEDES. It is optional for existing v1 logs, matching
+`create_fact.supersedes`; learning/retraction remains a FactLearned projection effect.
+Character tile mirroring lives in the server's GraphNode extension; shared debug
+Character and Graph schemas remain unchanged.

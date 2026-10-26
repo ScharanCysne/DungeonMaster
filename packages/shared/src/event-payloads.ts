@@ -171,6 +171,7 @@ export const eventPayloadSchemas = {
     fact: factSchema,
     about: z.array(entityIdSchema),
     originOf: z.array(z.union([itemIdSchema, characterIdSchema])),
+    supersedes: factIdSchema.optional(),
   }),
   FactLearned: z.strictObject({
     characterId: characterIdSchema,

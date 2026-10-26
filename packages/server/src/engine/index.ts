@@ -4,6 +4,7 @@ import type {
   AttackOutput,
   ContestedCheckInput,
   EpisodeSeed,
+  GameEvent,
   EndCombatInput,
   EquipInput,
   HealInput,
@@ -50,6 +51,7 @@ import type { CommandActor, CommandOptions } from './transaction.js';
 import { createState } from './state.js';
 import type { EngineState, WalkabilityGrid } from './state.js';
 import { endCondition } from './endCondition.js';
+import { reduceEvent } from './replay.js';
 
 export type { CommandOptions } from './transaction.js';
 export interface EngineSnapshot {
@@ -65,6 +67,17 @@ export class Engine {
   constructor(seed: EpisodeSeed, grid: WalkabilityGrid, sessionSeed: string) {
     this.#state = createState(seed, grid, sessionSeed);
     this.#start = this.snapshot();
+  }
+
+  static fromLog(records: readonly GameEvent[], grid: WalkabilityGrid): Engine {
+    const first = records[0];
+    if (first?.type !== 'SeedLoaded')
+      throw new Error('Engine replay requires SeedLoaded as the first record.');
+    const engine = new Engine(first.payload.seed, grid, first.payload.rngSeed);
+    for (const record of records)
+      engine.#state = reduceEvent(engine.#state, record, grid);
+    engine.#start = engine.snapshot();
+    return engine;
   }
 
   get state(): EngineState {
@@ -261,3 +274,4 @@ export type { CheckReceipt } from './receipts.js';
 export type { EventDraft } from './events.js';
 export type { CombatState, EngineState, WalkabilityGrid } from './state.js';
 export { endCondition } from './endCondition.js';
+export { reduceEvent } from './replay.js';

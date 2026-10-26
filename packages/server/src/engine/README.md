@@ -177,3 +177,26 @@ direct targets still obey the room, consciousness and contest restrictions.
 - Loot is an ordinary `transfer_item` action with reason `loot`; the holder must
   be unconscious. Combat never ends automatically. `end_combat {reason}` requires
   active combat, emits `CombatEnded` in its original room and clears combat state.
+
+## Replay
+
+`Engine.fromLog(records, grid)` rebuilds state from committed records returned by
+`readEventLog`. The first record must be `SeedLoaded`; its full seed and `rngSeed`
+initialize the engine. The grid remains an explicit input. `reduceEvent` is also
+exported as a pure, detached state reducer. Replay applies recorded outcomes and
+stored positions without rolling dice or recomputing perception.
+
+Transfers restore holders, inventory, container contents and resulting gold;
+healing from an item removes that consumed item and its equipment. Container
+reveals restore item visibility. Combat reconstructs its room from the initiating
+actor, movement usage from `EntityMoved`, and its cursor from `TurnAdvanced`.
+`EntityCreated` registers characters (requiring position), containers (position
+or `LOCATED_IN`), items (holder edges or floor position), and locations (`PART_OF`).
+Generated keys use the same `key_for:` convention as the seed. Soft entities and
+other event types leave hard state unchanged; every subsequent record advances
+`state.beat`. Quest statuses remain in the graph because EngineState has no quests.
+
+Receipts, receipt counters, attempt and RNG position are transient and are not
+replayed. Call `beginBeat(nextBeat, attempt)` before resuming commands; it reseeds
+from the session seed, beat and attempt. Replayed engines have no pending drafts
+and use the reconstructed state as their initial rollback baseline.
