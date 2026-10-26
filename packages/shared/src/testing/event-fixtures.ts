@@ -91,6 +91,7 @@ export const eventPayloads = {
     ],
   },
   CombatEnded: { reason: 'talked_down' },
+  TurnAdvanced: { combatant: 'char:brann', round: 1, turn: 1 },
   EntityCreated: { entity: container, edges: [] },
   FactCreated: { fact, about: ['item:quill'], originOf: [] },
   FactLearned: {

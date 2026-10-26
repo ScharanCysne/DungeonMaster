@@ -5,7 +5,8 @@ with an already parsed `EpisodeSeed`, call `beginBeat(beat, attempt)`, then call
 the methods named after the engine tools. Inputs use the shared types and are
 expected to have passed the shared input schemas. State-dependent failures return
 `{ ok: false, error: { code, message } }` without changing any state, receipt,
-buffered event or RNG position. Invalid construction or beat coordinates throw
+buffered event or RNG position, except that an initiating attack can start combat
+before being refused its turn (see Combat). Invalid construction or beat coordinates throw
 `EngineError` before mutation.
 
 `state`, `snapshot()`, command results and `collectEvents()` return detached
@@ -17,7 +18,7 @@ aborted attempt before beginning its retry. Starting the next beat keeps the
 current hard state. Older receipts remain queryable in state but are invalid for
 new actions; a new attempt of the same beat replaces that beat's receipts.
 
-`combat` is `null`. Direct engine calls have no per-beat call limit.
+`combat` is `null` outside combat. Direct engine calls have no per-beat call limit.
 
 ## Events and perception
 
@@ -107,7 +108,8 @@ direct targets still obey the room, consciousness and contest restrictions.
   amount even when remaining HP is lower.
 - `apply_damage` is a system/environmental action with `actor: null`. Its shared
   input has only target, dice and free-text cause. The cause is descriptive;
-  it does not trigger an attack, initiative or turn resolution.
+  it does not trigger an attack or initiative. Knocking out the current combatant
+  advances their turn when another participant is eligible.
 - One transaction-boundary guard prevents quest-item creation, deletion,
   critical-flag changes and holder changes except actor-driven `transfer_item`.
   Ordinary movement carries inventory without changing its canonical holder;
@@ -117,3 +119,61 @@ direct targets still obey the room, consciousness and contest restrictions.
 - Construction checks seed references, HP/maxHP/consciousness consistency and
   rectangular grid dimensions. It does not validate full map geometry or reject
   location parent cycles.
+
+## Combat
+
+- An attack requires a conscious attacker and a character target in the same
+  room. Unconscious targets are allowed. Actor, target, weapon ownership, dice
+  syntax and safe damage arithmetic (including criticals) are checked before starting combat. Every conscious character in the
+  attacker's room participates, including hidden characters. Initiative records
+  d20 + DEX modifier for each participant, sorted by total descending, then DEX
+  score descending, then character ID ascending. Round 1 starts at index 0.
+- The first valid attack starts combat even if its attacker loses initiative.
+  In that case it returns `NOT_YOUR_TURN`; no attack roll occurs, but initiative,
+  RNG consumption and `CombatStarted` persist in state and `collectEvents()`.
+  If the attacker wins initiative, the successful result includes both the start
+  and attack events. Subsequent rejected commands preserve the entire snapshot.
+- While combat is active, only the current combatant may move, attack, initiate
+  checks or contests, search, open/unlock containers, transfer, equip/unequip,
+  hide, or heal using a check receipt. Receipt healing uses the receipt's actor.
+  Contest targets need not have the turn. A check consumes an action even if its
+  roll fails or ties; spending its receipt requires a later turn in the same beat.
+  Item/rest healing and environmental damage do not consume actions.
+- Each turn permits one `move`, including a move that stays on the same tile,
+  and one action. `MOVE_ALREADY_USED` rejects a second move. A successful action
+  immediately ends the turn; `pass_turn {actor}` ends it without an action.
+  Other actors receive `NOT_YOUR_TURN`. Movement is optional and must precede an
+  action. Rejected commands consume neither movement nor actions.
+- The combat room and initiative order remain fixed. Advancement skips
+  unconscious characters and those outside that room. Leaving the room ends the
+  fleeing character's turn immediately; environmental knockout does likewise.
+  Passing the end of the order increments the round, including when the only
+  eligible combatant receives another turn. Healing makes an original participant
+  eligible again. With nobody eligible, combat retains its cursor and movement
+  usage until healing permits advancement or combat is explicitly ended.
+- `CombatStarted` records order, round and turn. Every advancement emits
+  `TurnAdvanced {combatant, round, turn}`, including a new round with the same
+  combatant, and resets movement usage. `combat.roomId` comes from the instigator's
+  room at `CombatStarted`; `combat.moved` is set by the current actor's
+  `EntityMoved` and cleared by `TurnAdvanced`. These fields survive beat changes
+  and can be reconstructed from events and prior character positions.
+- An explicit weapon must be carried and have valid damage dice. Otherwise a
+  damaging main-hand item is used; otherwise the attack is unarmed. Item kind is
+  immaterial. The `ranged` tag uses DEX; otherwise `finesse` uses the higher of
+  STR and DEX; otherwise STR applies. All attacks add +2 proficiency regardless
+  of skill proficiencies. To-hit is d20 + ability modifier + 2 against AC.
+  Natural 20 always hits critically; natural 1 always misses.
+- A hit deals weapon dice plus the selected ability modifier, with minimum 1
+  damage. Criticals roll every weapon die twice, adding the expression's fixed
+  modifier and ability modifier once each. Unarmed damage is 1 + STR modifier,
+  minimum 1, with no damage RNG and no critical doubling. Its roll records a
+  constant expression and an empty dice array. Damage roll totals retain their
+  arithmetic value before the minimum is applied to `amount`.
+- `AttackResolved` records the to-hit roll, hit and critical flags, and the weapon
+  actually used. Hits additionally emit `DamageApplied`, attributed to the
+  attacker. Zero HP makes the target unconscious. All combat events use the same
+  command-time witness capture, darkness, privacy and contested-stealth rules as
+  other events; unconscious characters cannot witness subsequent commands.
+- Loot is an ordinary `transfer_item` action with reason `loot`; the holder must
+  be unconscious. Combat never ends automatically. `end_combat {reason}` requires
+  active combat, emits `CombatEnded` in its original room and clears combat state.

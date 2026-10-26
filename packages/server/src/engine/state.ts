@@ -35,6 +35,14 @@ export type EngineContainer = Omit<SeedContainer, 'location'> & {
 };
 export type EngineItem = SeedItem;
 
+export interface CombatState {
+  order: CharacterId[];
+  turn: number;
+  round: number;
+  roomId: LocationId;
+  moved: boolean;
+}
+
 export interface EngineState {
   beat: number;
   attempt: number;
@@ -47,7 +55,7 @@ export interface EngineState {
   grid: WalkabilityGrid;
   receipts: Map<string, CheckReceipt>;
   receiptCounter: number;
-  combat: null;
+  combat: CombatState | null;
 }
 
 export function createState(

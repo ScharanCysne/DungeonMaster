@@ -157,6 +157,11 @@ export const eventPayloadSchemas = {
       .min(1),
   }),
   CombatEnded: z.strictObject({ reason: combatEndReasonSchema }),
+  TurnAdvanced: z.strictObject({
+    combatant: characterIdSchema,
+    round: z.int().positive(),
+    turn: z.int().nonnegative(),
+  }),
   EntityCreated: z.strictObject({
     entity: nodeSchema,
     edges: z.array(edgeSchema),

@@ -136,3 +136,5 @@ export const endCombatInputSchema = z.strictObject({
   reason: combatEndReasonSchema,
 });
 export type EndCombatInput = z.infer<typeof endCombatInputSchema>;
+export const passTurnInputSchema = z.strictObject({ actor: characterIdSchema });
+export type PassTurnInput = z.infer<typeof passTurnInputSchema>;

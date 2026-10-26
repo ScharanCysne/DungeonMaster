@@ -50,6 +50,7 @@ export const toolInputs = {
   },
   heal: { target: 'char:player', dice: '1d4', source: 'rest' },
   end_combat: { reason: 'talked_down' },
+  pass_turn: { actor: 'char:player' },
   set_attitude: {
     from: 'char:brann',
     to: 'char:player',
@@ -99,6 +100,7 @@ export const toolOutputs = {
   apply_damage: events.DamageApplied,
   heal: events.Healed,
   end_combat: events.CombatEnded,
+  pass_turn: events.TurnAdvanced,
   set_attitude: events.AttitudeChanged,
   share_fact: { learned: [events.FactLearned] },
   create_fact: { factId: 'fact:new-clue' },

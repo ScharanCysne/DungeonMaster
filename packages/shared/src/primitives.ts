@@ -168,7 +168,7 @@ export const rollOutcomeSchema = z.enum(['success', 'failure', 'tie']);
 export type RollOutcome = z.infer<typeof rollOutcomeSchema>;
 export const rollSchema = z.strictObject({
   expr: z.string().min(1),
-  rolls: z.array(z.int().positive()).min(1),
+  rolls: z.array(z.int().positive()),
   total: z.int(),
   dc: z.int().optional(),
   outcome: rollOutcomeSchema,
@@ -192,6 +192,7 @@ export const eventTypeSchema = z.enum([
   'Healed',
   'CombatStarted',
   'CombatEnded',
+  'TurnAdvanced',
   'EntityCreated',
   'FactCreated',
   'FactLearned',

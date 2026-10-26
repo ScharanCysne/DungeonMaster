@@ -83,6 +83,10 @@ export const toolSchemas = {
     input: engine.endCombatInputSchema,
     output: output.endCombatOutputSchema,
   },
+  pass_turn: {
+    input: engine.passTurnInputSchema,
+    output: output.passTurnOutputSchema,
+  },
   set_attitude: {
     input: soft.setAttitudeInputSchema,
     output: output.setAttitudeOutputSchema,

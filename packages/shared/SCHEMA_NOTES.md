@@ -20,8 +20,9 @@ examples or prose instead of a complete wire format.
 - The fixed DC scale applies to ordinary item/container discovery and lock DCs as
   well as skill checks. A roll's `dc` is any integer because it also represents AC
   and opposed totals. Roll outcomes are `success | failure | tie`; attack criticals
-  have a separate boolean. Rolls contain at least one positive integer die result,
-  and totals may be negative. Dice expressions remain strings for the later engine
+  have a separate boolean. Die results are positive integers; fixed unarmed damage
+  uses an empty `rolls` array and a constant expression (e.g. `1+5`). Totals may be
+  negative and precede damage clamping. Dice expressions remain strings for the engine
   parser; the schemas do not implement dice syntax or arithmetic.
 - Proficiencies use the 18 standard 5e skill names in snake_case. Ability modifiers
   and the Episode N +2 proficiency bonus are engine rules, not additional Character
@@ -87,6 +88,12 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
   return receipt/winner/both rolls; sharing returns learned records; fact creation
   returns the assigned fact ID; narrate returns its narration. All are wrapped by
   the schema factory for the specified generic `ToolResult<T>` union.
+- `TurnAdvanced` carries `{combatant: CharacterId, round, turn}` with a positive
+  round and nonnegative turn index. Together with `CombatStarted`, `EntityMoved`
+  and `CombatEnded`, it preserves turn and movement usage for replay. `pass_turn`
+  accepts only `{actor: CharacterId}` and returns the `TurnAdvanced` payload.
+  A first attack refused its turn still leaves `CombatStarted` available through
+  event collection; the unchanged failed `ToolResult` branch contains only error.
 - `skill_check` requires exactly one of skill/ability. Unlocking requires `itemId`
   for a key and `checkId` for lockpick/force. Stealing requires `checkId`; buying
   requires a nonnegative integer `price`, consistent with integer gold balances.

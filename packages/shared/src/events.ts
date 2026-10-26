@@ -39,6 +39,7 @@ export const gameEventSchema = z.discriminatedUnion('type', [
   record('Healed'),
   record('CombatStarted'),
   record('CombatEnded'),
+  record('TurnAdvanced'),
   record('EntityCreated'),
   record('FactCreated'),
   record('FactLearned'),

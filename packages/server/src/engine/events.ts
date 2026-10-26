@@ -13,6 +13,10 @@ export type EngineEventType =
   | 'EntityHidden'
   | 'CheckRolled'
   | 'DamageApplied'
+  | 'CombatStarted'
+  | 'CombatEnded'
+  | 'TurnAdvanced'
+  | 'AttackResolved'
   | 'Healed';
 export type EventBody = {
   [K in EngineEventType]: Pick<GameEventOf<K>, 'type' | 'payload'>;
