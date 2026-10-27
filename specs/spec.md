@@ -781,6 +781,16 @@ Rules that apply to every tool call:
 - Handlers don't change engine state until validation passes. A rejected call has no
   side effects.
 - Every call, its input, its result and its latency are recorded in the beat trace.
+- **Strict schemas, within the API's limits.** Tool definitions are sent with
+  `strict: true` where possible, but the API caps a request at 20 strict tools, 16
+  union-typed parameters across them, and a maximum compiled grammar size. Measured
+  against the live API, 14 tools fit: move, skill_check, search, open_container,
+  unlock_container, transfer_item, attack, apply_damage, hide, heal, set_attitude,
+  share_fact, voice_npc and narrate. The rest (contested_check, pass_turn,
+  end_combat, equip, unequip, set_quest_status, create_fact and the generators) are
+  sent without strict mode. All inputs are zod-validated either way. Optional fields
+  are left out of `required` rather than modelled as nullable unions.
+  `npm run llm:tools-check` confirms the API accepts the whole set.
 - **Check receipts.** Checks return a `checkId`. Tools whose outcome depends on a roll
   (`unlock_container` by lockpicking or force, `search`, `transfer_item` with reason
   `steal`, `hide`) require a `checkId` from this beat with a successful outcome for the

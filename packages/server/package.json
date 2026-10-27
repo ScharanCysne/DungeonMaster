@@ -7,6 +7,7 @@
     "typecheck": "tsc --noEmit",
     "graph:rebuild": "node scripts/graph-rebuild.mjs",
     "llm:ping": "node scripts/llm-ping.mjs",
+    "llm:tools-check": "node scripts/llm-tools-check.mjs",
     "content:check": "node scripts/content-check.mjs",
     "graph:seed": "node scripts/graph-seed.mjs"
   },

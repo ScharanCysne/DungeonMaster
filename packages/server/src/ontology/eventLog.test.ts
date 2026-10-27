@@ -44,6 +44,16 @@ afterEach(async () => {
 });
 
 describe('event log', () => {
+  it('preserves per-draft provenance while defaulting older drafts to the beat envelope', () => {
+    const records = envelopeDrafts(
+      [
+        ...drafts(),
+        ...drafts().map((event) => ({ ...event, createdBy: 'dm' as const })),
+      ],
+      envelope,
+    );
+    expect(records.map((event) => event.createdBy)).toEqual(['engine', 'dm']);
+  });
   it('envelopes detached, validated records with sequences from zero', () => {
     const input = drafts();
     const records = envelopeDrafts([...input, ...input], envelope);

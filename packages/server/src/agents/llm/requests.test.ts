@@ -174,9 +174,9 @@ const invalidRequests: LlmRequest[] = [
     role: 'dm',
     tools: [
       {
-        name: 'optional',
+        name: 'loose',
         description: '',
-        inputSchema: z.strictObject({ field: z.string().optional() }),
+        inputSchema: z.looseObject({ field: z.string() }),
       },
     ],
   },

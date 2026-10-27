@@ -13,6 +13,9 @@ export interface ToolSchema {
   name: string;
   description: string;
   inputSchema: z.ZodType;
+  apiInputSchema?: z.core.JSONSchema.JSONSchema & { type: 'object' };
+  // Defaults to true; the API accepts at most 20 strict tools per request.
+  strict?: boolean;
   cache?: boolean;
   ttl?: CacheTtl;
 }

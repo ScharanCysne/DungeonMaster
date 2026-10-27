@@ -32,10 +32,14 @@ function strictObjects(schema: unknown): void {
       typeof schema.properties !== 'object' ||
       schema.properties === null ||
       !Array.isArray(required) ||
-      Object.keys(schema.properties).some((name) => !required.includes(name))
+      required.some(
+        (name) =>
+          typeof name !== 'string' ||
+          !Object.keys(schema.properties ?? {}).includes(name),
+      )
     ) {
       throw new Error(
-        'Strict tool objects require additionalProperties:false and every property required',
+        'Strict tool objects require additionalProperties:false and a required list naming only declared properties',
       );
     }
   }
@@ -43,7 +47,7 @@ function strictObjects(schema: unknown): void {
 }
 
 export function toolInputSchema(tool: ToolSchema) {
-  const schema = z.toJSONSchema(tool.inputSchema);
+  const schema = tool.apiInputSchema ?? z.toJSONSchema(tool.inputSchema);
   if (schema.type !== 'object')
     throw new Error('Tool inputs must be object schemas');
   // Empty objects have no required array in Zod's JSON schema output.
@@ -77,7 +81,7 @@ export function prepareRequest(request: LlmRequest) {
       name: tool.name,
       description: tool.description,
       input_schema: toolInputSchema(tool),
-      strict: true,
+      strict: tool.strict ?? true,
       ...(tool.cache ? { cache_control: cacheControl(tool.ttl ?? ttl) } : {}),
     };
   });

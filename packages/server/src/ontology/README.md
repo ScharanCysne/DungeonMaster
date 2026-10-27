@@ -1,7 +1,9 @@
 # Event log and ontology
 
 `envelopeDrafts(drafts, envelope)` validates v1 records with sequences starting at
-zero. `EventLog(dataDir, sessionId).commitBeat(envelope, drafts)` appends all records
+zero. A draft's optional `createdBy` overrides the beat envelope's default so a
+beat can mix engine, DM and generator provenance.
+`EventLog(dataDir, sessionId).commitBeat(envelope, drafts)` appends all records
 and its `BeatCommitted` marker in **one write**, then fsyncs and closes the file.
 This follows the Slice 4 request's single-write marker placement. Commits on one
 instance are serialized; use one writer instance per session. Beats must increase,

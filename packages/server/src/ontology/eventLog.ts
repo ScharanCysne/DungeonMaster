@@ -8,7 +8,8 @@ export type LogDraft = {
     GameEventOf<T>,
     'type' | 'payload' | 'actor' | 'private' | 'witnesses'
   >;
-}[GameEvent['type']];
+}[GameEvent['type']] &
+  Partial<Pick<EventEnvelope, 'createdBy'>>;
 export type BeatEnvelope = Pick<
   EventEnvelope,
   'sessionId' | 'beat' | 'createdBy' | 'traceId'
@@ -22,6 +23,7 @@ export function envelopeDrafts(
     gameEventSchema.parse({
       ...draft,
       ...envelope,
+      createdBy: draft.createdBy ?? envelope.createdBy,
       v: 1,
       seq,
     }),

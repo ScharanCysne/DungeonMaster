@@ -8,6 +8,10 @@ limits belong to the caller. Only `AnthropicProvider.ts` imports SDK types or co
   Use `validateToolInput` before executing a tool; invalid inputs should produce an
   `is_error` result. `appendToolResults` preserves the complete assistant turn and
   appends all results in one user turn. It does not execute or retry tools.
+  The tool registry supplies `apiInputSchema` for optional-field normalization;
+  use its `toolSchemasForProvider` and `executeToolCall` together. The override
+  still passes the provider's strict-object checks; ordinary schemas retain the
+  existing conversion and validation behavior.
 - Other roles can pass `outputFormat`; `parsedOutput` then has the schema's output
   type. Missing, invalid, or incomplete output throws `LlmValidationError`.
 - DM and story enable server refusal fallbacks, including story's beta structured
