@@ -1,0 +1,179 @@
+{
+  "checked_on": "2026-10-26",
+  "finalists": [
+    {
+      "slug": "kenney-roguelike-indoors-characters",
+      "name": "Roguelike Indoors + Roguelike Characters",
+      "author": "Kenney (kenney.nl)",
+      "urls": ["https://kenney.nl/assets/roguelike-indoors", "https://kenney.nl/assets/roguelike-characters"],
+      "licence": "\"Creative Commons CC0\" (links to https://creativecommons.org/publicdomain/zero/1.0/); preview images also say \"CC0 1.0 ... Written permission not required, support us by crediting or donating (voluntary)\"",
+      "licence_seen_at": ["https://kenney.nl/assets/roguelike-indoors", "https://kenney.nl/assets/roguelike-characters"],
+      "tile_size": "Not stated on either page. Believed to be 16x16 with 1px spacing on the sheet, as in the rest of Kenney's Roguelike series, but that is UNVERIFIED",
+      "counts": "Indoors: 480 files. Characters: 450 files (page counts only; there are no separate tile counts)",
+      "tavern_props": {
+        "wooden_floor": "yes (sample map)",
+        "stone_brick_walls": "partial: plaster/beige interior walls in the sample; stone not confirmed",
+        "bar_counter": "partial: long counters and kitchen units",
+        "bottle_shelves": "partial: shelves and cabinets with items; dedicated bottle shelf not confirmed",
+        "barrels": "not confirmed in preview",
+        "tables_chairs": "yes, many variants",
+        "fireplace": "not confirmed (cast-iron stove present)",
+        "doors": "yes",
+        "stairs": "possible (ladder-like pieces); not confirmed",
+        "rug": "yes",
+        "chest": "not confirmed",
+        "trapdoor": "no"
+      },
+      "characters": "Modular paper-doll system: bodies/skin tones + clothing + hair + headgear + weapons + shields. It can produce dozens of distinct humanoids (ranger, fighter, cleric, hooded stranger and so on). No halfling body type.",
+      "animations": false,
+      "item_icons": "Weapons and shields are in the character pack (a bow is likely); no quill, letter or rope seen",
+      "style": "Colourful, flat, low-contrast muted pastel, no dark outline, orthographic top-down with front-facing furniture",
+      "gaps": "No animations and only one facing direction. Characters must be composited from layers. Tile size is not stated on the page. Unclear whether it has a barrel, fireplace or chest, so Tiny Dungeon may be needed to fill those in. No trapdoor.",
+      "previews": [
+        "previews/kenney-roguelike-indoors-1.png",
+        "previews/kenney-roguelike-indoors-2.png",
+        "previews/kenney-roguelike-characters-1.png",
+        "previews/kenney-roguelike-characters-2.png"
+      ]
+    },
+    {
+      "slug": "kenney-tiny-dungeon-town",
+      "name": "Tiny Dungeon + Tiny Town",
+      "author": "Kenney (kenney.nl)",
+      "urls": ["https://kenney.nl/assets/tiny-dungeon", "https://kenney.nl/assets/tiny-town"],
+      "licence": "\"Creative Commons CC0\" (links to https://creativecommons.org/publicdomain/zero/1.0/)",
+      "licence_seen_at": ["https://kenney.nl/assets/tiny-dungeon", "https://kenney.nl/assets/tiny-town"],
+      "tile_size": "16x16 (stated on both pages: \"16 × 16\")",
+      "counts": "Tiny Dungeon: 130 files. Tiny Town: 130 files (page file counts)",
+      "tavern_props": {
+        "wooden_floor": "partial: Tiny Town wood-plank wall/facade tiles; Tiny Dungeon floors are sand/stone",
+        "stone_brick_walls": "yes (grey stone brick walls in both)",
+        "bar_counter": "no",
+        "bottle_shelves": "no (individual potion bottles only)",
+        "barrels": "yes",
+        "tables_chairs": "yes, simple (table, stool, bench)",
+        "fireplace": "no (wall torch/brazier only)",
+        "doors": "yes (several, arched and wooden)",
+        "stairs": "yes (stair/ladder tiles)",
+        "rug": "no",
+        "chest": "yes (closed, open and mimic)",
+        "trapdoor": "no (a grate/hatch tile may substitute)"
+      },
+      "characters": "About 16 humanoid sprites in Tiny Dungeon: wizard, knights, rogue, bearded dwarf-like figure, women, hooded figure, plus monsters. Enough for the party and most NPCs if some are reused. No dedicated barkeep, cook or bard.",
+      "animations": false,
+      "item_icons": "Potions (several colours), swords, axes, staffs and shields in Tiny Dungeon; key, bow, arrow, tools and bags in Tiny Town. No quill, letter or rope.",
+      "style": "Bright, chunky, thick dark outline, 3/4 top-down, warm sand and cool grey palette, consistent across the Tiny series",
+      "gaps": "Weak on tavern furniture (no bar, bottle shelf, fireplace or rug), no animations, single-facing characters, small sheet",
+      "previews": [
+        "previews/kenney-tiny-dungeon-1.png",
+        "previews/kenney-tiny-dungeon-2.png",
+        "previews/kenney-tiny-town-1.png"
+      ]
+    },
+    {
+      "slug": "ninja-adventure",
+      "name": "Ninja Adventure - Asset Pack",
+      "author": "Pixel-Boy and AAA",
+      "urls": ["https://pixel-boy.itch.io/ninja-adventure-asset-pack"],
+      "licence": "\"They are released under the Creative Commons Zero (CC0) license.\" ... \"Attribution is not required but appreciated.\" Sidebar: \"Creative Commons Zero v1.0 Universal\"",
+      "licence_seen_at": ["https://pixel-boy.itch.io/ninja-adventure-asset-pack"],
+      "tile_size": "16x16 per the page tag. The description text does not state a tile size.",
+      "counts": "50+ characters (with animations and faceset), 30+ monsters, 9 bosses, 60+ items, 30+ visual effects, 100+ SFX, 37 music tracks, 2 fonts; tile count not stated",
+      "tavern_props": {
+        "wooden_floor": "likely (interior tileset elements stated); not confirmed in screenshots",
+        "stone_brick_walls": "likely; not confirmed for interiors",
+        "bar_counter": "not confirmed",
+        "bottle_shelves": "not confirmed",
+        "barrels": "not confirmed (pots and crates appear in exterior shots)",
+        "tables_chairs": "not confirmed",
+        "fireplace": "not confirmed",
+        "doors": "yes (building doors)",
+        "stairs": "yes (exterior steps)",
+        "rug": "not confirmed",
+        "chest": "not confirmed",
+        "trapdoor": "no"
+      },
+      "furniture_note": "On furniture, the author wrote in a page comment: \"It's a bit limited at the moment\"",
+      "characters": "50+ distinct humanoid and creature characters (the gallery caption says 56), each with walk/attack-style animations and a portrait faceset. Wide variety: hooded figures, old men, warriors, monks, a chef-like hat. The best candidate for all 9 party and NPC roles.",
+      "animations": true,
+      "item_icons": "60+ items: feather/quill-like, scroll/book, potion-like flasks, arrows, tools, food; key, letter and rope not confirmed",
+      "style": "Saturated, colourful, dark outlines, chibi proportions, Zelda-like 3/4 top-down. Ninja/east-Asian flavour on some characters.",
+      "gaps": "Interior and tavern furniture is limited by the author's own admission, so tavern props would need supplementing (for example from Kenney Roguelike Indoors, though the styles differ). The ninja theme is a slight mismatch with D&D.",
+      "previews": [
+        "previews/ninja-adventure-1.png",
+        "previews/ninja-adventure-2.png",
+        "previews/ninja-adventure-3.png"
+      ]
+    },
+    {
+      "slug": "kenney-1-bit-pack",
+      "name": "1-Bit Pack",
+      "author": "Kenney (kenney.nl)",
+      "urls": ["https://kenney.nl/assets/1-bit-pack"],
+      "licence": "\"Creative Commons CC0\" (links to https://creativecommons.org/publicdomain/zero/1.0/)",
+      "licence_seen_at": ["https://kenney.nl/assets/1-bit-pack"],
+      "tile_size": "16x16 (stated: \"16 × 16\")",
+      "counts": "1078 files (page count); includes monochrome and transparent variants",
+      "tavern_props": {
+        "wooden_floor": "partial: 1-bit pattern floors; the interior sample uses a plain floor",
+        "stone_brick_walls": "yes",
+        "bar_counter": "yes (long tables and counters in the interior sample)",
+        "bottle_shelves": "partial: shelves and bookcases",
+        "barrels": "likely; not confirmed in preview",
+        "tables_chairs": "yes",
+        "fireplace": "possible (stove/hearth-like tile in interior sample); not confirmed",
+        "doors": "yes",
+        "stairs": "yes (stair and ladder tiles in the sheet)",
+        "rug": "partial: patterned floor tiles",
+        "chest": "likely; not confirmed",
+        "trapdoor": "possible: hatch/grate tiles; not confirmed"
+      },
+      "characters": "Many 1-bit humanoids in the sheet (dozens): knights, robed and hooded figures, bearded characters, and others. Enough distinct silhouettes for all 9 roles, though they can only be told apart by silhouette and tint.",
+      "animations": false,
+      "item_icons": "Large icon set: keys, potions, bows, swords, scrolls, hearts, coins and more; quill, letter and rope plausible but not confirmed",
+      "style": "Muted 1-bit: light glyphs on a dark plum background, with orange, green, red and yellow accents. Roguelike/orthographic, no outline.",
+      "gaps": "No animations. The minimalist look loses tavern atmosphere, and characters read as icons. Many specific props are unconfirmed without opening the sheet.",
+      "previews": [
+        "previews/kenney-1-bit-pack-1.png",
+        "previews/kenney-1-bit-pack-2.png"
+      ]
+    }
+  ],
+  "excluded": [
+    {
+      "name": "16x16 DungeonTileset II (0x72)",
+      "licence": "CC0. Page: \"You can use this tileset for whatever you like (CC-0).\" Sidebar: \"Creative Commons Zero v1.0 Universal\" (https://0x72.itch.io/dungeontileset-ii)",
+      "reason": "Licence OK, but it is dungeon-only: no tavern furniture, bar, shelves or fireplace. Strong runner-up as a source of animated idle/run characters (knight, elf, wizard, lizard, dwarf; male and female variants), but heroes are few and there are no townsfolk."
+    },
+    {
+      "name": "Versatile 255-Tile Pixel Art Pack (wareya / ufeff)",
+      "licence": "CC0. Page: \"Creative commons zero, public domain!\" Sidebar: \"Creative Commons Zero v1.0 Universal\" (https://wareya.itch.io/versatile-255-tile-pixel-art-pack)",
+      "reason": "Licence OK, but it is generic: about 4 humanoid characters, mixed side-view and top-down, and few tavern props (bed, pot, chest, carpet, door)"
+    },
+    {
+      "name": "Tangerine Tavern! Fantasy Tileset (PetricakeGames)",
+      "licence": "\"This work is published under a Creative Commons--Attribution Share-Alike license\", linking to CC BY-SA 4.0 (https://petricakegames.itch.io/tangerine-tavern-fantasy-tileset)",
+      "reason": "Not CC0 (attribution and share-alike). The full pack also costs $1+. Otherwise a direct 16x16 tavern fit."
+    },
+    {
+      "name": "AxulArt's Basic Top-down Interior (AxulArt)",
+      "licence": "\"This work is licensed under a Creative Commons Attribution 4.0 International License.\" Link and badge are inconsistent (BY-SA 4.0 link, BY 3.0 badge) (https://axulart.itch.io/axularts-basic-top-down-interior)",
+      "reason": "Not CC0 (attribution required)"
+    },
+    {
+      "name": "[LPC] Tavern (bluecarrot16, OpenGameArt)",
+      "licence": "UNVERIFIED: opengameart.org returned HTTP 503. A search snippet says CC-BY-SA 3.0 (https://opengameart.org/content/lpc-tavern)",
+      "reason": "Probably not CC0 (LPC packs are BY-SA/GPL). It is also 32x32, not 16x16."
+    },
+    {
+      "name": "Interior Tileset 16x16 (Bonsaiheldin, OpenGameArt)",
+      "licence": "UNVERIFIED: opengameart.org returned HTTP 503. A search snippet says CC-BY-SA 3.0 (https://opengameart.org/content/interior-tileset-16x16)",
+      "reason": "Probably not CC0 (share-alike)"
+    },
+    {
+      "name": "Fantasy Interiors - 16x16 Top-Down Tileset (bubbabba)",
+      "licence": "Paid ($4.95+); seen only in a search result snippet, page not opened",
+      "reason": "Not free and not CC0, though it is the best tavern match found"
+    }
+  ]
+}

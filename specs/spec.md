@@ -89,7 +89,7 @@ machine.
 | World seed | A hand-written seed (characters, tavern layout, key NPCs and containers, the quill's true location). Details are generated during play. | Runs can be repeated and compared; the generators still get exercised. |
 | Ontology store | Neo4j (Community, Docker) as a projection of an append-only event log. | Real graph queries plus free visual inspection in Neo4j Browser. The log keeps history safe and makes replay possible. |
 | Rendering | Phaser 3 for the map, with maps made in Tiled (`.tmj`). React for everything around it. | Tilemaps, sprites, camera and input come built in, and the same engine will serve the overworld later. |
-| Art | Free CC0 top-down fantasy packs (e.g. Kenney "Tiny Dungeon" / "Tiny Town" or similar, chosen at implementation time for a consistent tile size). Generated entities are mapped to the closest existing sprite by tag. | It looks coherent from day one and is legally clean. |
+| Art | **Kenney 1-Bit Pack (CC0, 16×16), recoloured to the Codex palette**: dark-brown ink on parchment, red ink for selection and warm accents, so the map reads as an ink illustration on the book's left page. Chosen from a shortlist of four CC0 packs (`mocks/asset-packs/index.html`). Generated entities are mapped to the closest sprite by tag. | One cohesive style for tiles, characters and icons that matches the book UI; the most pieces of any CC0 pack. Trade-off: no animation and less colour, so characters are told apart by name labels and per-role ink tints. |
 | Rules | 5e-lite (see [Rules summary](#rules-summary)). | Enough for "do anything" to have consequences, without a full rulebook. |
 | Debug visibility | Live ontology graph panel, beat trace / LLM log, replay from the event log, per-agent knowledge view. | Episode N exists to test mechanics, so the machinery must be visible. |
 | Language | TypeScript throughout. Zod schemas are the single source of truth for every shape that crosses a boundary (LLM output, tool I/O, network messages, events, seed file); the static types are derived from them. | LLM output is the least trustworthy input in the system. |
@@ -1300,14 +1300,17 @@ the session from the event log or start a new run from the seed.
 
 ### Assets
 
-- One CC0 top-down pack with a single tile size (16 px expected), chosen at
-  implementation time. A second CC0 pack for characters is fine if the palettes match.
-  Each pack keeps its LICENSE file in `content/assets/<pack>/`.
+- **Kenney 1-Bit Pack** (CC0, 16×16), kept with its licence file in
+  `content/assets/kenney-1-bit/`. Sprites are recoloured at build time, not in the
+  original files: ink `#2b1d12` on parchment `#f6ecd6`, red ink `#9b1c1c` for warm
+  accents and selection, and a small per-role ink tint for characters (player, peers,
+  NPCs) so they can be told apart without full colour. Missing tavern pieces are drawn
+  as new 16×16 tiles in the same 1-bit style and kept in `content/assets/dungeon-extra/`.
 - The tavern is rebuilt in Tiled following the prototype's layout: bar with bottle
   shelves and strongbox, hearth, stage, common room with rug and tables, stairs,
   kitchen with a counter, barrels and the cellar trapdoor.
-- `sprites.json` maps tags to frames, e.g. `{"barrel": "tiny-dungeon:82",
-  "quill": "tiny-dungeon:121"}`, plus a fallback frame per entity kind.
+- `sprites.json` maps tags to frames, e.g. `{"barrel": "kenney-1-bit:204",
+  "quill": "kenney-1-bit:633"}`, plus a fallback frame per entity kind.
 
 ### Accessibility basics
 
