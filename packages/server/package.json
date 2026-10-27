@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "graph:rebuild": "node --env-file=../../.env scripts/graph-rebuild.mjs"
+    "graph:rebuild": "node --env-file=../../.env scripts/graph-rebuild.mjs",
+    "content:check": "node scripts/content-check.mjs",
+    "graph:seed": "node --env-file=../../.env scripts/graph-seed.mjs"
   },
   "dependencies": {
     "@dungeon/shared": "*",

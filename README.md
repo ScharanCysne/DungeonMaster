@@ -35,6 +35,8 @@ npm run typecheck
 npm test
 npm run test:integration
 npm run graph:rebuild -- <sessionId>
+npm run content:check
+npm run graph:seed
 npm run build -w @dungeon/client
 ```
 
@@ -48,6 +50,12 @@ clears the graph. Set
 repo root). Both commands require Neo4j; `npm test` does not. See the
 [ontology README](packages/server/src/ontology/README.md) for encoding, transaction
 semantics and rebuild details.
+
+`content:check` validates the Episode N seed, map, sprite mappings and placements
+without Neo4j. `graph:seed` validates the same content, then loads `.env`, clears
+the configured Neo4j graph and projects the episode's `SeedLoaded` event, printing
+node and edge counts. See the [episode guide](content/episode-n/README.md) for
+solution paths, map conventions and editing instructions.
 
 The npm workspaces are `packages/shared` (protocol and future schemas),
 `packages/server` (server foundation), and `packages/client` (Vite and React).

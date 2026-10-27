@@ -9,4 +9,5 @@ export * from './tools.js';
 export * from './protocol.js';
 export * from './debug.js';
 export * from './seed.js';
+export * from './sprites.js';
 export * from './config.js';

@@ -1,0 +1,1410 @@
+{
+  "episodeId": "episode-n",
+  "mapId": "tavern",
+  "locations": [
+    {
+      "id": "loc:tavern",
+      "name": "The Crooked Lantern",
+      "summary": "Rain drums on a crooked roof; warm light spills across the threshold.",
+      "tags": [],
+      "kind": "building",
+      "tileBounds": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 16
+      },
+      "lit": true
+    },
+    {
+      "id": "loc:common-room",
+      "name": "Common room",
+      "summary": "A worn red rug divides crowded tables from the hearth and bar.",
+      "tags": [],
+      "kind": "room",
+      "tileBounds": {
+        "x": 1,
+        "y": 1,
+        "w": 24,
+        "h": 14
+      },
+      "lit": true,
+      "partOf": "loc:tavern"
+    },
+    {
+      "id": "loc:bar",
+      "name": "Behind the bar",
+      "summary": "Bottles crowd the shelves; Brann guards the narrow passage at the counter\u2019s end.",
+      "tags": [],
+      "kind": "room",
+      "tileBounds": {
+        "x": 1,
+        "y": 1,
+        "w": 9,
+        "h": 2
+      },
+      "lit": true,
+      "partOf": "loc:tavern"
+    },
+    {
+      "id": "loc:stage",
+      "name": "Bard\u2019s stage",
+      "summary": "Scuffed planks amplify every missed note.",
+      "tags": [],
+      "kind": "room",
+      "tileBounds": {
+        "x": 20,
+        "y": 1,
+        "w": 5,
+        "h": 3
+      },
+      "lit": true,
+      "partOf": "loc:tavern"
+    },
+    {
+      "id": "loc:kitchen",
+      "name": "Kitchen",
+      "summary": "Onion steam hangs above old ale stock and a shut cellar hatch.",
+      "tags": [],
+      "kind": "room",
+      "tileBounds": {
+        "x": 18,
+        "y": 9,
+        "w": 7,
+        "h": 6
+      },
+      "lit": true,
+      "partOf": "loc:tavern"
+    },
+    {
+      "id": "loc:stairs",
+      "name": "Stairs",
+      "summary": "Two worn steps lead toward rooms beyond this episode\u2019s map.",
+      "tags": [],
+      "kind": "room",
+      "tileBounds": {
+        "x": 1,
+        "y": 6,
+        "w": 1,
+        "h": 2
+      },
+      "lit": true,
+      "partOf": "loc:tavern"
+    },
+    {
+      "id": "loc:hearth",
+      "name": "Hearthside",
+      "summary": "A loose brick sits within reach of the fire\u2019s warmth.",
+      "tags": [],
+      "kind": "spot",
+      "tileBounds": {
+        "x": 13,
+        "y": 1,
+        "w": 3,
+        "h": 1
+      },
+      "lit": true,
+      "partOf": "loc:common-room"
+    },
+    {
+      "id": "loc:hatch",
+      "name": "Cellar hatch and old stock",
+      "summary": "Dust cakes the barrels beside a heavy wooden hatch.",
+      "tags": [],
+      "kind": "spot",
+      "tileBounds": {
+        "x": 21,
+        "y": 13,
+        "w": 4,
+        "h": 1
+      },
+      "lit": true,
+      "partOf": "loc:kitchen"
+    }
+  ],
+  "characters": [
+    {
+      "id": "char:kael",
+      "name": "Kael Varn",
+      "summary": "Half-elf ranger, level 5; a tracker following a forger\u2019s last trail.",
+      "tags": ["ranger", "half-elf", "darkvision"],
+      "role": "player",
+      "abilities": {
+        "str": 12,
+        "dex": 18,
+        "con": 14,
+        "int": 12,
+        "wis": 16,
+        "cha": 10
+      },
+      "hp": 31,
+      "maxHp": 38,
+      "ac": 15,
+      "gold": 34,
+      "proficiencies": ["perception", "survival", "investigation", "stealth"],
+      "personality": "Quiet, watchful; asks short questions and remembers the answers.",
+      "background": "Odo forged the warrant that ruined Kael\u2019s family. The Inkless Quill may expose the hand behind it. At Greywater, Kael carried Mael out of a burning chapel.",
+      "appearance": "Rain-dark green cloak, auburn hair, a yew bow over one shoulder.",
+      "tile": {
+        "x": 12,
+        "y": 9
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:ilsa",
+      "name": "Ilsa Quickfingers",
+      "summary": "Halfling rogue, level 5; every smile hides an exit.",
+      "tags": ["rogue", "halfling"],
+      "role": "peer",
+      "abilities": {
+        "str": 8,
+        "dex": 18,
+        "con": 12,
+        "int": 14,
+        "wis": 12,
+        "cha": 16
+      },
+      "hp": 22,
+      "maxHp": 27,
+      "ac": 14,
+      "gold": 7,
+      "proficiencies": [
+        "sleight_of_hand",
+        "stealth",
+        "deception",
+        "investigation"
+      ],
+      "personality": "Warm teasing patter; counts pockets while appearing to count friends.",
+      "background": "A Thieves\u2019 Guild courier who lost a crooked card game to Brann. She needs the debt erased before the guild hears.",
+      "appearance": "Violet coat, black curls, quick hands below the table.",
+      "tile": {
+        "x": 11,
+        "y": 10
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:doran",
+      "name": "Doran Ashby",
+      "summary": "Human fighter, level 5; a patient man with one dangerous grudge.",
+      "tags": ["fighter", "human"],
+      "role": "peer",
+      "abilities": {
+        "str": 18,
+        "dex": 12,
+        "con": 16,
+        "int": 10,
+        "wis": 12,
+        "cha": 10
+      },
+      "hp": 44,
+      "maxHp": 44,
+      "ac": 18,
+      "gold": 19,
+      "proficiencies": ["athletics", "intimidation", "perception"],
+      "personality": "Plain-spoken and protective; falls silent at talk of his brother.",
+      "background": "His brother died in an Ashen Hand ambush. Doran has followed the faction\u2019s burned-hand seal from town to town.",
+      "appearance": "Copper hair, dented mail, shield painted with a faded ash tree.",
+      "tile": {
+        "x": 13,
+        "y": 10
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:mael",
+      "name": "Sister Mael",
+      "summary": "Human cleric, level 5; mercy sits uneasily beside obedience.",
+      "tags": ["cleric", "human"],
+      "role": "peer",
+      "abilities": {
+        "str": 12,
+        "dex": 10,
+        "con": 14,
+        "int": 12,
+        "wis": 18,
+        "cha": 14
+      },
+      "hp": 18,
+      "maxHp": 33,
+      "ac": 16,
+      "gold": 12,
+      "proficiencies": ["religion", "medicine", "insight"],
+      "personality": "Gentle, measured speech; touches her holy symbol before a difficult answer.",
+      "background": "Kael saved her at Greywater. Her abbess now demands the quill for the Temple of the Dawn, by any means.",
+      "appearance": "Ivory robes over mail, white veil, a small gold sun at her throat.",
+      "tile": {
+        "x": 12,
+        "y": 11
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:brann",
+      "name": "Brann, the barkeep",
+      "summary": "Keeper of the Crooked Lantern, its keys and its grudges.",
+      "tags": ["barkeep"],
+      "role": "npc",
+      "abilities": {
+        "str": 14,
+        "dex": 10,
+        "con": 14,
+        "int": 12,
+        "wis": 14,
+        "cha": 12
+      },
+      "hp": 26,
+      "maxHp": 26,
+      "ac": 12,
+      "gold": 61,
+      "proficiencies": ["insight", "intimidation"],
+      "personality": "Gruff hospitality; polishes the same mug when nervous.",
+      "background": "Bought the Lantern\u2019s trade from Odo and inherited more debts than customers. Keeps Odo\u2019s small iron key on his belt.",
+      "appearance": "Broad shoulders, rolled sleeves, flour-white apron stained with ale.",
+      "tile": {
+        "x": 5,
+        "y": 2
+      },
+      "location": "loc:bar",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:tobb",
+      "name": "Old Tobb",
+      "summary": "A drunk regular with scraps of a useful memory.",
+      "tags": ["drunk"],
+      "role": "npc",
+      "abilities": {
+        "str": 9,
+        "dex": 8,
+        "con": 12,
+        "int": 10,
+        "wis": 11,
+        "cha": 13
+      },
+      "hp": 12,
+      "maxHp": 12,
+      "ac": 10,
+      "gold": 2,
+      "proficiencies": ["history"],
+      "personality": "Wandering sentences, startling flashes of clarity, then another drink.",
+      "background": "Once unloaded Odo\u2019s carts. Remembers a black feather, an old barrel and a promise not to look.",
+      "appearance": "Weathered face, grey wisps of hair, patched brown coat.",
+      "tile": {
+        "x": 7,
+        "y": 4
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:wren",
+      "name": "Wren the bard",
+      "summary": "A bright voice with a weakness for a better story.",
+      "tags": ["bard"],
+      "role": "npc",
+      "abilities": {
+        "str": 8,
+        "dex": 14,
+        "con": 10,
+        "int": 12,
+        "wis": 12,
+        "cha": 16
+      },
+      "hp": 18,
+      "maxHp": 18,
+      "ac": 12,
+      "gold": 15,
+      "proficiencies": ["performance", "persuasion"],
+      "personality": "Rhymes when nervous; tells rumours as if they happened yesterday.",
+      "background": "Travels the river taverns collecting songs. Mistook the stranger\u2019s familiar gait for Odo\u2019s return.",
+      "appearance": "Crimson doublet, golden curls, a battered lute.",
+      "tile": {
+        "x": 22,
+        "y": 2
+      },
+      "location": "loc:stage",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:stranger",
+      "name": "Hooded stranger",
+      "summary": "An Ashen Hand agent waiting for someone else to find the quill.",
+      "tags": ["hooded"],
+      "role": "npc",
+      "abilities": {
+        "str": 12,
+        "dex": 16,
+        "con": 14,
+        "int": 14,
+        "wis": 14,
+        "cha": 12
+      },
+      "hp": 30,
+      "maxHp": 30,
+      "ac": 14,
+      "gold": 23,
+      "proficiencies": ["stealth", "deception", "sleight_of_hand"],
+      "personality": "Soft, precise questions; never takes off his gloves in company.",
+      "background": "Sent by the Ashen Hand to recover Odo\u2019s tool and silence anyone who understands its history.",
+      "appearance": "Charcoal hood, grey gloves, a hard glint of metal beneath one cuff.",
+      "tile": {
+        "x": 3,
+        "y": 13
+      },
+      "location": "loc:common-room",
+      "conscious": true,
+      "hidden": false
+    },
+    {
+      "id": "char:marta",
+      "name": "Marta the cook",
+      "summary": "The kitchen\u2019s ruler; very little escapes her notice.",
+      "tags": ["cook"],
+      "role": "npc",
+      "abilities": {
+        "str": 12,
+        "dex": 12,
+        "con": 13,
+        "int": 11,
+        "wis": 15,
+        "cha": 12
+      },
+      "hp": 16,
+      "maxHp": 16,
+      "ac": 11,
+      "gold": 8,
+      "proficiencies": ["perception", "insight"],
+      "personality": "Brisk and practical; dislikes wasted food and evasive answers.",
+      "background": "Has cooked here longer than either landlord. Odo\u2019s forbidden old barrel has irritated her for months.",
+      "appearance": "Flour on her sleeves, red kerchief, a wooden spoon tucked into her apron.",
+      "tile": {
+        "x": 22,
+        "y": 10
+      },
+      "location": "loc:kitchen",
+      "conscious": true,
+      "hidden": false
+    }
+  ],
+  "containers": [
+    {
+      "id": "container:floorboard",
+      "name": "Loose floorboard",
+      "summary": "A nail head catches the light beside the rug.",
+      "tags": ["floorboard"],
+      "tile": {
+        "x": 16,
+        "y": 9
+      },
+      "location": "loc:common-room",
+      "hidden": true,
+      "locked": false,
+      "opened": false,
+      "findDc": 10
+    },
+    {
+      "id": "container:strongbox",
+      "name": "Iron strongbox",
+      "summary": "Brann\u2019s iron-bound cashbox is wedged behind the bar.",
+      "tags": ["strongbox"],
+      "tile": {
+        "x": 2,
+        "y": 2
+      },
+      "location": "loc:bar",
+      "hidden": false,
+      "locked": true,
+      "opened": false,
+      "lockDc": 15
+    },
+    {
+      "id": "container:barrel-1",
+      "name": "Ale barrel",
+      "summary": "A fresh chalk mark promises a decent brown ale.",
+      "tags": ["barrel"],
+      "tile": {
+        "x": 23,
+        "y": 12
+      },
+      "location": "loc:kitchen",
+      "hidden": false,
+      "locked": false,
+      "opened": false
+    },
+    {
+      "id": "container:barrel-2",
+      "name": "Ale barrel",
+      "summary": "This cask smells of yeast and wet oak.",
+      "tags": ["barrel"],
+      "tile": {
+        "x": 24,
+        "y": 12
+      },
+      "location": "loc:kitchen",
+      "hidden": false,
+      "locked": false,
+      "opened": false
+    },
+    {
+      "id": "container:old-barrel",
+      "name": "Old barrel by the hatch",
+      "summary": "Dust disguises the seam of a locked lid among the old stock.",
+      "tags": ["old-barrel"],
+      "tile": {
+        "x": 24,
+        "y": 13
+      },
+      "location": "loc:kitchen",
+      "hidden": true,
+      "locked": true,
+      "opened": false,
+      "findDc": 15,
+      "lockDc": 15
+    },
+    {
+      "id": "container:loose-brick",
+      "name": "Loose hearth brick",
+      "summary": "A thumb-worn brick conceals a dry, empty recess.",
+      "tags": ["brick"],
+      "tile": {
+        "x": 13,
+        "y": 1
+      },
+      "location": "loc:hearth",
+      "hidden": true,
+      "locked": false,
+      "opened": false,
+      "findDc": 15
+    }
+  ],
+  "items": [
+    {
+      "id": "item:longbow",
+      "name": "Yew longbow",
+      "summary": "Kael\u2019s weathered bow, its grip repaired with green thread.",
+      "tags": ["bow", "ranged"],
+      "kind": "weapon",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 2,
+      "value": 50,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:kael"
+      },
+      "damage": "1d8"
+    },
+    {
+      "id": "item:rope",
+      "name": "Silk rope (50 ft)",
+      "summary": "Fine silk cord, carefully coiled and strong enough for a climber.",
+      "tags": ["rope"],
+      "kind": "tool",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 5,
+      "value": 10,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:kael"
+      }
+    },
+    {
+      "id": "item:potion-1",
+      "name": "Healing potion",
+      "summary": "Red liquid warms the glass; drink to restore 2d4+2 HP.",
+      "tags": ["potion"],
+      "kind": "consumable",
+      "rarity": "common",
+      "magical": true,
+      "properties": ["heals 2d4+2 HP when consumed"],
+      "weight": 0.5,
+      "value": 50,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:kael"
+      }
+    },
+    {
+      "id": "item:potion-2",
+      "name": "Healing potion",
+      "summary": "A second corked vial of restorative red liquid.",
+      "tags": ["potion"],
+      "kind": "consumable",
+      "rarity": "common",
+      "magical": true,
+      "properties": ["heals 2d4+2 HP when consumed"],
+      "weight": 0.5,
+      "value": 50,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:kael"
+      }
+    },
+    {
+      "id": "item:map-fragment",
+      "name": "Torn map fragment",
+      "summary": "Odo\u2019s crossed-quill mark points toward the Crooked Lantern.",
+      "tags": ["map"],
+      "kind": "document",
+      "rarity": "uncommon",
+      "magical": false,
+      "properties": [],
+      "weight": 0,
+      "value": 1,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:kael"
+      }
+    },
+    {
+      "id": "item:ilsa-dagger",
+      "name": "Ilsa\u2019s dagger",
+      "summary": "A narrow blade suited to cutting purses or arguments short.",
+      "tags": ["dagger", "finesse"],
+      "kind": "weapon",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 1,
+      "value": 2,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:ilsa"
+      },
+      "damage": "1d4"
+    },
+    {
+      "id": "item:thieves-tools",
+      "name": "Thieves\u2019 tools",
+      "summary": "Oiled picks and tension wires in a discreet leather roll.",
+      "tags": ["tools"],
+      "kind": "tool",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 1,
+      "value": 25,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:ilsa"
+      }
+    },
+    {
+      "id": "item:longsword",
+      "name": "Doran\u2019s longsword",
+      "summary": "A plain service blade sharpened with ritual care.",
+      "tags": ["sword"],
+      "kind": "weapon",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 3,
+      "value": 15,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:doran"
+      },
+      "damage": "1d8"
+    },
+    {
+      "id": "item:shield",
+      "name": "Ash-tree shield",
+      "summary": "A battered shield bearing Doran\u2019s family tree.",
+      "tags": ["shield"],
+      "kind": "armor",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 6,
+      "value": 10,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:doran"
+      }
+    },
+    {
+      "id": "item:mace",
+      "name": "Mael\u2019s mace",
+      "summary": "A sun-headed mace with a grip polished by prayer.",
+      "tags": ["mace"],
+      "kind": "weapon",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 4,
+      "value": 5,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:mael"
+      },
+      "damage": "1d6"
+    },
+    {
+      "id": "item:holy-symbol",
+      "name": "Dawn holy symbol",
+      "summary": "A little gold sun, warm against the skin.",
+      "tags": ["holy-symbol"],
+      "kind": "trinket",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 0.1,
+      "value": 5,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:mael"
+      }
+    },
+    {
+      "id": "item:iron-key",
+      "name": "Odo\u2019s small iron key",
+      "summary": "A worn iron key hangs from Brann\u2019s belt.",
+      "tags": ["key"],
+      "kind": "tool",
+      "rarity": "common",
+      "magical": false,
+      "properties": ["key_for:container:old-barrel"],
+      "weight": 0.1,
+      "value": 1,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:brann"
+      }
+    },
+    {
+      "id": "item:wax-letter",
+      "name": "Wax-sealed letter",
+      "summary": "Under red wax, Odo\u2019s cramped hand records his last delivery.",
+      "tags": ["letter"],
+      "kind": "document",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 0,
+      "value": 0,
+      "hidden": true,
+      "questCritical": false,
+      "holder": {
+        "kind": "container",
+        "id": "container:floorboard"
+      }
+    },
+    {
+      "id": "item:ledger",
+      "name": "Brann\u2019s ledger",
+      "summary": "Tabs, deliveries and one stubborn debt in Odo\u2019s name.",
+      "tags": ["ledger"],
+      "kind": "document",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 1,
+      "value": 2,
+      "hidden": true,
+      "questCritical": false,
+      "holder": {
+        "kind": "container",
+        "id": "container:strongbox"
+      }
+    },
+    {
+      "id": "item:coins",
+      "name": "Strongbox coins",
+      "summary": "Twelve gold pieces in a patched purse.",
+      "tags": ["coins"],
+      "kind": "treasure",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 0.2,
+      "value": 12,
+      "hidden": true,
+      "questCritical": false,
+      "holder": {
+        "kind": "container",
+        "id": "container:strongbox"
+      }
+    },
+    {
+      "id": "item:quill",
+      "name": "The Inkless Quill",
+      "summary": "A raven-black quill that writes without ink.",
+      "tags": ["quill", "feather", "magical"],
+      "kind": "tool",
+      "rarity": "rare",
+      "magical": true,
+      "properties": ["writes without ink", "advantage on forgery checks"],
+      "weight": 0,
+      "value": 500,
+      "hidden": true,
+      "questCritical": true,
+      "holder": {
+        "kind": "container",
+        "id": "container:old-barrel"
+      }
+    },
+    {
+      "id": "item:stranger-dagger",
+      "name": "Blackened dagger",
+      "summary": "A light blade treated to swallow lamplight.",
+      "tags": ["dagger", "finesse"],
+      "kind": "weapon",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 1,
+      "value": 2,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:stranger"
+      },
+      "damage": "1d4"
+    },
+    {
+      "id": "item:signet",
+      "name": "Ashen Hand signet",
+      "summary": "A scorched hand engraved inside a heavy iron ring.",
+      "tags": ["signet"],
+      "kind": "trinket",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 0.1,
+      "value": 8,
+      "hidden": true,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:stranger"
+      }
+    },
+    {
+      "id": "item:lute",
+      "name": "Wren\u2019s lute",
+      "summary": "A cracked but tuneful lute with a ribbon on its neck.",
+      "tags": ["instrument"],
+      "kind": "tool",
+      "rarity": "common",
+      "magical": false,
+      "properties": [],
+      "weight": 3,
+      "value": 20,
+      "hidden": false,
+      "questCritical": false,
+      "holder": {
+        "kind": "character",
+        "id": "char:wren"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "fact:odo-hid-quill",
+      "name": "Odo\u2019s hidden stock",
+      "summary": "Odo hid something precious near the tavern\u2019s old stock before he fled.",
+      "tags": [],
+      "statement": "Odo hid something precious near the tavern\u2019s old stock before he fled.",
+      "kind": "lore",
+      "truth": true,
+      "about": ["item:quill", "loc:kitchen"],
+      "knownBy": [
+        {
+          "character": "char:brann",
+          "confidence": 0.6
+        },
+        {
+          "character": "char:tobb",
+          "confidence": 0.3
+        },
+        {
+          "character": "char:stranger",
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "id": "fact:letter-cellar",
+      "name": "The letter\u2019s directions",
+      "summary": "The letter says Odo\u2019s last stock went to \u201cthe old barrel by the hatch\u201d.",
+      "tags": [],
+      "statement": "The letter says Odo\u2019s last stock went to \u201cthe old barrel by the hatch\u201d.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["item:wax-letter", "container:old-barrel", "loc:hatch"],
+      "knownBy": []
+    },
+    {
+      "id": "fact:rumour-stranger",
+      "name": "Odo returned?",
+      "summary": "The hooded stranger is Odo himself, returned in disguise.",
+      "tags": [],
+      "statement": "The hooded stranger is Odo himself, returned in disguise.",
+      "kind": "rumour",
+      "truth": false,
+      "about": ["char:stranger"],
+      "knownBy": [
+        {
+          "character": "char:wren",
+          "confidence": 0.8
+        }
+      ]
+    },
+    {
+      "id": "fact:ilsa-debt",
+      "name": "Ilsa\u2019s debt",
+      "summary": "Ilsa owes Brann 40 gold from a rigged card game.",
+      "tags": [],
+      "statement": "Ilsa owes Brann 40 gold from a rigged card game.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:ilsa", "char:brann"],
+      "knownBy": [
+        {
+          "character": "char:ilsa",
+          "confidence": 1
+        },
+        {
+          "character": "char:brann",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:doran-grudge",
+      "name": "An unquiet grief",
+      "summary": "Doran\u2019s brother was killed by the Ashen Hand.",
+      "tags": [],
+      "statement": "Doran\u2019s brother was killed by the Ashen Hand.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:doran", "faction:ashen"],
+      "knownBy": [
+        {
+          "character": "char:doran",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:mael-orders",
+      "name": "The abbess\u2019s command",
+      "summary": "Mael\u2019s abbess ordered her to bring the quill to the Temple of the Dawn by any means.",
+      "tags": [],
+      "statement": "Mael\u2019s abbess ordered her to bring the quill to the Temple of the Dawn by any means.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:mael", "item:quill", "faction:temple"],
+      "knownBy": [
+        {
+          "character": "char:mael",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:stranger-ashen",
+      "name": "The hidden signet",
+      "summary": "The stranger wears an Ashen Hand signet under his glove.",
+      "tags": [],
+      "statement": "The stranger wears an Ashen Hand signet under his glove.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:stranger", "item:signet", "faction:ashen"],
+      "knownBy": [
+        {
+          "character": "char:stranger",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:quill-origin",
+      "name": "The lying raven",
+      "summary": "The quill was cut from a raven that only ever spoke lies.",
+      "tags": [],
+      "statement": "The quill was cut from a raven that only ever spoke lies.",
+      "kind": "backstory",
+      "truth": true,
+      "about": ["item:quill"],
+      "knownBy": [
+        {
+          "character": "char:mael",
+          "confidence": 0.8
+        },
+        {
+          "character": "char:stranger",
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "id": "fact:quill-inkless",
+      "name": "Ink from nothing",
+      "summary": "The Inkless Quill writes without ink.",
+      "tags": [],
+      "statement": "The Inkless Quill writes without ink.",
+      "kind": "lore",
+      "truth": true,
+      "about": ["item:quill"],
+      "knownBy": [
+        {
+          "character": "char:kael",
+          "confidence": 0.9
+        },
+        {
+          "character": "char:mael",
+          "confidence": 1
+        },
+        {
+          "character": "char:stranger",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:quill-forgery",
+      "name": "A forger\u2019s instrument",
+      "summary": "The quill lends uncanny precision to forged writing.",
+      "tags": [],
+      "statement": "The quill lends uncanny precision to forged writing.",
+      "kind": "lore",
+      "truth": true,
+      "about": ["item:quill"],
+      "knownBy": [
+        {
+          "character": "char:kael",
+          "confidence": 0.8
+        },
+        {
+          "character": "char:stranger",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:key-brann",
+      "name": "Iron at Brann\u2019s belt",
+      "summary": "Brann carries Odo\u2019s small iron key on his belt.",
+      "tags": [],
+      "statement": "Brann carries Odo\u2019s small iron key on his belt.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["char:brann", "item:iron-key"],
+      "knownBy": [
+        {
+          "character": "char:brann",
+          "confidence": 1
+        },
+        {
+          "character": "char:ilsa",
+          "confidence": 1
+        },
+        {
+          "character": "char:doran",
+          "confidence": 1
+        },
+        {
+          "character": "char:marta",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:marta-stock",
+      "name": "Off limits",
+      "summary": "The old barrel by the hatch has been off limits since Odo left.",
+      "tags": [],
+      "statement": "The old barrel by the hatch has been off limits since Odo left.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["container:old-barrel", "loc:hatch"],
+      "knownBy": [
+        {
+          "character": "char:marta",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:tobb-scrape",
+      "name": "A scrape in the night",
+      "summary": "Tobb remembers Odo dragging a barrel toward the kitchen hatch after closing.",
+      "tags": [],
+      "statement": "Tobb remembers Odo dragging a barrel toward the kitchen hatch after closing.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["char:tobb", "container:old-barrel", "loc:hatch"],
+      "knownBy": [
+        {
+          "character": "char:tobb",
+          "confidence": 0.3
+        }
+      ]
+    },
+    {
+      "id": "fact:ledger-tab",
+      "name": "Odo\u2019s unpaid tab",
+      "summary": "Brann\u2019s ledger records Odo\u2019s unpaid tab beside a final delivery marked \u201cold stock\u201d.",
+      "tags": [],
+      "statement": "Brann\u2019s ledger records Odo\u2019s unpaid tab beside a final delivery marked \u201cold stock\u201d.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["item:ledger", "char:brann", "container:old-barrel"],
+      "knownBy": [
+        {
+          "character": "char:brann",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:brann-rigged",
+      "name": "A barkeep\u2019s marked cards",
+      "summary": "Brann marked the cards in the game that put Ilsa in debt.",
+      "tags": [],
+      "statement": "Brann marked the cards in the game that put Ilsa in debt.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:brann", "char:ilsa"],
+      "knownBy": [
+        {
+          "character": "char:brann",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:marta-saw-mark",
+      "name": "An inconvenient witness",
+      "summary": "Marta saw Brann marking the cards before his game with Ilsa.",
+      "tags": [],
+      "statement": "Marta saw Brann marking the cards before his game with Ilsa.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:marta", "char:brann", "char:ilsa"],
+      "knownBy": [
+        {
+          "character": "char:marta",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:stranger-mission",
+      "name": "The Hand\u2019s commission",
+      "summary": "The Ashen Hand sent the stranger to recover the quill from the tavern.",
+      "tags": [],
+      "statement": "The Ashen Hand sent the stranger to recover the quill from the tavern.",
+      "kind": "secret",
+      "truth": true,
+      "about": ["char:stranger", "item:quill", "faction:ashen"],
+      "knownBy": [
+        {
+          "character": "char:stranger",
+          "confidence": 1
+        }
+      ]
+    },
+    {
+      "id": "fact:kael-warrant",
+      "name": "The forged warrant",
+      "summary": "Odo used the quill to forge the warrant that ruined Kael\u2019s family.",
+      "tags": [],
+      "statement": "Odo used the quill to forge the warrant that ruined Kael\u2019s family.",
+      "kind": "backstory",
+      "truth": true,
+      "about": ["char:kael", "item:quill", "item:map-fragment"],
+      "knownBy": [
+        {
+          "character": "char:kael",
+          "confidence": 0.9
+        }
+      ]
+    },
+    {
+      "id": "fact:floorboard-scuffs",
+      "name": "Scuffed boards",
+      "summary": "Fresh scuffs beside the rug end at a loose floorboard.",
+      "tags": [],
+      "statement": "Fresh scuffs beside the rug end at a loose floorboard.",
+      "kind": "observation",
+      "truth": true,
+      "about": ["container:floorboard", "loc:common-room"],
+      "knownBy": [
+        {
+          "character": "char:tobb",
+          "confidence": 0.6
+        }
+      ]
+    },
+    {
+      "id": "fact:brick-scratches",
+      "name": "A scratched reminder",
+      "summary": "The hearth recess bears Odo\u2019s scratched words: \u201cBrann kept the iron; I kept the feather.\u201d",
+      "tags": [],
+      "statement": "The hearth recess bears Odo\u2019s scratched words: \u201cBrann kept the iron; I kept the feather.\u201d",
+      "kind": "observation",
+      "truth": true,
+      "about": ["container:loose-brick", "item:iron-key", "item:quill"],
+      "knownBy": []
+    }
+  ],
+  "quests": [
+    {
+      "id": "quest:quill",
+      "name": "Find the quill",
+      "summary": "Bring the Inkless Quill into the player\u2019s or a peer\u2019s possession.",
+      "tags": [],
+      "kind": "episode",
+      "objective": "Bring the Inkless Quill into the player\u2019s or a peer\u2019s possession.",
+      "status": "active"
+    },
+    {
+      "id": "quest:ilsa-debt",
+      "name": "Clear the debt",
+      "summary": "Erase Ilsa\u2019s forty-gold debt to Brann without paying it.",
+      "tags": [],
+      "kind": "personal",
+      "objective": "Erase Ilsa\u2019s forty-gold debt to Brann without paying it.",
+      "status": "active",
+      "pursuedBy": "char:ilsa"
+    },
+    {
+      "id": "quest:doran-hand",
+      "name": "Unmask the stranger",
+      "summary": "Discover whom the hooded stranger serves.",
+      "tags": [],
+      "kind": "personal",
+      "objective": "Discover whom the hooded stranger serves.",
+      "status": "active",
+      "pursuedBy": "char:doran"
+    },
+    {
+      "id": "quest:mael-quill",
+      "name": "Quill for the temple",
+      "summary": "Secure the quill for the Temple of the Dawn.",
+      "tags": [],
+      "kind": "personal",
+      "objective": "Secure the quill for the Temple of the Dawn.",
+      "status": "active",
+      "pursuedBy": "char:mael"
+    }
+  ],
+  "factions": [
+    {
+      "id": "faction:temple",
+      "name": "Temple of the Dawn",
+      "summary": "Respected healers with increasingly forceful collectors.",
+      "tags": [],
+      "ideals": "Truth brought into light; dangerous relics kept under sacred guard.",
+      "standing": "Respected healers with increasingly forceful collectors.",
+      "members": [
+        {
+          "character": "char:mael"
+        }
+      ]
+    },
+    {
+      "id": "faction:ashen",
+      "name": "The Ashen Hand",
+      "summary": "Feared in the river towns; officially denied.",
+      "tags": [],
+      "ideals": "Power through hidden debts, forged orders and selective violence.",
+      "standing": "Feared in the river towns; officially denied.",
+      "members": [
+        {
+          "character": "char:stranger"
+        }
+      ]
+    },
+    {
+      "id": "faction:guild",
+      "name": "The Thieves\u2019 Guild",
+      "summary": "Tolerated so long as respectable pockets remain untouched.",
+      "tags": [],
+      "ideals": "Keep the trade quiet, honour guild bargains and never work for free.",
+      "standing": "Tolerated so long as respectable pockets remain untouched.",
+      "members": [
+        {
+          "character": "char:ilsa"
+        }
+      ]
+    }
+  ],
+  "attitudes": [
+    {
+      "to": "char:kael",
+      "value": 25,
+      "reason": "Kael keeps confidences.",
+      "from": "char:ilsa"
+    },
+    {
+      "to": "char:kael",
+      "value": 30,
+      "reason": "Trust earned on the road.",
+      "from": "char:doran"
+    },
+    {
+      "to": "char:kael",
+      "value": 35,
+      "reason": "Kael saved her at Greywater.",
+      "from": "char:mael"
+    },
+    {
+      "to": "char:ilsa",
+      "value": 20,
+      "reason": "Her quick hands have saved the party.",
+      "from": "char:kael"
+    },
+    {
+      "to": "char:doran",
+      "value": 30,
+      "reason": "A dependable shield at his back.",
+      "from": "char:kael"
+    },
+    {
+      "to": "char:mael",
+      "value": 25,
+      "reason": "Her mercy survives hard choices.",
+      "from": "char:kael"
+    },
+    {
+      "to": "char:doran",
+      "value": 10,
+      "reason": "Easy to tease, hard to shake.",
+      "from": "char:ilsa"
+    },
+    {
+      "to": "char:mael",
+      "value": -5,
+      "reason": "Worries about sermons and hidden orders.",
+      "from": "char:ilsa"
+    },
+    {
+      "to": "char:ilsa",
+      "value": 15,
+      "reason": "Respects her courage, doubts her schemes.",
+      "from": "char:doran"
+    },
+    {
+      "to": "char:mael",
+      "value": 20,
+      "reason": "She tended his wounds without questions.",
+      "from": "char:doran"
+    },
+    {
+      "to": "char:ilsa",
+      "value": 10,
+      "reason": "Sees kindness behind the tricks.",
+      "from": "char:mael"
+    },
+    {
+      "to": "char:doran",
+      "value": 20,
+      "reason": "Shares his loyalty, fears his anger.",
+      "from": "char:mael"
+    },
+    {
+      "to": "char:ilsa",
+      "value": -25,
+      "reason": "Forty gold still unpaid.",
+      "from": "char:brann"
+    },
+    {
+      "to": "char:brann",
+      "value": -40,
+      "reason": "Suspects his cards were marked.",
+      "from": "char:ilsa"
+    },
+    {
+      "to": "char:stranger",
+      "value": -20,
+      "reason": "That guarded glove feels familiar.",
+      "from": "char:doran"
+    },
+    {
+      "to": "char:kael",
+      "value": 10,
+      "reason": "A generous listener.",
+      "from": "char:wren"
+    },
+    {
+      "to": "char:brann",
+      "value": -10,
+      "reason": "Dislikes his treatment of Ilsa.",
+      "from": "char:marta"
+    }
+  ],
+  "secrets": [
+    {
+      "character": "char:ilsa",
+      "fact": "fact:ilsa-debt"
+    },
+    {
+      "character": "char:doran",
+      "fact": "fact:doran-grudge"
+    },
+    {
+      "character": "char:mael",
+      "fact": "fact:mael-orders"
+    },
+    {
+      "character": "char:stranger",
+      "fact": "fact:stranger-ashen"
+    },
+    {
+      "character": "char:stranger",
+      "fact": "fact:stranger-mission"
+    },
+    {
+      "character": "char:brann",
+      "fact": "fact:brann-rigged"
+    },
+    {
+      "character": "char:marta",
+      "fact": "fact:marta-saw-mark"
+    }
+  ]
+}
