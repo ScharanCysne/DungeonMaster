@@ -26,7 +26,7 @@ for (const role of ['dm', 'story', 'peer'] as const) {
     messages: [{ role: 'user', content: 'Reply with OK.' }],
     maxTokens: 64,
   };
-  report(role === 'peer' ? 'fast' : role, await provider.complete(request));
+  report(role === 'peer' ? 'small' : role, await provider.complete(request));
 }
 const prompt = await loadPrompt('peer', promptDir);
 report(

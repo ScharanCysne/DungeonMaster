@@ -63,11 +63,11 @@ test('empty config assigns the specified models to all seven roles', () => {
   expect(c.defaultConfig.models).toEqual({
     dm: 'claude-opus-5-5',
     story: 'claude-sonnet-5-5',
-    peer: 'claude-haiku-5-5',
-    npc_voice: 'claude-haiku-5-5',
-    generator: 'claude-haiku-5-5',
-    critic: 'claude-haiku-5-5',
-    recap: 'claude-haiku-5-5',
+    peer: 'claude-sonnet-5-5',
+    npc_voice: 'claude-sonnet-5-5',
+    generator: 'claude-sonnet-5-5',
+    critic: 'claude-sonnet-5-5',
+    recap: 'claude-sonnet-5-5',
   });
 });
 test('empty config supplies USD budget defaults', () => {

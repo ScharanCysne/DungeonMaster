@@ -229,11 +229,11 @@ Browser                         Node server                               Docker
 
 | Role | Tier | Calls per beat |
 |---|---|---|
-| DM | Strong (Opus-class) | 1 tool loop, up to 8 tool calls; +1 retry if the critic rejects |
-| Peer intent | Fast (Haiku-class) | 1 per peer whose turn it is |
-| Generators (item, npc, story) | Fast, or mid-tier for story | 0..n, only when the DM calls them |
-| NPC voice | Fast | 1 per speaking NPC (via `voice_npc`) |
-| Critic | Fast | 1 (+1 after a retry) |
+| DM | Opus 5.5, medium effort | 1 tool loop, up to 8 tool calls; +1 retry if the critic rejects |
+| Peer intent | Sonnet 5.5, low effort | 1 per peer whose turn it is |
+| Generators (item, npc, story) | Sonnet 5.5 (low effort; medium for story) | 0..n, only when the DM calls them |
+| NPC voice | Sonnet 5.5, low effort | 1 per speaking NPC (via `voice_npc`) |
+| Critic | Sonnet 5.5, low effort | 1 (+1 after a retry) |
 
 Model ids live in one config file; changing a tier is a config change, not a code
 change. Prompts put the stable content (rules, tool schemas, persona, seed lore) first,
@@ -737,12 +737,12 @@ new projections without migrating stored history.
 
 | Agent | Tier | Sees | Can do |
 |---|---|---|---|
-| **DM** | Strong | Ground truth around the party, all intents, recent events, the knowledge slice of every NPC present | Call engine, soft-state, generator, `voice_npc` and terminal tools. Decides when NPCs speak and what they're after, but never writes their words. |
-| **NPC voice** | Fast | One NPC's knowledge slice, persona and the DM's direction only | Return one line of dialogue for that NPC |
-| **Peer** (×3) | Fast | Its own knowledge slice only | Return one intent or pass. No tools. |
-| **Item / NPC / Feature generator** | Fast | The DM's brief plus a small graph excerpt | Return one schema-valid entity with its backstory facts |
-| **Story generator** | Mid | The DM's brief plus related facts | Return new facts consistent with existing lore |
-| **Critic** | Fast | Narration, this beat's events, ground truth of mentioned entities, the player's and speaking NPCs' knowledge | Return OK or a list of issues |
+| **DM** | Opus 5.5, medium effort | Ground truth around the party, all intents, recent events, the knowledge slice of every NPC present | Call engine, soft-state, generator, `voice_npc` and terminal tools. Decides when NPCs speak and what they're after, but never writes their words. |
+| **NPC voice** | Sonnet 5.5, low effort | One NPC's knowledge slice, persona and the DM's direction only | Return one line of dialogue for that NPC |
+| **Peer** (×3) | Sonnet 5.5, low effort | Its own knowledge slice only | Return one intent or pass. No tools. |
+| **Item / NPC / Feature generator** | Sonnet 5.5, low effort | The DM's brief plus a small graph excerpt | Return one schema-valid entity with its backstory facts |
+| **Story generator** | Sonnet 5.5, medium effort | The DM's brief plus related facts | Return new facts consistent with existing lore |
+| **Critic** | Sonnet 5.5, low effort | Narration, this beat's events, ground truth of mentioned entities, the player's and speaking NPCs' knowledge | Return OK or a list of issues |
 
 #### NPC voices
 
@@ -964,7 +964,7 @@ The critic runs after `narrate`, in two stages:
    - **Unspent receipt:** a successful check whose receipt no tool used this beat, while
      the narration claims the result (taken, opened, hidden, unlocked) → reject as
      `unbacked_outcome`.
-2. **LLM check (fast tier), claim by claim.** Input: the narration, this beat's events
+2. **LLM check (Sonnet 5.5, low effort), claim by claim.** Input: the narration, this beat's events
    and facts, the ground-truth state of every entity mentioned (by id from the tool
    calls, and by name match against known entities), the player's knowledge slice, the
    knowledge slice of each NPC and peer that speaks, and any `generate_story` facts with
@@ -1018,20 +1018,23 @@ interface LlmProvider {
 |---|---|---|
 | `dm` | `claude-opus-5-5` | `medium` (tuned later by evals) |
 | `story` | `claude-sonnet-5-5` | `medium` |
-| `peer`, `npc_voice`, `generator`, `critic`, `recap` | `claude-haiku-5-5` | `low` |
+| `peer`, `npc_voice`, `generator`, `critic`, `recap` | `claude-sonnet-5-5` | `low` |
 
 - **Request shape:**
   - Thinking is left to each model's default (adaptive; it can't be turned off on Opus
     5.5), and depth is controlled only by an explicit `effort` per role, because
-    Opus 5.5 and Haiku 5.5 default to `medium`.
+    Opus 5.5 defaults to `medium` and Sonnet 5.5 to `high`.
   - No `temperature`, `top_p` or `top_k` (rejected by current models).
   - No assistant prefill.
 - **Tool loop:** the DM appends each response's full `content` (including thinking
   blocks, unchanged) before sending tool results, so the history stays append-only as
   the models' preserved-thinking check requires. Tool inputs are parsed with zod as
   JSON, never string-matched.
-- **Refusals:** the DM and story roles send server-side refusal fallbacks
-  (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`). Every response's
+- **No Haiku.** Every role runs on Opus 5.5 or Sonnet 5.5 (user decision, 2026-10-27):
+  small, high-volume roles use Sonnet 5.5 at low effort rather than a cheaper tier.
+- **Refusals:** every request on a model that offers them (Opus 5.5, Sonnet 5.5) sends
+  server-side refusal fallbacks (`fallbacks: "default"`, beta
+  `server-side-fallback-2026-07-01`). Every response's
   `stop_reason` is checked before its content is read; a final `refusal` is treated as
   a failed call (the DM narrates around it; nothing is committed from it).
 - **Prices** live in config (USD per million tokens), filled from Anthropic's
@@ -1042,7 +1045,7 @@ interface LlmProvider {
   tokens.
 
 - `role` maps to a model id through config. The DM uses the strong tier; everything
-  else defaults to the fast tier, and the story generator uses the mid tier.
+  else runs on Sonnet 5.5 (low effort for small roles, medium for the story generator).
 - **Timeouts:** 60 s for DM calls, 20 s for the rest. No unbounded waits.
 - **Retries:** HTTP 429, 5xx (including 529 overloaded) and network errors are
   retried twice with exponential backoff and jitter (the SDK's own `maxRetries`, with

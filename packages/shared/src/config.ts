@@ -49,11 +49,11 @@ export type InputLimits = z.infer<typeof inputLimitsSchema>;
 export const modelMapSchema = z.strictObject({
   dm: z.string().min(1).default('claude-opus-5-5'),
   story: z.string().min(1).default('claude-sonnet-5-5'),
-  peer: z.string().min(1).default('claude-haiku-5-5'),
-  npc_voice: z.string().min(1).default('claude-haiku-5-5'),
-  generator: z.string().min(1).default('claude-haiku-5-5'),
-  critic: z.string().min(1).default('claude-haiku-5-5'),
-  recap: z.string().min(1).default('claude-haiku-5-5'),
+  peer: z.string().min(1).default('claude-sonnet-5-5'),
+  npc_voice: z.string().min(1).default('claude-sonnet-5-5'),
+  generator: z.string().min(1).default('claude-sonnet-5-5'),
+  critic: z.string().min(1).default('claude-sonnet-5-5'),
+  recap: z.string().min(1).default('claude-sonnet-5-5'),
 });
 export type ModelMap = z.infer<typeof modelMapSchema>;
 export const effortSchema = z.enum(['low', 'medium', 'high', 'xhigh', 'max']);

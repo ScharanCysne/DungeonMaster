@@ -39,7 +39,7 @@ it.each([400, 401, 403, 404, 422, 429, 500, 529, 408, 409])(
         ? LlmUnavailableError
         : LlmRequestError,
     );
-    await expect(result).rejects.toThrow('LLM peer (claude-haiku-5-5)');
+    await expect(result).rejects.toThrow('LLM peer (claude-sonnet-5-5)');
     await result.catch((error: unknown) => {
       expect(String(error)).not.toContain(fakeKey);
       expect(JSON.stringify(error)).not.toContain(fakeKey);

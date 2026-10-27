@@ -27,12 +27,7 @@ it.each(roles)(
     const { provider, bodies, betaHeaders } = providerFor(wireMessage());
     await provider.complete({ ...request, role });
     const body = bodies[0];
-    const model =
-      role === 'dm'
-        ? 'claude-opus-5-5'
-        : role === 'story'
-          ? 'claude-sonnet-5-5'
-          : 'claude-haiku-5-5';
+    const model = role === 'dm' ? 'claude-opus-5-5' : 'claude-sonnet-5-5';
     expect(body).toMatchObject({
       model,
       max_tokens: 64,
@@ -59,13 +54,8 @@ it.each(roles)(
       'tools',
     ])
       expect(body).not.toHaveProperty(field);
-    if (role === 'dm' || role === 'story') {
-      expect(body).toHaveProperty('fallbacks', 'default');
-      expect(betaHeaders[0]).toContain('server-side-fallback-2026-07-01');
-    } else {
-      expect(body).not.toHaveProperty('fallbacks');
-      expect(betaHeaders[0]).toBeNull();
-    }
+    expect(body).toHaveProperty('fallbacks', 'default');
+    expect(betaHeaders[0]).toContain('server-side-fallback-2026-07-01');
   },
 );
 
@@ -230,3 +220,17 @@ it.each(invalidRequests)(
     expect(fetch).not.toHaveBeenCalled();
   },
 );
+
+it('omits refusal fallbacks for a model that does not offer them', async () => {
+  const transport = fakeTransport(Response.json(wireMessage()));
+  const provider = new AnthropicProvider({
+    apiKey: fakeKey,
+    config: configSchema.parse({
+      models: { peer: 'claude-haiku-5-5' },
+      timeouts: { providerRetries: 0 },
+    }),
+    fetch: transport.fetch,
+  });
+  await provider.complete({ ...request, role: 'peer' });
+  expect(transport.bodies[0]).not.toHaveProperty('fallbacks');
+});

@@ -25,7 +25,9 @@ limits belong to the caller. Only `AnthropicProvider.ts` imports SDK types or co
   roles default to 5m. The wrapper flags DM misses and prompts below 512 total input
   tokens. A larger total does not prove the stable prefix reaches 512 tokens;
   callers should build sufficiently long stable prefixes when caching matters.
-- Prices are USD per million tokens. Cache writes are split by TTL. Haiku's
+- Every default role runs on Opus 5.5 or Sonnet 5.5; Haiku is priced only so an
+  override can be costed. Prices are USD per million tokens. Cache writes are
+  split by TTL. Haiku's
   threshold includes uncached, cache-write, and cache-read input tokens. Fallback
   iteration usage is priced per serving model without billing the aggregate twice.
   Missing prices fail explicitly. Rates use the supplied reference; no online

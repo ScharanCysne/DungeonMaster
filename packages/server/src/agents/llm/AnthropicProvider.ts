@@ -63,6 +63,12 @@ function contentBlocks(message: Message | BetaMessage): LlmContentBlock[] {
   });
 }
 
+// Server-side refusal fallbacks are offered for these models; others would 400.
+const REFUSAL_FALLBACK_MODELS = new Set([
+  'claude-opus-5-5',
+  'claude-sonnet-5-5',
+]);
+
 export class AnthropicProvider implements LlmProvider {
   readonly #client: Anthropic;
   readonly #config: Config;
@@ -220,7 +226,7 @@ export class AnthropicProvider implements LlmProvider {
           },
         }
       : undefined;
-    if (request.role === 'dm' || request.role === 'story') {
+    if (REFUSAL_FALLBACK_MODELS.has(model)) {
       const params = {
         ...base,
         messages: request.messages,

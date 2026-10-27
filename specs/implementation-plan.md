@@ -215,7 +215,7 @@ text-only CLI before any UI exists.
     role → model mapping in config:
     - DM: `claude-opus-5-5`
     - story generator: `claude-sonnet-5-5`
-    - peers, item/npc/feature generators, critic, recap: `claude-haiku-5-5`
+    - peers, NPC voice, item/npc/feature generators, critic, recap: `claude-sonnet-5-5` at low effort (no Haiku)
   - Prompt caching on the stable system blocks.
   - Forced-tool structured output.
   - Timeouts (60 s DM / 20 s others) and 2 retries with backoff and jitter on
