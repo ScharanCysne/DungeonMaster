@@ -865,8 +865,10 @@ Every generator follows the same steps:
    location and what's in it, facts `ABOUT` the referenced entities, the names of
    existing entities, and the session's most-used tags ("recently used motifs: socks,
    ravens…") so generated content doesn't keep repeating the same ideas.
-2. **Structured output.** Call the model with a single forced tool whose input schema
-   is the entity schema, so the response is always JSON in that shape.
+2. **Structured output.** Call the model with structured outputs
+   (`output_config.format` built from the entity's zod schema), so the response is
+   always JSON in that shape. Forced `tool_choice` is not used anywhere: Claude Opus 5.5
+   and Claude Sonnet 5.5 reject it.
 3. **Validate.** Parse with zod, then apply policy bounds (rarity, value, stat ranges
    for NPCs: ability scores 6–18, HP 4–40, AC 10–17). Then a deterministic
    near-duplicate check: a normalised name matching an existing entity, or high tag
@@ -929,7 +931,7 @@ entities. The selection context and the intents are never dropped.
 slice, attitude towards each party member, inventory, the last narration, and the
 player's current intent.
 
-**Output** (forced tool, zod-validated):
+**Output** (structured output, zod-validated):
 
 ```ts
 type PeerTurn =
@@ -979,7 +981,7 @@ The critic runs after `narrate`, in two stages:
      (peers may confide); instead it becomes a `FactLearned` for the witnesses and is
      flagged in the trace.
 
-   Output (forced tool):
+   Output (structured output):
 
    ```ts
    type CriticVerdict =
@@ -1004,19 +1006,47 @@ interface LlmProvider {
     role: 'dm' | 'peer' | 'npc_voice' | 'generator' | 'story' | 'critic' | 'recap';
     system: { text: string; cache: boolean }[];
     messages: LlmMessage[];
-    tools?: ToolSchema[];
-    toolChoice?: 'auto' | { name: string };
+    tools?: ToolSchema[];            // DM loop only; always tool_choice auto, strict schemas
+    outputFormat?: ZodSchema;         // structured output for every other role
     maxTokens: number;
     timeoutMs: number;
   }): Promise<LlmResponse>;
 }
 ```
 
+| Role | Model | Effort |
+|---|---|---|
+| `dm` | `claude-opus-5-5` | `medium` (tuned later by evals) |
+| `story` | `claude-sonnet-5-5` | `medium` |
+| `peer`, `npc_voice`, `generator`, `critic`, `recap` | `claude-haiku-5-5` | `low` |
+
+- **Request shape:**
+  - Thinking is left to each model's default (adaptive; it can't be turned off on Opus
+    5.5), and depth is controlled only by an explicit `effort` per role, because
+    Opus 5.5 and Haiku 5.5 default to `medium`.
+  - No `temperature`, `top_p` or `top_k` (rejected by current models).
+  - No assistant prefill.
+- **Tool loop:** the DM appends each response's full `content` (including thinking
+  blocks, unchanged) before sending tool results, so the history stays append-only as
+  the models' preserved-thinking check requires. Tool inputs are parsed with zod as
+  JSON, never string-matched.
+- **Refusals:** the DM and story roles send server-side refusal fallbacks
+  (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`). Every response's
+  `stop_reason` is checked before its content is read; a final `refusal` is treated as
+  a failed call (the DM narrates around it; nothing is committed from it).
+- **Prices** live in config (USD per million tokens), filled from Anthropic's
+  published rates: Opus 5.5 $4 in / $20 out / $0.20 cache read; Sonnet 5.5 $2 / $10 /
+  $0.20; Haiku 5.5 $0.10 / $0.50 for prompts up to 100K tokens ($0.50 / $2.50
+  beyond), cache reads at 0.1× input. Cache writes cost 1.25× input for the 5-minute
+  TTL and 2× for the 1-hour TTL. The minimum cacheable prefix on all three is 512
+  tokens.
+
 - `role` maps to a model id through config. The DM uses the strong tier; everything
   else defaults to the fast tier, and the story generator uses the mid tier.
 - **Timeouts:** 60 s for DM calls, 20 s for the rest. No unbounded waits.
-- **Retries:** HTTP 429, 5xx and network errors are retried twice with exponential
-  backoff and jitter. That's safe because LLM calls don't change state; state changes
+- **Retries:** HTTP 429, 5xx (including 529 overloaded) and network errors are
+  retried twice with exponential backoff and jitter (the SDK's own `maxRetries`, with
+  per-request timeouts in milliseconds). That's safe because LLM calls don't change state; state changes
   only happen in tool handlers, which run once per tool call.
 - **Prompt caching:**
   - The DM's stable prefix (principles, rules, tools, seed lore) uses the **1-hour
