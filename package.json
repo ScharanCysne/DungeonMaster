@@ -17,6 +17,7 @@
     "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "test": "vitest run",
     "graph:rebuild": "npm run graph:rebuild -w @dungeon/server --",
+    "llm:ping": "npm run llm:ping -w @dungeon/server --",
     "test:integration": "node --env-file=.env ./node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts",
     "content:check": "npm run content:check -w @dungeon/server --",
     "graph:seed": "npm run graph:seed -w @dungeon/server --"

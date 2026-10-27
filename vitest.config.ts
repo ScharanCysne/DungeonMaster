@@ -2,9 +2,11 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
+  envDir: false,
   test: {
     projects: [
       {
+        envDir: false,
         test: {
           name: 'shared',
           environment: 'node',
@@ -12,6 +14,7 @@ export default defineConfig({
         },
       },
       {
+        envDir: false,
         test: {
           name: 'server',
           environment: 'node',
@@ -20,6 +23,7 @@ export default defineConfig({
         },
       },
       {
+        envDir: false,
         plugins: [react()],
         test: {
           name: 'client',

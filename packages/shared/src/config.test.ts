@@ -17,7 +17,13 @@ schemaCases([
   [
     'model price',
     c.modelPriceSchema,
-    { input: 1, cacheWrite: 1.25, cacheRead: 0.1, output: 5 },
+    {
+      input: 1,
+      cacheWrite5m: 1.25,
+      cacheWrite1h: 2,
+      cacheRead: 0.1,
+      output: 5,
+    },
     { input: 1, output: 5 },
   ],
   ['config', c.configSchema, {}, { limit: { toolCalls: 8 } }],
@@ -86,14 +92,23 @@ test('partial nested config preserves unspecified defaults', () => {
     { ...c.defaultConfig.timeouts, dmMs: 30_000 },
   );
 });
-test('config does not invent model prices', () => {
-  expect(c.defaultConfig.prices).toEqual({});
+test('config supplies published prices for every configured model', () => {
+  expect(c.defaultConfig.prices).toEqual(c.defaultModelPrices);
+  for (const model of Object.values(c.defaultConfig.models)) {
+    expect(c.defaultConfig.prices[model]).toBeDefined();
+  }
 });
 test('config accepts a supplied per-million-token price table', () => {
   expect(
     c.configSchema.safeParse({
       prices: {
-        'test-model': { input: 1, cacheWrite: 1, cacheRead: 0.1, output: 2 },
+        'test-model': {
+          input: 1,
+          cacheWrite5m: 1,
+          cacheWrite1h: 2,
+          cacheRead: 0.1,
+          output: 2,
+        },
       },
     }).success,
   ).toBe(true);

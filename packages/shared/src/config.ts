@@ -56,28 +56,77 @@ export const modelMapSchema = z.strictObject({
   recap: z.string().min(1).default('claude-haiku-5-5'),
 });
 export type ModelMap = z.infer<typeof modelMapSchema>;
+export const effortSchema = z.enum(['low', 'medium', 'high', 'xhigh', 'max']);
+export const effortMapSchema = z.strictObject({
+  dm: effortSchema.default('medium'),
+  story: effortSchema.default('medium'),
+  peer: effortSchema.default('low'),
+  npc_voice: effortSchema.default('low'),
+  generator: effortSchema.default('low'),
+  critic: effortSchema.default('low'),
+  recap: effortSchema.default('low'),
+});
 export const budgetSchema = z.strictObject({
   sessionUsd: z.number().nonnegative().default(5),
   stepUsd: z.number().positive().default(5),
   evalUsd: z.number().nonnegative().default(10),
 });
 export type Budget = z.infer<typeof budgetSchema>;
-export const modelPriceSchema = z.strictObject({
+const tokenPriceSchema = z.strictObject({
   input: z.number().nonnegative(),
-  cacheWrite: z.number().nonnegative(),
+  cacheWrite5m: z.number().nonnegative(),
+  cacheWrite1h: z.number().nonnegative(),
   cacheRead: z.number().nonnegative(),
   output: z.number().nonnegative(),
 });
+export const modelPriceSchema = tokenPriceSchema.extend({
+  longContext: tokenPriceSchema
+    .extend({ aboveInputTokens: z.int().positive() })
+    .optional(),
+});
 export type ModelPrice = z.infer<typeof modelPriceSchema>;
+export const defaultModelPrices: Record<string, ModelPrice> = {
+  'claude-opus-5-5': {
+    input: 4,
+    output: 20,
+    cacheRead: 0.2,
+    cacheWrite5m: 5,
+    cacheWrite1h: 8,
+  },
+  'claude-sonnet-5-5': {
+    input: 2,
+    output: 10,
+    cacheRead: 0.2,
+    cacheWrite5m: 2.5,
+    cacheWrite1h: 4,
+  },
+  'claude-haiku-5-5': {
+    input: 0.1,
+    output: 0.5,
+    cacheRead: 0.01,
+    cacheWrite5m: 0.125,
+    cacheWrite1h: 0.2,
+    longContext: {
+      aboveInputTokens: 100_000,
+      input: 0.5,
+      output: 2.5,
+      cacheRead: 0.01,
+      cacheWrite5m: 0.625,
+      cacheWrite1h: 1,
+    },
+  },
+};
 export const configSchema = z.strictObject({
   limits: perBeatLimitsSchema.prefault({}),
   timeouts: timeoutsSchema.prefault({}),
   input: inputLimitsSchema.prefault({}),
   models: modelMapSchema.prefault({}),
+  efforts: effortMapSchema.prefault({}),
   budget: budgetSchema.prefault({}),
   generatorStats: generatorStatBoundsSchema.prefault({}),
-  // Prices are filled from published pricing in Slice 7, never guessed or treated as zero.
-  prices: z.record(z.string().min(1), modelPriceSchema).default({}),
+  prices: z
+    .record(z.string().min(1), modelPriceSchema)
+    .default(defaultModelPrices),
 });
 export type Config = z.infer<typeof configSchema>;
 export const defaultConfig = configSchema.parse({});
