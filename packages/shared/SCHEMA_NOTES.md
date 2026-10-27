@@ -123,6 +123,13 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
 
 ## Generators
 
+- Physical nodes (Character, Item, Container) may persist a resolved `sprite`
+  frame. It is optional for old seeds/logs and excluded from raw model schemas;
+  the generator resolves it from the injected manifest during registration.
+- `FactCreated.secretOf?` is a CharacterId for generator-owned secrets. Projection
+  creates HAS_SECRET after the Fact node; an explicit FactLearned records the NPC's
+  knowledge. Older events omit the field unchanged.
+
 - Raw model response schemas (`generated*`) are distinct from registered tool
   result schemas (`generate*Output`). Registration assigns IDs/provenance, adds
   relationships and applies config policy before producing ordinary ontology nodes.

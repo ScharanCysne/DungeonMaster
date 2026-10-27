@@ -886,8 +886,12 @@ Every generator follows the same steps:
    validation failure. Listing names in the prompt alone doesn't prevent duplicates.
 4. **Retry once.** On failure, call again with the validation errors in the prompt. If
    it fails again, the tool returns `ok: false` to the DM, which narrates around it.
-5. **Register.** Assign an id, resolve a sprite from the tags (falling back to a
-   generic sprite per kind), add the entity to the engine (if it has hard state), and
+5. **Register.** Assign an id (fact ids use the first few words of the statement,
+   so they stay short), resolve a sprite (items, NPC inventory and features must
+   carry at least one tag from the sprite catalogue, which the generator is shown;
+   generated NPCs get a frame from a pool the seeded cast doesn't use, picked from
+   their id; no generated entity may reuse a seeded character's frame or a
+   quest-critical item's frame, so nothing new looks like Brann or the quill), add the entity to the engine (if it has hard state), and
    emit `EntityCreated` plus `FactCreated` events.
 6. **Return** a short description to the DM, so it can narrate what was created.
 

@@ -21,7 +21,8 @@
     "llm:tools-check": "npm run llm:tools-check -w @dungeon/server --",
     "test:integration": "node --env-file=.env ./node_modules/vitest/vitest.mjs run --config vitest.integration.config.ts",
     "content:check": "npm run content:check -w @dungeon/server --",
-    "graph:seed": "npm run graph:seed -w @dungeon/server --"
+    "graph:seed": "npm run graph:seed -w @dungeon/server --",
+    "gen:sample": "npm run gen:sample -w @dungeon/server --"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

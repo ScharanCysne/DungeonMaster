@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { spriteFrameSchema } from './sprites.js';
 import {
   characterIdSchema,
   containerIdSchema,
@@ -43,6 +44,7 @@ export const commonNodeSchema = provenanceSchema.extend({
 });
 export type CommonNode = z.infer<typeof commonNodeSchema>;
 export const characterSchema = commonNodeSchema.extend({
+  sprite: spriteFrameSchema.optional(),
   id: characterIdSchema,
   role: characterRoleSchema,
   abilities: abilitiesSchema,
@@ -59,6 +61,7 @@ export const characterSchema = commonNodeSchema.extend({
 });
 export type Character = z.infer<typeof characterSchema>;
 export const itemSchema = commonNodeSchema.extend({
+  sprite: spriteFrameSchema.optional(),
   id: itemIdSchema,
   kind: itemKindSchema,
   rarity: raritySchema,
@@ -80,6 +83,7 @@ export const locationSchema = commonNodeSchema.extend({
 });
 export type Location = z.infer<typeof locationSchema>;
 export const containerSchema = commonNodeSchema.extend({
+  sprite: spriteFrameSchema.optional(),
   id: containerIdSchema,
   locked: z.boolean(),
   lockDc: dcSchema.optional(),

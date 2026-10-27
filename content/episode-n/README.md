@@ -11,6 +11,15 @@ mappings, kind fallbacks and explicit overrides for every character, container
 and item. Use an override first, then the first matching tag in entity order,
 then the item-kind fallback or `npc`/`container` fallback.
 
+Generated entities persist their chosen sprite. Their prompts include catalogue
+tags; objects require a closest-category tag before descriptive motifs. Generic
+`item`/`tool` fallbacks and the `tools` tag use treasure frame 237 as a neutral
+object because the former 571 frame depicts a key. Explicit seeded gear overrides
+remain authoritative. Document fallback stays 290; container fallback stays 302.
+Generated NPCs prefer role tags; unmatched roles and generic `human` use a stable
+ID hash over frames 25, 26, 76, 78, 79, 80, 126, 127, 173, 174, 175, 176. None
+overlap the seeded character overrides (74, 124, 77, 128, 172, 319, 470, 75, 222).
+
 ## Finding the quill
 
 - Search the common room (Investigation or Perception DC 10), open the loose

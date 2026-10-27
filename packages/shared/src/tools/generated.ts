@@ -12,6 +12,7 @@ export const generatedFactSchema = z.strictObject({
 export type GeneratedFact = z.infer<typeof generatedFactSchema>;
 // Identity/provenance and questCritical are assigned by registration, not the model.
 const generatedFields = {
+  sprite: true,
   id: true,
   createdBy: true,
   createdAtBeat: true,

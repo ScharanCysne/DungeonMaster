@@ -1,7 +1,7 @@
 # Tool registry rules
 
 Create a fresh `BeatContext` after `engine.beginBeat`. Inject `Generators` and
-`NpcVoice`; their implementations belong to slices 9 and 11. Await
+`NpcVoice`; generators live in `../generators`, while voice belongs to slice 11. Await
 `executeToolCall` calls sequentially in model order. Only `narrate` ends the loop;
 `voice_npc` is classified as `soft` because it does not end it. A finished context
 accepts replacement narration for critic corrections; state-changing retries need
@@ -28,12 +28,12 @@ the later beat orchestrator's explicit retry policy.
   Limits are checked before validation or delegation. Rejections leave gameplay
   state unchanged, except for the engine's documented initiating-attack exception.
 - `ctx.events` is the single ordered, detached draft stream. Engine collection
-  runs after every engine call, including failures. New engine drafts append at
+  runs after every engine or generator call, including failures. New engine drafts append at
   that call's position; earlier slots refresh so later contested checks can revise
   witnesses. Successful soft/generator results append their drafts once. Do not
   append engine result events separately. Draft provenance overrides the event
   log's beat default.
-- Soft handlers read committed ontology plus pending soft/generator projections
+- Soft handlers read committed ontology plus all ordered pending projections
   in a temporary MemoryStore. They never write the committed store. Presence and
   consciousness use current engine state. Discard the context and roll back the
   engine on abort; commit the combined drafts only after the critic accepts.

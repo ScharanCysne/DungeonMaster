@@ -46,6 +46,17 @@ direct targets still obey the room, consciousness and contest restrictions.
 
 ## Command rules
 
+- Internal `createEntities` is not a DM tool. A whole batch uses one transaction,
+  so an NPC and its inventory either all exist or none do. Existing IDs and missing
+  holders are rejected; the quest-item guard still applies. Items retain their
+  requested holder, even a closed container. NPCs/containers use the nearest free
+  walkable tile within their exact location, by Manhattan distance from the
+  location's top-left or the feature's preferred tile, with row/column ties.
+  Characters, containers and door tiles are occupied. Containers start empty and
+  closed. Initial NPC attitude edges accompany creation. The command uses the same
+  registrar as replay, and records chosen positions and generator provenance in
+  EntityCreated drafts; usual command-time perception applies.
+
 - The PRNG is FNV-1a over UTF-16 seed code units followed by mulberry32. Beat seeds
   hash `JSON.stringify([sessionSeed, beat, attempt])`. RNG position is the mutable
   32-bit generator state. Dice accept lowercase, whitespace-free `NdM[+K|-K]`

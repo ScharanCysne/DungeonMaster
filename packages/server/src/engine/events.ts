@@ -3,6 +3,7 @@ import type { EngineState } from './state.js';
 import { witnessesFor } from './rules/perception.js';
 
 export type EngineEventType =
+  | 'EntityCreated'
   | 'EntityMoved'
   | 'ItemTransferred'
   | 'ItemEquipped'
@@ -22,7 +23,8 @@ export type EventBody = {
   [K in EngineEventType]: Pick<GameEventOf<K>, 'type' | 'payload'>;
 }[EngineEventType];
 export type EventDraft = EventBody &
-  Pick<GameEventOf<EngineEventType>, 'actor' | 'private' | 'witnesses'>;
+  Pick<GameEventOf<EngineEventType>, 'actor' | 'private' | 'witnesses'> &
+  Partial<Pick<GameEventOf<EngineEventType>, 'createdBy'>>;
 export interface EventContext {
   actor: CharacterId | null;
   locationId: LocationId;
@@ -44,6 +46,9 @@ export function eventDraft(
     actor: pending.context.actor,
     private: pending.context.private,
     witnesses: witnessesFor(state, pending),
+    ...(pending.body.type === 'EntityCreated'
+      ? { createdBy: pending.body.payload.entity.createdBy }
+      : {}),
   };
 }
 

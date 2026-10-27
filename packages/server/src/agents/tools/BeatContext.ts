@@ -3,6 +3,7 @@ import type {
   CharacterId,
   Config,
   CreatedBy,
+  Fact,
   ResolvedNarration,
 } from '@dungeon/shared';
 import type { Engine } from '../../engine/index.js';
@@ -36,6 +37,7 @@ export class BeatContext {
   readonly peerSayLines: readonly SpokenLine[];
   readonly voicedLines = new Map<string, SpokenLine>();
   readonly counters = { toolCalls: 0, generatorCalls: 0, voiceNpcCalls: 0 };
+  readonly storyFacts: { facts: Fact[]; basedOn: Fact[] }[] = [];
   narration: ResolvedNarration | undefined;
   finished = false;
   #events: BeatEventDraft[] = [];
@@ -66,7 +68,7 @@ export class BeatContext {
     for (const [index, event] of this.engine.collectEvents().entries()) {
       const slot = this.#engineSlots[index] ?? this.#events.length;
       this.#engineSlots[index] = slot;
-      this.#events[slot] = { ...event, createdBy: 'engine' };
+      this.#events[slot] = { ...event, createdBy: event.createdBy ?? 'engine' };
     }
   }
 
@@ -80,7 +82,7 @@ export class BeatContext {
   }
 
   async softState(): Promise<OntologyStore> {
-    // Pending soft changes must be readable without projecting into the committed store.
+    // Pending changes must be readable without projecting into the committed store.
     const view = new MemoryStore();
     await this.store.read(async (reader) => {
       const [nodes, edges] = await Promise.all([
@@ -92,9 +94,7 @@ export class BeatContext {
         ...edges.map((edge) => ({ type: 'upsertEdge' as const, edge })),
       ]);
     });
-    const engineSlots = new Set(this.#engineSlots);
-    const drafts = this.#events.filter((_, index) => !engineSlots.has(index));
-    const records = envelopeDrafts(drafts, {
+    const records = envelopeDrafts(this.#events, {
       sessionId: 'pending',
       beat: this.beat,
       createdBy: 'engine',

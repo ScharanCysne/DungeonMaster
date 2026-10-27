@@ -48,8 +48,9 @@ export async function executeToolCall(
     );
   try {
     const result = await tool.execute(rawInput, ctx);
-    if (tool.kind === 'engine') ctx.collectEngineEvents();
-    else if (result.ok) ctx.appendEvents(result.events);
+    if (tool.kind === 'engine' || tool.kind === 'generator')
+      ctx.collectEngineEvents();
+    if (tool.kind !== 'engine' && result.ok) ctx.appendEvents(result.events);
     return result;
   } catch (error) {
     if (error instanceof ToolError) return failure(error.code, error.message);

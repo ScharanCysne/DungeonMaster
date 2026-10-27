@@ -20,6 +20,8 @@ import type {
   UnlockContainerInput,
 } from '@dungeon/shared';
 import { move } from './commands/move.js';
+import { createEntities } from './commands/create_entities.js';
+import type { EntityCreation } from './commands/create_entities.js';
 import { skillCheck } from './commands/skill_check.js';
 import { contestedCheck } from './commands/contested_check.js';
 import { search } from './commands/search.js';
@@ -159,6 +161,13 @@ export class Engine {
 
   move(input: MoveInput, options: CommandOptions = {}) {
     return this.#run('move', (ctx) => move(ctx, input), options, input.actor);
+  }
+  createEntities(inputs: readonly EntityCreation[]) {
+    return this.#run(
+      'createEntities',
+      (ctx) => createEntities(ctx, inputs),
+      {},
+    );
   }
   skill_check(input: SkillCheckInput, options: CommandOptions = {}) {
     return this.#run(

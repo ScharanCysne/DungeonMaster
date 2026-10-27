@@ -122,8 +122,15 @@ export function project(record: GameEvent): GraphMutation[] {
       mutations.push(...projectCreatedEntity(record.payload, provenance));
       break;
     case 'FactCreated': {
-      const { fact, about, originOf, supersedes } = record.payload;
+      const { fact, about, originOf, supersedes, secretOf } = record.payload;
       mutations.push({ type: 'upsertNode', node: { ...fact, ...provenance } });
+      if (secretOf)
+        mutations.push(
+          edgeMutation(
+            { type: 'HAS_SECRET', from: secretOf, to: fact.id, properties: {} },
+            provenance,
+          ),
+        );
       for (const target of about)
         mutations.push(
           edgeMutation(
