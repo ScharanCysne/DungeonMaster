@@ -5,11 +5,13 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "graph:rebuild": "node --env-file=../../.env scripts/graph-rebuild.mjs",
+    "graph:rebuild": "node scripts/graph-rebuild.mjs",
+    "llm:ping": "node scripts/llm-ping.mjs",
     "content:check": "node scripts/content-check.mjs",
-    "graph:seed": "node --env-file=../../.env scripts/graph-seed.mjs"
+    "graph:seed": "node scripts/graph-seed.mjs"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.3.0",
     "@dungeon/shared": "*",
     "neo4j-driver": "^6.2.0"
   }

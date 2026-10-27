@@ -1,7 +1,9 @@
 import { fileURLToPath } from 'node:url';
 import { createServer } from 'vite';
+import { loadProjectEnv } from './loadProjectEnv.mjs';
 
 const root = fileURLToPath(new URL('../../../', import.meta.url));
+loadProjectEnv(root);
 process.chdir(root);
 const server = await createServer({
   root,
