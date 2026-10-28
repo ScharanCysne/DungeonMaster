@@ -121,9 +121,33 @@ export class EventLog {
     logPath(dataDir, sessionId);
   }
 
+  recover(): Promise<void> {
+    const operation = this.#tail.then(async () => {
+      const path = logPath(this.dataDir, this.sessionId);
+      const contents = await fs.readFile(path, 'utf8');
+      const read = parseLog(contents);
+      if (!read.droppedRecords) return;
+      const committed = contents.split('\n').slice(0, read.records.length);
+      const file = await fs.open(path, 'r+');
+      try {
+        await file.truncate(
+          Buffer.byteLength(
+            committed.length ? committed.join('\n') + '\n' : '',
+          ),
+        );
+        await file.sync();
+      } finally {
+        await file.close();
+      }
+    });
+    this.#tail = operation.catch(() => undefined);
+    return operation;
+  }
+
   commitBeat(
     envelope: Omit<BeatEnvelope, 'sessionId'>,
     drafts: readonly LogDraft[],
+    marker: GameEventOf<'BeatCommitted'>['payload'] = {},
   ): Promise<GameEvent[]> {
     if (drafts.some((draft) => draft.type === 'BeatCommitted'))
       return Promise.reject(new Error('BeatCommitted is added by commitBeat.'));
@@ -132,7 +156,7 @@ export class EventLog {
         ...drafts,
         {
           type: 'BeatCommitted',
-          payload: {},
+          payload: marker,
           actor: null,
           private: false,
           witnesses: [],
@@ -161,6 +185,7 @@ export class EventLog {
       recursive: true,
     });
     const file = await fs.open(logPath(this.dataDir, this.sessionId), 'a');
+    const size = (await file.stat()).size;
     try {
       const bytes = Buffer.from(
         records.map((record) => JSON.stringify(record)).join('\n') + '\n',
@@ -171,6 +196,11 @@ export class EventLog {
           `Incomplete beat write: ${result.bytesWritten}/${bytes.length} bytes.`,
         );
       await file.sync();
+    } catch (error) {
+      // A failed write must not leave a complete-looking marker for a rolled-back beat.
+      await file.truncate(size);
+      await file.sync();
+      throw error;
     } finally {
       await file.close();
     }

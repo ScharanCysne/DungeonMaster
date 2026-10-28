@@ -47,7 +47,7 @@ describe('move', () => {
       value(engine.move({ actor: 'char:player', to: 'loc:other' })).to,
     ).toBe('loc:spot');
   });
-  it('routes around other characters including unconscious characters', () => {
+  it('passes through other characters including unconscious characters', () => {
     const engine = fixture((seed) => {
       const blocker = entry(seed.characters, 'char:watcher');
       blocker.tile = { x: 1, y: 1 };
@@ -55,7 +55,7 @@ describe('move', () => {
     });
     expect(
       value(engine.move({ actor: 'char:player', to: 'loc:other' })).path,
-    ).not.toContainEqual({ x: 1, y: 1 });
+    ).toContainEqual({ x: 1, y: 1 });
   });
   it('ends orthogonally adjacent to a character without occupying their tile', () => {
     const engine = fixture();
@@ -87,16 +87,14 @@ describe('move', () => {
       fact: true,
     });
   });
-  it.each(['locked door', 'wall', 'character'] as const)(
+  it.each(['locked door', 'wall'] as const)(
     'rejects a corridor blocked by a %s without changes',
     (obstacle) => {
-      const engine = fixture((seed, grid) => {
+      const engine = fixture((_seed, grid) => {
         grid.walkable = grid.walkable.map((row, y) => row.map(() => y === 1));
         if (obstacle === 'locked door')
           grid.doors = [{ tile: { x: 2, y: 1 }, locked: true }];
         if (obstacle === 'wall') grid.walkable[1]?.splice(2, 1, false);
-        if (obstacle === 'character')
-          entry(seed.characters, 'char:watcher').tile = { x: 2, y: 1 };
       });
       rejects(
         engine,

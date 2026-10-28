@@ -1,10 +1,11 @@
-import type { CharacterId, PeerTurn, PlayerIntent } from '@dungeon/shared';
+import type {
+  CharacterId,
+  PeerTurn,
+  PlayerIntent,
+  PeerRotationState,
+} from '@dungeon/shared';
 
-export interface PeerRotationState {
-  nextPeer: CharacterId | null;
-  consecutivePasses: Partial<Record<CharacterId, number>>;
-  pending: CharacterId[];
-}
+export type { PeerRotationState } from '@dungeon/shared';
 export function initialRotation(): PeerRotationState {
   return { nextPeer: null, consecutivePasses: {}, pending: [] };
 }

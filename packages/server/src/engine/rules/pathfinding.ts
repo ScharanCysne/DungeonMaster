@@ -16,13 +16,11 @@ export function findPath(
   targets: Tile[],
   occupied: Tile[],
 ): Tile[] {
+  const occupiedKeys = new Set(occupied.map(tileKey));
   const blocked = new Set(
-    [
-      ...occupied,
-      ...(grid.doors ?? [])
-        .filter((door) => door.locked)
-        .map((door) => door.tile),
-    ].map(tileKey),
+    (grid.doors ?? [])
+      .filter((door) => door.locked)
+      .map((door) => tileKey(door.tile)),
   );
   const walkable = (tile: Tile): boolean =>
     tile.x >= 0 &&
@@ -31,7 +29,9 @@ export function findPath(
     tile.y < grid.height &&
     grid.walkable[tile.y]?.[tile.x] === true &&
     !blocked.has(tileKey(tile));
-  const goals = targets.filter(walkable);
+  const goals = targets.filter(
+    (tile) => walkable(tile) && !occupiedKeys.has(tileKey(tile)),
+  );
   const goalKeys = new Set(goals.map(tileKey));
   const heuristic = (tile: Tile): number =>
     Math.min(

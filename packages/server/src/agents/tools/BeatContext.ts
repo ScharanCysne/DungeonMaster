@@ -34,7 +34,7 @@ export class BeatContext {
   readonly config: Config;
   readonly generators: Generators;
   readonly npcVoice: NpcVoice;
-  readonly peerSayLines: readonly SpokenLine[];
+  peerSayLines: readonly SpokenLine[];
   readonly voicedLines = new Map<string, SpokenLine>();
   readonly counters = { toolCalls: 0, generatorCalls: 0, voiceNpcCalls: 0 };
   readonly storyFacts: { facts: Fact[]; basedOn: Fact[] }[] = [];
@@ -56,6 +56,10 @@ export class BeatContext {
 
   get beat() {
     return this.engine.state.beat;
+  }
+
+  setPeerSayLines(lines: readonly SpokenLine[]): void {
+    this.peerSayLines = structuredClone(lines);
   }
   get limits() {
     return this.config.limits;

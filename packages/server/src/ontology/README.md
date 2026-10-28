@@ -13,8 +13,11 @@ digits, underscores, dots and hyphens, starting with a letter or digit.
 `readEventLog` returns `{records, droppedRecords}`. It validates all complete lines,
 rejects unsupported versions and interior corruption with line numbers, and drops
 a final uncommitted beat, including a torn final JSON fragment. Missing files are
-empty logs. Appending after an incomplete tail is refused; file repair is outside
-this append-only API. Project only after commit succeeds, and replay committed
+empty logs. Appending after an incomplete tail is refused; `EventLog.recover()`
+serializes truncation of that uncommitted tail before a retry or resume. Failed
+writes/fsyncs truncate back to the prior committed length. The optional third
+`commitBeat` argument stores rotation in the BeatCommitted marker, atomically
+with the beat; legacy empty markers remain supported. Project only after commit succeeds, and replay committed
 records in order into an empty store to rebuild. A failed projection can be retried
 as a whole batch. There is no cross-process writer lock.
 

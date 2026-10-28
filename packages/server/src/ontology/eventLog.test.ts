@@ -191,7 +191,43 @@ describe('event log', () => {
     await expect(
       new EventLog(dataDir, 'session').commitBeat(envelope, drafts()),
     ).rejects.toThrow('Incomplete beat write: 1/');
-    expect(sync).not.toHaveBeenCalled();
+    expect(sync).toHaveBeenCalledOnce();
     expect(close).toHaveBeenCalledOnce();
   });
+});
+
+it('recovers only a trailing uncommitted beat before appending the retry', async () => {
+  const log = new EventLog(dataDir, 'session');
+  const committed = await log.commitBeat(envelope, drafts());
+  const path = join(dataDir, 'sessions', 'session', 'events.jsonl');
+  await fs.appendFile(
+    path,
+    jsonl(envelopeDrafts(drafts(), { ...envelope, beat: 2 })) + '{"v":1',
+  );
+  await log.recover();
+  expect(await readEventLog(dataDir, 'session')).toEqual({
+    records: committed,
+    droppedRecords: 0,
+  });
+  await log.commitBeat({ ...envelope, beat: 2 }, drafts());
+  expect((await readEventLog(dataDir, 'session')).records.at(-1)?.beat).toBe(2);
+});
+
+it('truncates a failed fsync back to the previous committed beat', async () => {
+  const log = new EventLog(dataDir, 'session');
+  const committed = await log.commitBeat(envelope, drafts());
+  const file = await fs.open(
+    join(dataDir, 'sessions', 'session', 'events.jsonl'),
+    'a',
+  );
+  vi.spyOn(file, 'sync').mockRejectedValueOnce(new Error('Disk sync failed.'));
+  vi.mocked(fs.open).mockResolvedValueOnce(file);
+  await expect(
+    log.commitBeat({ ...envelope, beat: 2 }, drafts()),
+  ).rejects.toThrow('Disk sync failed.');
+  expect(await readEventLog(dataDir, 'session')).toEqual({
+    records: committed,
+    droppedRecords: 0,
+  });
+  await log.commitBeat({ ...envelope, beat: 2 }, drafts());
 });

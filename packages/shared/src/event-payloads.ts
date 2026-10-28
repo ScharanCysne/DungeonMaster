@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { criticIssueSchema } from './agents.js';
+import { criticIssueSchema, peerRotationStateSchema } from './agents.js';
 import { edgeSchema } from './edges.js';
 import {
   characterIdSchema,
@@ -203,7 +203,9 @@ export const eventPayloadSchemas = {
     questId: questIdSchema,
     summary: z.string(),
   }),
-  BeatCommitted: z.strictObject({}),
+  BeatCommitted: z.strictObject({
+    rotation: peerRotationStateSchema.optional(),
+  }),
 };
 export type EventPayload<T extends keyof typeof eventPayloadSchemas> = z.infer<
   (typeof eventPayloadSchemas)[T]

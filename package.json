@@ -24,7 +24,8 @@
     "graph:seed": "npm run graph:seed -w @dungeon/server --",
     "gen:sample": "npm run gen:sample -w @dungeon/server --",
     "dm:sample": "npm run dm:sample -w @dungeon/server --",
-    "agents:sample": "npm run agents:sample -w @dungeon/server --"
+    "agents:sample": "npm run agents:sample -w @dungeon/server --",
+    "play:cli": "npm run play:cli -w @dungeon/server --"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

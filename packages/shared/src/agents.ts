@@ -1,5 +1,12 @@
 import { z } from 'zod';
-import { entityIdSchema } from './ids.js';
+import { characterIdSchema, entityIdSchema } from './ids.js';
+
+export const peerRotationStateSchema = z.strictObject({
+  nextPeer: characterIdSchema.nullable(),
+  consecutivePasses: z.partialRecord(characterIdSchema, z.int().nonnegative()),
+  pending: z.array(characterIdSchema),
+});
+export type PeerRotationState = z.infer<typeof peerRotationStateSchema>;
 
 export const peerTurnSchema = z.discriminatedUnion('kind', [
   z.strictObject({ kind: z.literal('pass') }),

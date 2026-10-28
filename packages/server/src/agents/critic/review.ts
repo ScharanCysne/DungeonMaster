@@ -25,6 +25,7 @@ export async function reviewBeat(
     dm: Pick<DmBeat, 'retryNarration'>;
     result: DmBeatResult;
     intents: DmIntents;
+    onCheck?: (check: CriticCheck) => void;
   },
 ): Promise<ReviewResult> {
   const { ctx, dm, intents } = options;
@@ -44,6 +45,7 @@ export async function reviewBeat(
       intents,
     );
     checks.push(check);
+    options.onCheck?.(check);
     if (check.verdict?.ok) {
       const selfLeaks = await learnSelfLeaks(ctx, check.selfLeaks);
       ctx.narration = structuredClone(result.narration);

@@ -10,7 +10,9 @@ before being refused its turn (see Combat). Invalid construction or beat coordin
 `EngineError` before mutation.
 
 `state`, `snapshot()`, command results and `collectEvents()` return detached
-copies. `successfulReceipts()` returns this beat's successful, unspent receipts.
+copies. `restore(snapshot)` installs a detached snapshot and resets the rollback
+baseline; the beat runner uses it to publish an isolated, committed attempt.
+`successfulReceipts()` returns this beat's successful, unspent receipts.
 Commands execute on a private working copy and publish it only after validation,
 including the central quest-item invariant. `rollback()` restores the snapshot
 taken immediately after `beginBeat` sets the beat, attempt and RNG. Roll back an
@@ -69,14 +71,19 @@ direct targets still obey the room, consciousness and contest restrictions.
 - Grid rows are indexed `[y][x]`; tile bounds are half-open. A* uses orthogonal
   unit steps, includes the starting tile, and chooses the nearest reachable free
   tile by path length. A character already at a valid destination returns a
-  one-tile path. Every other character, including an unconscious one, blocks
-  movement. Furniture collision comes from the grid. Doors are independent
+  one-tile path. Other characters, including unconscious ones, allow passage but cannot
+  share a destination tile. Stable A* insertion order breaks equal-length ties
+  (east, south, west, north). Furniture collision comes from the grid. Doors are independent
   `{tile, locked}` obstacles, with no container coupling or door-opening command.
-- Entity destinations use an orthogonally adjacent free tile. Items inherit
+- Entity destinations prefer the shortest path to an orthogonally adjacent free
+  tile inside the entity’s room. If none is reachable, they use the shortest
+  path to any free walkable tile in that room. Items inherit
   their character/container holder's tile; a floor item uses its location's first
   walkable tile in row-major order because items have no tile field. Movement
   chooses the most specific containing location: spot, room, then building,
-  followed by smallest bounds and lexical ID. Interactions require the same room,
+  followed by smallest bounds and lexical ID. Room destinations exclude tiles
+  belonging to overlapping sibling rooms, so leaving the bar for the common room
+  actually crosses its boundary. Interactions require the same room,
   without extra tile adjacency. Parent chains resolve spots to rooms; a spot
   without a room parent can use its smallest geometrically containing room.
   Room lighting governs its spots. Move accepts any known positioned entity,

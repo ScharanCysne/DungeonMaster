@@ -55,6 +55,10 @@ export class DmBeat {
     return this.loop();
   }
 
+  get diagnostics(): DmBeatResult {
+    return this.result(this.options.ctx.narration ? 'narrated' : 'noNarration');
+  }
+
   async retryNarration(issues: readonly CriticIssue[]): Promise<DmBeatResult> {
     if (this.#running || this.#retried || !this.options.ctx.narration)
       throw new Error(

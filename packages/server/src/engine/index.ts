@@ -93,6 +93,13 @@ export class Engine {
     });
   }
 
+  restore(snapshot: EngineSnapshot): void {
+    const copy = structuredClone(snapshot);
+    this.#state = copy.state;
+    this.#pending = copy.pendingEvents;
+    this.#start = this.snapshot();
+  }
+
   beginBeat(beat: number, attempt = 0): void {
     requireRule(
       Number.isSafeInteger(beat) &&
