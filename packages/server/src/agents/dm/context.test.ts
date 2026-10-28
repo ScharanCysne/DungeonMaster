@@ -27,8 +27,10 @@ it('renders real Episode N ground truth, selection, present knowledge and peer s
   expect(rendered.text).toContain('"ranged"');
   expect(rendered.text).toContain('"finesse"');
   expect(data.npcs.map((slice) => slice.character.id)).toContain('char:tobb');
+  // Brann behind the bar is on the open common-room floor; Marta is in the walled kitchen.
+  expect(data.npcs.map((slice) => slice.character.id)).toContain('char:brann');
   expect(data.npcs.map((slice) => slice.character.id)).not.toContain(
-    'char:brann',
+    'char:marta',
   );
   expect(renderEpisode(seed)).toContain('truth=false');
   expect(renderRecap('Earlier adventures.')).toContain(

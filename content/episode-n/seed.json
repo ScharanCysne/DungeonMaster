@@ -36,7 +36,7 @@
       "name": "Behind the bar",
       "summary": "Bottles crowd the shelves; Brann guards the narrow passage at the counter\u2019s end.",
       "tags": [],
-      "kind": "room",
+      "kind": "spot",
       "tileBounds": {
         "x": 1,
         "y": 1,
@@ -44,14 +44,14 @@
         "h": 2
       },
       "lit": true,
-      "partOf": "loc:tavern"
+      "partOf": "loc:common-room"
     },
     {
       "id": "loc:stage",
       "name": "Bard\u2019s stage",
       "summary": "Scuffed planks amplify every missed note.",
       "tags": [],
-      "kind": "room",
+      "kind": "spot",
       "tileBounds": {
         "x": 20,
         "y": 1,
@@ -59,7 +59,7 @@
         "h": 3
       },
       "lit": true,
-      "partOf": "loc:tavern"
+      "partOf": "loc:common-room"
     },
     {
       "id": "loc:kitchen",
@@ -81,7 +81,7 @@
       "name": "Stairs",
       "summary": "Two worn steps lead toward rooms beyond this episode\u2019s map.",
       "tags": [],
-      "kind": "room",
+      "kind": "spot",
       "tileBounds": {
         "x": 1,
         "y": 6,
@@ -89,7 +89,7 @@
         "h": 2
       },
       "lit": true,
-      "partOf": "loc:tavern"
+      "partOf": "loc:common-room"
     },
     {
       "id": "loc:hearth",

@@ -98,7 +98,9 @@ function fightForKey(engine: Engine) {
       );
     else if (current === 'char:brann')
       value(engine.attack({ attacker: current, target: actor }));
-    else throw new Error(`Unexpected combatant ${current}.`);
+    // Everyone conscious on the open tavern floor rolls initiative; bystanders hold.
+    else if (current) value(engine.pass_turn({ actor: current }));
+    else throw new Error('Expected a combatant on the current turn.');
   }
   expect(engine.state.characters.get('char:brann')?.conscious).toBe(false);
   value(engine.end_combat({ reason: 'defeated' }));
