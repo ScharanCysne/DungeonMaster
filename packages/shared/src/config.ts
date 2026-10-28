@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { raritySchema } from './primitives.js';
 
 export const perBeatLimitsSchema = z.strictObject({
-  toolCalls: z.int().positive().default(8),
+  toolCalls: z.int().positive().default(12),
   generatorCalls: z.int().nonnegative().default(3),
   voiceNpcPerBeat: z.int().nonnegative().default(4),
   retryToolCallsForUnbackedOutcome: z.int().nonnegative().default(2),

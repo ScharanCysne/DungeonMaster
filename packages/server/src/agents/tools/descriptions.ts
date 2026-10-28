@@ -3,7 +3,7 @@ import type { ToolName } from './types.js';
 export const descriptions: Record<ToolName, string> = {
   move: 'Move a conscious actor to a location or next to an entity in the tavern. Locked paths and combat turn/move limits still apply; do not use to teleport items. Returns the actual destination, tile and path.',
   skill_check:
-    "Roll when an outcome is uncertain. Supply exactly one of skill or ability (null for the unused field), DC 5/10/15/20/25, advantage and a reason. Do not claim the outcome before rolling. Returns total, outcome and checkId; dependent actions must spend this beat's successful receipt for the same actor.",
+    "Roll when an outcome is uncertain. For each check, give exactly one of skill or ability; leave the other null. Choose DC 5/10/15/20/25, supply advantage and state the DC with its justification in reason before rolling. Do not claim the outcome before rolling. Returns total, outcome and checkId; dependent actions must spend this beat's successful receipt for the same actor.",
   contested_check:
     "Resolve opposed skills between present, conscious characters. Do not substitute a fixed success or use for an attack. Returns both rolls, winner (null on a tie) and the initiating actor's checkId; only a successful receipt can back an action.",
   search:

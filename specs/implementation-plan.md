@@ -276,7 +276,7 @@ text-only CLI before any UI exists.
     guide with a worked example).
   - Context rendering from the DM context query, with the 12k-token budget and the
     dropping order.
-  - The tool loop with the cap of 8 and the narrate-only fallback.
+  - The tool loop with the cap of 12 and the narrate-only fallback.
   - Prompt-cache-friendly ordering.
 - **Tests (scripted LLM):** tool results are fed back in order; a cap hit → narrate-only
   call; missing `narrate` → retry; the budget trimming order; the rendered context for a

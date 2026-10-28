@@ -3,7 +3,7 @@ import * as c from './config.js';
 import { schemaCases } from './testing/schema-cases.js';
 
 schemaCases([
-  ['per-beat limits', c.perBeatLimitsSchema, {}, { toolCalls: '8' }],
+  ['per-beat limits', c.perBeatLimitsSchema, {}, { toolCalls: '12' }],
   [
     'generator stat bounds',
     c.generatorStatBoundsSchema,
@@ -26,11 +26,11 @@ schemaCases([
     },
     { input: 1, output: 5 },
   ],
-  ['config', c.configSchema, {}, { limit: { toolCalls: 8 } }],
+  ['config', c.configSchema, {}, { limit: { toolCalls: 12 } }],
 ]);
 test('empty config supplies all per-beat defaults', () => {
   expect(c.defaultConfig.limits).toEqual({
-    toolCalls: 8,
+    toolCalls: 12,
     generatorCalls: 3,
     voiceNpcPerBeat: 4,
     retryToolCallsForUnbackedOutcome: 2,

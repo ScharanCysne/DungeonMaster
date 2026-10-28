@@ -229,7 +229,7 @@ Browser                         Node server                               Docker
 
 | Role | Tier | Calls per beat |
 |---|---|---|
-| DM | Opus 5.5, medium effort | 1 tool loop, up to 8 tool calls; +1 retry if the critic rejects |
+| DM | Opus 5.5, medium effort | 1 tool loop, up to 12 tool calls; +1 retry if the critic rejects |
 | Peer intent | Sonnet 5.5, low effort | 1 per peer whose turn it is |
 | Generators (item, npc, story) | Sonnet 5.5 (low effort; medium for story) | 0..n, only when the DM calls them |
 | NPC voice | Sonnet 5.5, low effort | 1 per speaking NPC (via `voice_npc`) |
@@ -252,13 +252,16 @@ so prompt caching can reuse it across beats.
 3. **DM tool loop.** The DM receives its context (ground truth around the player,
    recent events, all intents) and runs a tool-use loop. Each tool call is validated
    against its zod schema and executed by the engine or a generator. The result (facts
-   + events) goes back to the DM. The loop is capped at 8 tool calls.
+   + events) goes back to the DM. The loop is capped at 12 tool calls.
 4. **Narrate.** The DM ends the beat by calling `narrate {text, lines[]}`. NPC dialogue
    in `lines[]` must reference lines produced this beat by `voice_npc` (see
    [NPC voices](#npc-voices)); the DM never writes an NPC's words itself. If the DM hits
    the cap without narrating, it gets one more turn with the same tools and
    `tool_choice: auto`, plus an instruction to narrate now. Changing `tool_choice` would
-   invalidate the prompt cache.
+   invalidate the prompt cache. Invalid or handler-rejected narration gets up to two
+   further attempts, sharing a maximum of three narrate attempts with that finishing
+   turn. The same allowance applies to the critic retry, for at most six narrate
+   attempts across the beat and its one critic retry.
 5. **Critic.** A fast model receives the narration and the facts produced this beat,
    plus the ground-truth state of every entity mentioned. It returns
    `{ok: true}` or `{ok: false, issues[]}`. On a rejection, the DM gets one retry with
@@ -800,7 +803,7 @@ Rules that apply to every tool call:
 
 | Limit | Value |
 |---|---|
-| Tool calls per DM loop | 8 (`narrate` excluded) |
+| Tool calls per DM loop | 12 (`narrate` excluded) |
 | Generator calls per beat | 3 |
 | New NPCs per episode | 12 |
 | Rarity of generated items | `rare` at most (seed items are exempt) |

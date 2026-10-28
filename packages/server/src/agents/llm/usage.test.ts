@@ -50,3 +50,28 @@ it('normalizes nullable cache fields on an uncached response', async () => {
     cacheCreation: { ephemeral5mInputTokens: 0, ephemeral1hInputTokens: 0 },
   });
 });
+
+it('uses 5m accounting for a DM request with only automatic tail caching', async () => {
+  const { provider } = providerFor(
+    wireMessage({ usage: { ...wireUsage, cache_creation: null } }),
+  );
+  const response = await provider.complete({
+    ...request,
+    role: 'dm',
+    system: [],
+    cacheTail: '5m',
+  });
+  expect(response.usage.cacheCreation).toEqual({
+    ephemeral5mInputTokens: 30,
+    ephemeral1hInputTokens: 0,
+  });
+});
+
+it('requires a usage breakdown when automatic tail caching follows 1h prefixes', async () => {
+  const { provider } = providerFor(
+    wireMessage({ usage: { ...wireUsage, cache_creation: null } }),
+  );
+  await expect(
+    provider.complete({ ...request, role: 'dm', cacheTail: '5m' }),
+  ).rejects.toThrow('usage or serving-model prices are invalid');
+});

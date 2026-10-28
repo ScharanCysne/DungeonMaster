@@ -4,8 +4,10 @@ Create a fresh `BeatContext` after `engine.beginBeat`. Inject `Generators` and
 `NpcVoice`; generators live in `../generators`, while voice belongs to slice 11. Await
 `executeToolCall` calls sequentially in model order. Only `narrate` ends the loop;
 `voice_npc` is classified as `soft` because it does not end it. A finished context
-accepts replacement narration for critic corrections; state-changing retries need
-the later beat orchestrator's explicit retry policy.
+accepts replacement narration for critic corrections. The DM's critic retry policy
+calls `beginNarrationRetry` once, clearing only the rejected proposal and granting
+up to two extra ordinary attempts for `unbacked_outcome`; counters and buffered
+events remain intact. The DM separately gates every non-narrate retry attempt.
 
 - Registry order is fixed for prompt caching. Definitions use the shared Zod
   input/output schemas. `toolDefinitionsForApi` returns strict Anthropic params;
@@ -23,7 +25,7 @@ the later beat orchestrator's explicit retry policy.
   against the live API; the offline tests cannot establish API acceptance.
 - Every attempt consumes its applicable counters, including invalid inputs,
   unknown tools, handler failures and calls over a limit. Ordinary calls default
-  to 8; generator attempts also consume their separate cap of 3. Voice attempts
+  to 12; generator attempts also consume their separate cap of 3. Voice attempts
   have a separate cap of 4. Narration and voice never consume the ordinary cap.
   Limits are checked before validation or delegation. Rejections leave gameplay
   state unchanged, except for the engine's documented initiating-attack exception.

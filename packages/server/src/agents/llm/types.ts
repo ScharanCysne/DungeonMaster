@@ -49,6 +49,8 @@ export interface LlmMessage {
 export type LlmRequest<T = unknown> = {
   system: SystemBlock[];
   messages: LlmMessage[];
+  // Automatic breakpoint on the conversation tail, using one of four slots.
+  cacheTail?: '5m';
   maxTokens: number;
   timeoutMs?: number;
   promptVersion?: string;

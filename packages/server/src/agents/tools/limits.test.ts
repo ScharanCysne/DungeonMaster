@@ -10,7 +10,7 @@ import {
 } from './testing/fixtures.js';
 import { failure } from './types.js';
 
-it('counts every attempted ordinary call, including unknown, invalid and rejected calls; refuses the ninth', async () => {
+it('counts every attempted ordinary call, including unknown, invalid and rejected calls; refuses the thirteenth', async () => {
   const { ctx } = await fixture();
   await rejects(ctx, 'missing', {}, 'UNKNOWN_TOOL');
   await rejects(ctx, 'move', {}, 'INVALID_INPUT');
@@ -20,18 +20,18 @@ it('counts every attempted ordinary call, including unknown, invalid and rejecte
     { actor: 'char:missing', to: 'loc:room' },
     'NO_SUCH_ENTITY',
   );
-  for (let i = 0; i < 5; i++)
+  for (let i = 0; i < 9; i++)
     expect((await executeToolCall('set_attitude', attitude, ctx)).ok).toBe(
       true,
     );
-  expect(ctx.counters.toolCalls).toBe(8);
+  expect(ctx.counters.toolCalls).toBe(12);
   await rejects(ctx, 'set_attitude', attitude, 'TOOL_CAP_REACHED');
-  expect(ctx.counters.toolCalls).toBe(9);
+  expect(ctx.counters.toolCalls).toBe(13);
 });
 
 it('allows four voice calls and narrate after the ordinary cap, without counting either', async () => {
   const { ctx, npcVoice } = await fixture();
-  for (let i = 0; i < 8; i++)
+  for (let i = 0; i < 12; i++)
     await executeToolCall('set_attitude', attitude, ctx);
   for (let i = 0; i < 4; i++)
     expect((await executeToolCall('voice_npc', voice, ctx)).ok).toBe(true);
@@ -48,7 +48,7 @@ it('allows four voice calls and narrate after the ordinary cap, without counting
     ).ok,
   ).toBe(true);
   expect(ctx.counters).toEqual({
-    toolCalls: 8,
+    toolCalls: 12,
     generatorCalls: 0,
     voiceNpcCalls: 5,
   });

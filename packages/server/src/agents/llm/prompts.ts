@@ -3,7 +3,9 @@ import { join } from 'node:path';
 import type { LlmRole } from './types.js';
 
 export type PromptName =
-  LlmRole | `generator-${'item' | 'npc' | 'feature' | 'story'}`;
+  | LlmRole
+  | `dm-${'principles' | 'rules'}`
+  | `generator-${'item' | 'npc' | 'feature' | 'story'}`;
 
 export async function loadPrompt(
   role: PromptName,

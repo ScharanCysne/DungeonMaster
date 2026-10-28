@@ -3,6 +3,7 @@ import { expect, it } from 'vitest';
 import { z } from 'zod';
 import { AnthropicProvider } from './AnthropicProvider.js';
 import { LlmRequestError } from './errors.js';
+import { prepareRequest } from './request.js';
 import {
   fakeKey,
   fakeTransport,
@@ -52,6 +53,7 @@ it.each(roles)(
       'thinking',
       'tool_choice',
       'tools',
+      'cache_control',
     ])
       expect(body).not.toHaveProperty(field);
     expect(body).toHaveProperty('fallbacks', 'default');
@@ -164,6 +166,11 @@ const invalidRequests: LlmRequest[] = [
   },
   {
     ...request,
+    cacheTail: '5m',
+    system: Array.from({ length: 4 }, () => ({ text: 'prefix', cache: true })),
+  },
+  {
+    ...request,
     system: [
       { text: 'short', cache: true },
       { text: 'long', cache: true, ttl: '1h' },
@@ -233,4 +240,55 @@ it('omits refusal fallbacks for a model that does not offer them', async () => {
   });
   await provider.complete({ ...request, role: 'peer' });
   expect(transport.bodies[0]).not.toHaveProperty('fallbacks');
+  expect(transport.bodies[0]).not.toHaveProperty('cache_control');
+});
+
+it.each(['claude-opus-5-5', 'claude-haiku-5-5'])(
+  'sends automatic 5m tail caching after 1h prefixes for %s',
+  async (model) => {
+    const transport = fakeTransport(Response.json(wireMessage({ model })));
+    const provider = new AnthropicProvider({
+      apiKey: fakeKey,
+      config: configSchema.parse({
+        models: { dm: model },
+        timeouts: { providerRetries: 0 },
+      }),
+      fetch: transport.fetch,
+    });
+    await provider.complete({ ...request, role: 'dm', cacheTail: '5m' });
+    expect(transport.bodies[0]).toMatchObject({
+      cache_control: { type: 'ephemeral', ttl: '5m' },
+      system: [{ cache_control: { type: 'ephemeral', ttl: '1h' } }],
+      messages: request.messages,
+    });
+  },
+);
+
+it('counts tail caching as one of four breakpoints and preserves TTL ordering', () => {
+  const fourPrefixes: LlmRequest = {
+    ...request,
+    role: 'dm',
+    system: Array.from({ length: 4 }, () => ({ text: 'prefix', cache: true })),
+  };
+  expect(() => prepareRequest(fourPrefixes)).not.toThrow();
+  expect(() => prepareRequest({ ...fourPrefixes, cacheTail: '5m' })).toThrow(
+    'At most four cache breakpoints are allowed',
+  );
+  expect(
+    prepareRequest({
+      ...fourPrefixes,
+      system: fourPrefixes.system.slice(0, 3),
+      cacheTail: '5m',
+    }).cache_control,
+  ).toEqual({ type: 'ephemeral', ttl: '5m' });
+  expect(() =>
+    prepareRequest({
+      ...fourPrefixes,
+      system: [
+        { text: 'short', cache: true, ttl: '5m' },
+        { text: 'long', cache: true, ttl: '1h' },
+      ],
+      cacheTail: '5m',
+    }),
+  ).toThrow('1h cache breakpoints must precede 5m breakpoints');
 });

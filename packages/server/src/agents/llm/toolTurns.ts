@@ -16,8 +16,11 @@ export function appendToolResults(
   response: LlmResponse,
   results: ToolResultBlock[],
 ): LlmMessage[] {
-  if (response.stopReason !== 'tool_use')
-    throw new Error('Tool results require a tool_use response');
+  if (
+    response.stopReason !== 'tool_use' &&
+    response.stopReason !== 'max_tokens'
+  )
+    throw new Error('Tool results require a tool_use or max_tokens response');
   const ids = response.content
     .filter((block) => block.type === 'tool_use')
     .map((block) => block.id);

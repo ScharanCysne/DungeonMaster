@@ -1,7 +1,11 @@
+import type {
+  CacheControlEphemeral,
+  MessageCreateParams,
+} from '@anthropic-ai/sdk/resources/messages';
 import { z } from 'zod';
 import type { CacheTtl, LlmRequest, ToolSchema } from './types.js';
 
-export function cacheControl(ttl: CacheTtl) {
+export function cacheControl(ttl: CacheTtl): CacheControlEphemeral {
   return ttl === '1h'
     ? { type: 'ephemeral' as const, ttl }
     : { type: 'ephemeral' as const };
@@ -14,6 +18,7 @@ export function cacheWriteTtl(request: LlmRequest): CacheTtl | undefined {
       .filter((block) => block.cache)
       .map((block) => block.ttl ?? defaultTtl),
   );
+  if (request.cacheTail) ttls.add(request.cacheTail);
   return ttls.size > 1 ? undefined : ([...ttls][0] ?? defaultTtl);
 }
 
@@ -93,6 +98,11 @@ export function prepareRequest(request: LlmRequest) {
   const breakpoints = [...(tools ?? []), ...system].flatMap((block) =>
     block.cache_control ? [block.cache_control] : [],
   );
+  const tailCache: MessageCreateParams['cache_control'] = request.cacheTail
+    ? { type: 'ephemeral', ttl: request.cacheTail }
+    : undefined;
+  // Automatic caching moves the last breakpoint forward with the conversation.
+  if (tailCache) breakpoints.push(tailCache);
   if (breakpoints.length > 4)
     throw new Error('At most four cache breakpoints are allowed');
   let shortTtlSeen = false;
@@ -103,6 +113,7 @@ export function prepareRequest(request: LlmRequest) {
   }
   return {
     system,
+    ...(tailCache ? { cache_control: tailCache } : {}),
     ...(tools?.length ? { tools, tool_choice: { type: 'auto' as const } } : {}),
   };
 }

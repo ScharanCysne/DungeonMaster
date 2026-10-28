@@ -42,6 +42,7 @@ export class BeatContext {
   finished = false;
   #events: BeatEventDraft[] = [];
   #engineSlots: number[] = [];
+  #retryToolCallLimit: number | undefined;
 
   constructor(options: Options) {
     this.engine = options.engine;
@@ -58,6 +59,21 @@ export class BeatContext {
   }
   get limits() {
     return this.config.limits;
+  }
+  get toolCallLimit() {
+    return this.#retryToolCallLimit ?? this.limits.toolCalls;
+  }
+
+  beginNarrationRetry(allowStateChanges: boolean): void {
+    if (this.#retryToolCallLimit !== undefined)
+      throw new Error('Only one narration retry is allowed per beat.');
+    const extra = allowStateChanges
+      ? Math.min(2, this.limits.retryToolCallsForUnbackedOutcome)
+      : 0;
+    // Preserve counters and buffered events; only the rejected proposal is cleared.
+    this.#retryToolCallLimit = this.counters.toolCalls + extra;
+    this.narration = undefined;
+    this.finished = false;
   }
   get events(): BeatEventDraft[] {
     return structuredClone(this.#events);

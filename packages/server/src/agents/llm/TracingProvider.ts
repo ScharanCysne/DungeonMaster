@@ -34,9 +34,11 @@ export class TracingProvider implements LlmProvider {
     const start = this.now();
     const modelRequested = this.config.models[request.role];
     const effort = this.config.efforts[request.role];
-    const cacheRequested = [...(request.tools ?? []), ...request.system].some(
-      (block) => block.cache,
-    );
+    const cacheRequested =
+      !!request.cacheTail ||
+      [...(request.tools ?? []), ...request.system].some(
+        (block) => block.cache,
+      );
     const snapshot = serializeRequest(
       {
         ...request,

@@ -17,11 +17,11 @@ export async function executeToolCall(
   if (
     name !== 'narrate' &&
     name !== 'voice_npc' &&
-    ctx.counters.toolCalls > ctx.limits.toolCalls
+    ctx.counters.toolCalls > ctx.toolCallLimit
   )
     return failure(
       'TOOL_CAP_REACHED',
-      `Tool call ${ctx.counters.toolCalls}: limit is ${ctx.limits.toolCalls}; call narrate.`,
+      `Tool call ${ctx.counters.toolCalls}: limit is ${ctx.toolCallLimit}; call narrate.`,
     );
   if (
     tool?.kind === 'generator' &&

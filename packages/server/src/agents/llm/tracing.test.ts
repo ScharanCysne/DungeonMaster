@@ -46,6 +46,7 @@ it('records full redacted calls, effective settings and usage in memory and beat
       ...request,
       role: 'dm',
       promptVersion: 'v1',
+      cacheTail: '5m',
       knowledgeSliceHash: 'knowledge-sha256',
       messages: [{ role: 'user', content: `Secret echo ${fakeKey}` }],
     });
@@ -62,6 +63,7 @@ it('records full redacted calls, effective settings and usage in memory and beat
       fallbackUsed: true,
       cacheMiss: false,
       request: {
+        cacheTail: '5m',
         timeoutMs: 60_000,
         messages: [{ content: 'Secret echo [REDACTED]' }],
       },
@@ -132,34 +134,38 @@ it('traces typed failures and retains the provider error', async () => {
   });
 });
 
-it('retains refusal usage and cost, and flags a DM cache miss', async () => {
-  const { provider } = providerFor(
-    wireMessage({
-      stop_reason: 'refusal',
-      model: 'claude-opus-5-5',
-      usage: {
-        input_tokens: 10,
-        output_tokens: 5,
-        cache_creation_input_tokens: 0,
-        cache_read_input_tokens: 0,
-        cache_creation: null,
-      },
-    }),
-  );
-  const memory = new MemoryTraceSink();
-  await expect(
-    new TracingProvider(provider, [memory]).complete({
-      ...request,
-      role: 'dm',
-    }),
-  ).rejects.toThrow('final refusal');
-  expect(memory.records[0]).toMatchObject({
-    stopReason: 'refusal',
-    costUsd: 0.00014,
-    cacheMiss: true,
-    promptBelowCacheMinimum: true,
-  });
-});
+it.each([false, true])(
+  'retains refusal usage and flags a DM cache miss with tail-only caching=%s',
+  async (tailOnly) => {
+    const { provider } = providerFor(
+      wireMessage({
+        stop_reason: 'refusal',
+        model: 'claude-opus-5-5',
+        usage: {
+          input_tokens: 10,
+          output_tokens: 5,
+          cache_creation_input_tokens: 0,
+          cache_read_input_tokens: 0,
+          cache_creation: null,
+        },
+      }),
+    );
+    const memory = new MemoryTraceSink();
+    await expect(
+      new TracingProvider(provider, [memory]).complete({
+        ...request,
+        role: 'dm',
+        ...(tailOnly ? { system: [], cacheTail: '5m' as const } : {}),
+      }),
+    ).rejects.toThrow('final refusal');
+    expect(memory.records[0]).toMatchObject({
+      stopReason: 'refusal',
+      costUsd: 0.00014,
+      cacheMiss: true,
+      promptBelowCacheMinimum: true,
+    });
+  },
+);
 
 it('serializes simultaneous calls as complete JSONL records and redacts injected secrets', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'dungeon-llm-parallel-'));
