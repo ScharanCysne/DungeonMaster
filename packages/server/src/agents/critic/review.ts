@@ -1,4 +1,5 @@
 import type { CriticVerdict, ResolvedNarration } from '@dungeon/shared';
+import { notifyProgress } from '../progress.js';
 import type { DmBeat } from '../dm/DmBeat.js';
 import type { DmBeatResult, DmIntents } from '../dm/types.js';
 import type { BeatContext } from '../tools/BeatContext.js';
@@ -26,6 +27,7 @@ export async function reviewBeat(
     result: DmBeatResult;
     intents: DmIntents;
     onCheck?: (check: CriticCheck) => void;
+    onStatus?: (phase: 'critic' | 'dm_retry') => void;
   },
 ): Promise<ReviewResult> {
   const { ctx, dm, intents } = options;
@@ -37,6 +39,7 @@ export async function reviewBeat(
     attempt < 2 && result.status === 'narrated' && result.narration;
     attempt++
   ) {
+    notifyProgress(options.onStatus, 'critic');
     const check = await checkNarration(
       options,
       ctx,
@@ -65,6 +68,7 @@ export async function reviewBeat(
     }
     if (attempt || !check.verdict || check.verdict.ok) break;
     retry.attempted = true;
+    notifyProgress(options.onStatus, 'dm_retry');
     result = await dm.retryNarration(check.verdict.issues);
     retry.status = result.status;
   }

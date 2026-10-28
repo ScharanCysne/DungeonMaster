@@ -1,12 +1,11 @@
-import type { Roll, ServerMessage } from '@dungeon/shared';
+import { formatRollStamp } from '@dungeon/shared';
+import type { NameLookup, ServerMessage } from '@dungeon/shared';
 import type { Session } from '../beat/Session.js';
 
-export function rollStamp(roll: Roll): string {
-  return `${roll.expr}: [${roll.rolls.join(', ')}] = ${roll.total}${roll.dc === undefined ? '' : ` vs DC ${roll.dc}`} — ${roll.outcome}`;
-}
 export function displayMessage(
   message: ServerMessage,
   write: (text: string) => void,
+  lookup: NameLookup = () => undefined,
 ): void {
   switch (message.type) {
     case 'beat_started':
@@ -19,7 +18,9 @@ export function displayMessage(
         );
       break;
     case 'beat_result':
-      for (const roll of message.rolls) write(`[${rollStamp(roll)}]`);
+      for (const event of message.events)
+        if (event.type === 'CheckRolled' || event.type === 'AttackResolved')
+          write(formatRollStamp(event.payload, lookup));
       write(message.narration.text);
       for (const line of message.narration.lines)
         write(`${line.speaker}: ${line.text}`);

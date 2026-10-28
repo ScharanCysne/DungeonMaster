@@ -20,6 +20,7 @@ export async function createDmBeat(options: {
   promptDirectory?: string;
   maxTokens?: number;
   registry?: ToolRegistry;
+  onToolCall?: (count: number) => void;
 }): Promise<DmBeat> {
   const registry = options.registry ?? toolRegistry;
   const [data, prompts] = await Promise.all([

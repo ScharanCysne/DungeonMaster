@@ -1,4 +1,5 @@
 import { knowledgeSlice } from '../../ontology/queries/knowledge.js';
+import { notifyProgress } from '../progress.js';
 import { LlmUnavailableError } from '../llm/errors.js';
 import type { LlmProvider } from '../llm/types.js';
 import type { BeatContext } from '../tools/BeatContext.js';
@@ -11,6 +12,7 @@ const sequences = new WeakMap<BeatContext, number>();
 export function createNpcVoice(options: {
   provider: LlmProvider;
   promptDirectory?: string;
+  onStatus?: (phase: 'npc_voice') => void;
 }): NpcVoice {
   return {
     async voice(input, ctx) {
@@ -22,6 +24,7 @@ export function createNpcVoice(options: {
         timeoutMs: ctx.config.timeouts.othersMs,
       });
       try {
+        notifyProgress(options.onStatus, 'npc_voice');
         const response = await options.provider.complete(request);
         if (response.stopReason !== 'end_turn')
           throw new Error(`NPC voice stopped with ${response.stopReason}.`);

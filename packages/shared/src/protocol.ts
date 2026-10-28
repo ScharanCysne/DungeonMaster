@@ -62,6 +62,18 @@ export const beatStartedSchema = z.strictObject({
 export type BeatStarted = z.infer<typeof beatStartedSchema>;
 export const beatProgressPayloadSchema = z.discriminatedUnion('kind', [
   z.strictObject({
+    kind: z.literal('status'),
+    phase: z.enum([
+      'peers',
+      'dm',
+      'npc_voice',
+      'critic',
+      'dm_retry',
+      'committing',
+    ]),
+    toolCalls: z.int().nonnegative().optional(),
+  }),
+  z.strictObject({
     kind: z.literal('peer_line'),
     speaker: characterIdSchema,
     text: z.string().min(1),

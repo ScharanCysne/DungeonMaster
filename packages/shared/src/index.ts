@@ -1,5 +1,6 @@
 export * from './ids.js';
 export * from './primitives.js';
+export * from './stamps.js';
 export * from './ontology.js';
 export * from './edges.js';
 export * from './narration.js';

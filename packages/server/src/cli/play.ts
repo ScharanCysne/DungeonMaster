@@ -8,6 +8,8 @@ import { MemoryStore } from '../ontology/MemoryStore.js';
 import { Session } from '../beat/Session.js';
 import { parsePlayInput } from './playParser.js';
 import { costMeter, displayLook, displayMessage } from './playDisplay.js';
+import { createStatusRenderer } from './playStatus.js';
+import { createPlayOutput } from './playOutput.js';
 
 const args = process.argv.slice(2);
 const resumeAt = args.indexOf('--resume');
@@ -31,9 +33,16 @@ const provider = new AnthropicProvider({
 const store = args.includes('--neo4j')
   ? await Neo4jStore.connect(loadNeo4jConfig())
   : new MemoryStore();
-const write = (text: string) => {
-  stdout.write(`${text}\n`);
-};
+const status = createStatusRenderer({
+  write: (text) => {
+    stdout.write(text);
+  },
+  now: Date.now,
+  isTTY: stdout.isTTY === true,
+  setInterval,
+  clearInterval,
+});
+const write = status.write;
 const rl = createInterface({
   input: stdin,
   output: stdout,
@@ -56,6 +65,14 @@ const prompt = (text = '> ') => {
 const hasEnded = (current: Session) => current.state.status === 'ended';
 let session: Session | undefined;
 let countdown: ReturnType<typeof setInterval> | undefined;
+const output = createPlayOutput({
+  status,
+  visibleNames: async () => (session ? (await session.look()).selectable : []),
+});
+const remember = (view: Awaited<ReturnType<Session['look']>>) => {
+  output.remember(view.selectable);
+  return view;
+};
 
 try {
   const options = {
@@ -63,7 +80,7 @@ try {
     store,
     config,
     onMessage: (message: Parameters<typeof displayMessage>[0]) => {
-      displayMessage(message, write);
+      output.message(message);
       if (countdown) clearInterval(countdown);
       countdown = undefined;
       if (
@@ -78,20 +95,22 @@ try {
           );
         }, 1000);
       }
-      if (message.type === 'episode_ended') rl.close();
+      if (message.type === 'episode_ended' && !readerClosed) rl.close();
     },
   };
   session = resumeId
     ? await Session.resume(resumeId, options)
     : await Session.start(options);
   const active = session;
+  await output.flush();
   write(
     `Session ${active.id}. Select with @id, @slug or @"Full Name". /look /inventory /retry /budget +${config.budget.stepUsd} /quit`,
   );
-  displayLook(await active.look(), write);
+  displayLook(remember(await active.look()), write);
   write(costMeter(active));
-  if (active.state.status === 'ended') rl.close();
-  else {
+  if (active.state.status === 'ended') {
+    if (!readerClosed) rl.close();
+  } else {
     // Lines are handled one at a time, so input typed or piped during a beat
     // waits its turn instead of being dropped; end of input ends the loop.
     prompt();
@@ -101,11 +120,12 @@ try {
         // Pause commands remain usable when the graph is unavailable.
         const visible = line.trim().startsWith('/')
           ? []
-          : (await active.look()).selectable;
+          : remember(await active.look()).selectable;
         const input = parsePlayInput(line, visible, config.budget.stepUsd);
-        if (input.kind === 'look') displayLook(await active.look(), write);
+        if (input.kind === 'look')
+          displayLook(remember(await active.look()), write);
         if (input.kind === 'inventory') {
-          const view = await active.look();
+          const view = remember(await active.look());
           write(
             `Inventory: ${view.inventory.map(({ id, name }) => `${name} (@${id})`).join(', ') || 'empty'}; ${view.gold} gp`,
           );
@@ -115,8 +135,11 @@ try {
           await active.command(input.message);
           quit = input.message.command === 'save_and_quit';
         }
+        await output.flush();
         write(costMeter(active));
       } catch (error) {
+        await output.flush();
+        status.stop();
         write(error instanceof Error ? error.message : 'Input failed.');
       }
       if (quit || hasEnded(active)) break;
@@ -126,7 +149,9 @@ try {
   if (active.state.status !== 'ended')
     await active.command({ type: 'session_command', command: 'save_and_quit' });
 } finally {
+  await output.flush();
+  status.stop();
   if (countdown) clearInterval(countdown);
-  rl.close();
+  if (!readerClosed) rl.close();
   if (store instanceof Neo4jStore) await store.close();
 }

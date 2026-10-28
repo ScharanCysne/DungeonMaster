@@ -1,4 +1,5 @@
 import type { CriticIssue } from '@dungeon/shared';
+import { notifyProgress } from '../progress.js';
 import { LlmRefusalError } from '../llm/errors.js';
 import { appendToolResults } from '../llm/toolTurns.js';
 import type {
@@ -44,6 +45,7 @@ export class DmBeat {
       registry: ToolRegistry;
       request: LlmRequest;
       droppedContext: DroppedContext;
+      onToolCall?: (count: number) => void;
     },
   ) {
     this.#request = options.request;
@@ -234,6 +236,7 @@ export class DmBeat {
         input: structuredClone(call.input),
         ...(result.ok ? { ok: true } : { ok: false, error: result.error }),
       });
+      notifyProgress(this.options.onToolCall, this.#calls.length);
       results.push({
         type: 'tool_result',
         tool_use_id: call.id,

@@ -17,6 +17,7 @@ import { generateRecap } from './recap.js';
 import { intentDrafts } from './drafts.js';
 import type { BeatContext } from '../agents/tools/BeatContext.js';
 import type { BeatRunnerOptions, RunInput } from './types.js';
+import type { beatProgress } from './progress.js';
 
 export interface PreparationDiagnostics {
   peers: PeerResult[];
@@ -30,6 +31,7 @@ export async function prepareBeat(
   provider: LlmProvider,
   ctx: BeatContext,
   diagnostics: PreparationDiagnostics,
+  progress: ReturnType<typeof beatProgress>,
   check: () => void,
 ) {
   const { store, content, player } = options;
@@ -43,6 +45,7 @@ export async function prepareBeat(
   );
   const state = ctx.engine.state;
   const playerCharacter = state.characters.get(player);
+  progress.status('peers');
   const peers = await Promise.all(
     rotation.selected.map(async (actor) => {
       const result = await runPeer(provider, {
@@ -64,15 +67,10 @@ export async function prepareBeat(
         roomOf(state, character.locationId) ===
           roomOf(state, playerCharacter.locationId)
       ) {
-        diagnostics.firstFeedbackAt ??= options.clock.now();
-        options.onProgress?.({
-          type: 'beat_progress',
-          beat: input.beat,
-          progress: {
-            kind: 'peer_line',
-            speaker: actor,
-            text: result.turn.say,
-          },
+        progress.send({
+          kind: 'peer_line',
+          speaker: actor,
+          text: result.turn.say,
         });
       }
       return result;
@@ -102,11 +100,13 @@ export async function prepareBeat(
     ]);
   }
   const intents = { player: input.intent, peers };
+  progress.status('dm');
   const dm = await createDmBeat({
     provider,
     ctx,
     seed: content.seed,
     intents,
+    onToolCall: progress.toolCall,
     ...(recap ? { recap } : {}),
   });
   diagnostics.dm = dm;
@@ -116,6 +116,7 @@ export async function prepareBeat(
     ctx,
     dm,
     result: await dm.run(),
+    onStatus: progress.status,
     onCheck: (check) => {
       diagnostics.checks.push(check);
     },

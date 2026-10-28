@@ -176,8 +176,11 @@ payload example. `event-payloads.ts` makes the other payloads concrete:
   represents the dev overlay; visibility/dev authorization belongs to the server.
 - `beat_progress` carries `beat` and a strict `progress` union: a `peer_line` has a
   CharacterId `speaker` and nonempty `text`; a `map_cue` has a CharacterId `entity`,
-  a `look_at | turn | glance_up` cue and optional EntityId `target`. These are
-  provisional feedback only; rolls, movement and narration are excluded.
+  a `look_at | turn | glance_up` cue and optional EntityId `target`; a `status` has
+  only a `peers | dm | npc_voice | critic | dm_retry | committing` phase and an
+  optional nonnegative integer `toolCalls` (cumulative completed DM calls).
+  These are provisional feedback only; tool names/results, rolls, movement and
+  narration are excluded. Status messages are never canonical events.
 - `hello.lastSeenBeat?` supports §5 reconnect recovery, though absent from the §1
   table. `debug_request.target` remains an opaque string because trace targets need
   not be entity IDs. `debug_response` discriminates on `kind` as well as the outer

@@ -86,7 +86,11 @@ it('starts both peers in parallel and emits each provisional line before commit'
     provider,
     onMessage(message) {
       messages.push(message);
-      if (message.type === 'beat_progress') progress.resolve();
+      if (
+        message.type === 'beat_progress' &&
+        message.progress.kind === 'peer_line'
+      )
+        progress.resolve();
     },
   });
   const pending = session.submitIntent(playerIntent());
@@ -100,11 +104,53 @@ it('starts both peers in parallel and emits each provisional line before commit'
   ).toEqual([0, 0]);
   gates[1]?.resolve();
   await pending;
-  expect(messages.map(({ type }) => type)).toEqual([
-    'beat_started',
-    'beat_progress',
-    'beat_result',
+  expect(
+    messages
+      .filter(
+        (message) =>
+          message.type !== 'beat_progress' ||
+          message.progress.kind !== 'status',
+      )
+      .map(({ type }) => type),
+  ).toEqual(['beat_started', 'beat_progress', 'beat_result']);
+});
+
+it('reports phases and cumulative completed DM calls before the canonical commit', async () => {
+  const messages: ServerMessage[] = [];
+  const provider = new ScriptedProvider({
+    peer: [pass, pass],
+    dm: [calls(check, narrate)],
+    critic: [accepted],
+  });
+  const { session } = await harness({
+    provider,
+    onMessage: (message) => {
+      messages.push(message);
+    },
+  });
+  await session.submitIntent(playerIntent());
+  const statuses = messages.flatMap((message) =>
+    message.type === 'beat_progress' && message.progress.kind === 'status'
+      ? [message.progress]
+      : [],
+  );
+  expect(statuses).toEqual([
+    { kind: 'status', phase: 'peers' },
+    { kind: 'status', phase: 'dm' },
+    { kind: 'status', phase: 'dm', toolCalls: 1 },
+    { kind: 'status', phase: 'dm', toolCalls: 2 },
+    { kind: 'status', phase: 'critic', toolCalls: 2 },
+    { kind: 'status', phase: 'committing', toolCalls: 2 },
   ]);
+  for (const status of statuses)
+    expect(
+      Object.keys(status).every((key) =>
+        ['kind', 'phase', 'toolCalls'].includes(key),
+      ),
+    ).toBe(true);
+  expect(messages.at(-2)).toMatchObject({ progress: { phase: 'committing' } });
+  expect(messages.at(-1)?.type).toBe('beat_result');
+  provider.assertDrained();
 });
 
 it('rolls back a failed DM attempt including rotation and generated draft state', async () => {

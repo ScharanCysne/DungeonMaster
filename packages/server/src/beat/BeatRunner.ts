@@ -17,6 +17,7 @@ import { Calls } from './Calls.js';
 import { Deadline } from './Deadline.js';
 import { witnessedRolls } from './drafts.js';
 import { prepareBeat } from './prepareBeat.js';
+import { beatProgress } from './progress.js';
 import type { PreparationDiagnostics } from './prepareBeat.js';
 import { validateSelection } from './selection.js';
 import { AttemptTrace, metrics } from './traces.js';
@@ -76,6 +77,10 @@ export class BeatRunner {
     );
     work.restore(engine.snapshot());
     const diagnostics: PreparationDiagnostics = { peers: [], checks: [] };
+    const progress = beatProgress(input.beat, (message) => {
+      diagnostics.firstFeedbackAt ??= clock.now();
+      this.options.onProgress?.(message);
+    });
     let committed: RunResult | undefined;
     let preparation: Awaited<ReturnType<typeof prepareBeat>> | undefined;
     let ctx: BeatContext | undefined;
@@ -91,7 +96,7 @@ export class BeatRunner {
           provider,
           sprites: this.options.content.sprites,
         }),
-        npcVoice: createNpcVoice({ provider }),
+        npcVoice: createNpcVoice({ provider, onStatus: progress.status }),
       });
       ctx.appendEvents([
         {
@@ -109,6 +114,7 @@ export class BeatRunner {
           provider,
           ctx,
           diagnostics,
+          progress,
           () => deadline.check(),
         ),
       );
@@ -161,6 +167,7 @@ export class BeatRunner {
         rolls: witnessedRolls(events),
         traceId,
       });
+      progress.status('committing');
       const records = await log.commitBeat(
         { beat: input.beat, traceId, createdBy: 'engine' },
         drafts,
@@ -191,6 +198,7 @@ export class BeatRunner {
       if (committed) committed.pause = { reason: 'internal_error', error };
       else work.rollback();
     } finally {
+      progress.stop();
       deadline.stop();
       this.#running = false;
       const dm = preparation?.review.dmResult ?? diagnostics.dm?.diagnostics;
