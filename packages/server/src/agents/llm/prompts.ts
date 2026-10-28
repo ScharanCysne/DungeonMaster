@@ -4,6 +4,8 @@ import type { LlmRole } from './types.js';
 
 export type PromptName =
   | LlmRole
+  | 'npc-voice'
+  | 'ping'
   | `dm-${'principles' | 'rules'}`
   | `generator-${'item' | 'npc' | 'feature' | 'story'}`;
 

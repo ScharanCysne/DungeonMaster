@@ -1,7 +1,7 @@
 # Tool registry rules
 
 Create a fresh `BeatContext` after `engine.beginBeat`. Inject `Generators` and
-`NpcVoice`; generators live in `../generators`, while voice belongs to slice 11. Await
+`NpcVoice`; generators live in `../generators`, and real voices in `../npc-voice`. Await
 `executeToolCall` calls sequentially in model order. Only `narrate` ends the loop;
 `voice_npc` is classified as `soft` because it does not end it. A finished context
 accepts replacement narration for critic corrections. The DM's critic retry policy

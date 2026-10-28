@@ -18,7 +18,7 @@ function report(label: string, result: LlmResponse): void {
 }
 
 for (const role of ['dm', 'story', 'peer'] as const) {
-  const prompt = await loadPrompt(role, promptDir);
+  const prompt = await loadPrompt(role === 'peer' ? 'ping' : role, promptDir);
   const request: LlmRequest = {
     role,
     system: [{ text: prompt.text, cache: true }],
@@ -28,7 +28,7 @@ for (const role of ['dm', 'story', 'peer'] as const) {
   };
   report(role === 'peer' ? 'small' : role, await provider.complete(request));
 }
-const prompt = await loadPrompt('peer', promptDir);
+const prompt = await loadPrompt('ping', promptDir);
 report(
   'structured',
   await provider.complete({

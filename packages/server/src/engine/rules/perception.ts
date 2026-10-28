@@ -25,7 +25,7 @@ export function witnessCandidates(
 
 export function witnessesFor(
   state: EngineState,
-  pending: PendingEvent,
+  pending: Pick<PendingEvent, 'context' | 'candidateWitnesses'>,
 ): CharacterId[] {
   const { actor } = pending.context;
   const beaten = new Set<CharacterId>();

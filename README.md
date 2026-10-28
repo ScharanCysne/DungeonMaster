@@ -57,6 +57,14 @@ the configured Neo4j graph and projects the episode's `SeedLoaded` event, printi
 node and edge counts. See the [episode guide](content/episode-n/README.md) for
 solution paths, map conventions and editing instructions.
 
+`npm run agents:sample` runs two Episode N beats with real peers, DM, NPC voices,
+generators and critic, using an in-memory engine and graph. It uses the standard
+project environment launcher and requires an API key and network access. It prints
+turns, tool calls, dialogue, verdicts, retry/fallback flags and per-role cost/latency.
+See the [peer](packages/server/src/agents/peers/README.md),
+[voice](packages/server/src/agents/npc-voice/README.md) and
+[critic](packages/server/src/agents/critic/README.md) rules.
+
 The npm workspaces are `packages/shared` (protocol and future schemas),
 `packages/server` (server foundation), and `packages/client` (Vite and React).
 Shared exports point directly at TypeScript source, so no shared build is required.

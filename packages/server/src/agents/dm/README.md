@@ -4,6 +4,9 @@ Create a fresh `BeatContext` after `engine.beginBeat`, supplying exact peer say
 lines, generators and an NPC voice. `createDmBeat({provider, ctx, seed, intents})`
 loads the versioned principles/rules and query context; `run()` resolves one beat.
 Keep the returned `DmBeat` for one `retryNarration(issues)` call from the critic.
+The critic's `reviewBeat` owns that retry and the final fallback. Real voices come
+from `createNpcVoice` in `../npc-voice`; `peerSayLines` in `../peers` supplies speech.
+`npm run agents:sample` runs two real peer/DM/voice/critic beats in memory.
 Commit or roll back outside this module. A result is `narrated`, `noNarration` or
 `refused`; unavailable providers propagate to the caller. There is no neutral
 summary here. Neither `run` nor the retry commits anything.

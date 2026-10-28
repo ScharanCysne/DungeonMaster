@@ -14,8 +14,8 @@ limits belong to the caller. Only `AnthropicProvider.ts` imports SDK types or co
   existing conversion and validation behavior.
 - Other roles can pass `outputFormat`; `parsedOutput` then has the schema's output
   type. Missing, invalid, or incomplete output throws `LlmValidationError`.
-- DM and story enable server refusal fallbacks, including story's beta structured
-  parser. Final refusals throw `LlmRefusalError`; transport exhaustion throws
+- All default model roles enable server refusal fallbacks, including structured
+  output calls through the beta parser. Final refusals throw `LlmRefusalError`; transport exhaustion throws
   `LlmUnavailableError`. Authentication and invalid requests throw `LlmRequestError`.
 - `loadPrompt(role, directory)` reads a first-line `<!-- prompt: dm v1 -->` header.
   Pass its version as `promptVersion`, plus an optional `knowledgeSliceHash`.
@@ -47,3 +47,4 @@ must be replayed in place alongside thinking blocks.
 DM, story, peer, and a structured peer request. The Vite launcher itself disables
 automatic env-file loading. To check only the missing-key startup path, launch
 `node packages/server/scripts/llm-ping.mjs` with `ANTHROPIC_API_KEY` absent.
+Peer connectivity calls use `ping.md`; gameplay instructions live in `peer.md`.
