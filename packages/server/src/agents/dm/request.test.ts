@@ -40,7 +40,7 @@ it('orders 1h prefixes before recap and automatic 5m tail caching with auto tool
   expect(request.tools?.filter((tool) => tool.strict)).toHaveLength(14);
   expect(request).not.toHaveProperty('tool_choice');
   expect(request.messages).toHaveLength(1);
-  expect(request.promptVersion).toBe('dm-principles:v3,dm-rules:v3');
+  expect(request.promptVersion).toBe('dm-principles:v4,dm-rules:v3');
   const prepared = prepareRequest(request);
   expect(prepared.tool_choice).toEqual({ type: 'auto' });
   expect(prepared.tools?.at(-1)?.cache_control).toEqual({
