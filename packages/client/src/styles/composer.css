@@ -1,0 +1,128 @@
+.composer {
+  flex-shrink: 0;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-rule-light);
+  margin-top: 10px;
+}
+.beat-status {
+  min-height: 22px;
+  color: var(--color-red-ink);
+  font-style: italic;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+.selection-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  margin-bottom: 10px;
+}
+.chip {
+  color: var(--color-red-ink);
+  background: var(--color-paper-deep);
+  border: 1px solid var(--color-red-ink);
+  border-radius: 2px;
+  padding: 2px 7px;
+  font-size: 14px;
+}
+.selection-hint {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+.selection-limit,
+.connection-error {
+  color: var(--color-red-ink);
+  font-size: 14px;
+  margin: 6px 0;
+}
+.composer form {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+.quill {
+  font-size: 26px;
+  color: var(--color-red-ink);
+}
+.composer input {
+  min-width: 0;
+  flex: 1;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid var(--color-binding);
+  padding: 4px 0;
+  font-style: italic;
+  font-size: 18px;
+}
+.composer input::placeholder {
+  color: var(--color-ink-soft);
+}
+.write-button {
+  padding: 7px 16px;
+  font: 16px var(--font-label);
+  background: var(--color-ink);
+  color: var(--color-paper);
+  border-radius: 2px;
+}
+.write-button:hover:not(:disabled) {
+  background: var(--color-binding);
+}
+.appendix-tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 18px;
+}
+.appendix-tabs button {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  border: 1px solid var(--color-binding);
+  border-left: 0;
+  padding: 16px 9px;
+  background: var(--color-paper-deep);
+  color: var(--color-binding);
+  font: 14px var(--font-label);
+  letter-spacing: 0.05em;
+}
+.appendix-tabs button[aria-pressed='true'] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+.appendix-drawer {
+  position: absolute;
+  inset: 0;
+  border-left: 4px solid var(--color-red-ink);
+  background: var(--color-paper);
+  padding: 22px;
+  display: flex;
+  flex-direction: column;
+}
+.appendix-drawer header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.appendix-drawer h2 {
+  font-size: 25px;
+  text-transform: capitalize;
+}
+.appendix-drawer button {
+  color: var(--color-red-ink);
+  font-style: italic;
+}
+.appendix-placeholder {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+.appendix-placeholder > span {
+  font-size: 44px;
+}

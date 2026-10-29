@@ -1,10 +1,10 @@
-import { PROTOCOL_VERSION } from '@dungeon/shared';
+import { clientStore } from './store';
+import { BookLayout } from './ui/BookLayout';
+import type { BookLayoutProps } from './ui/BookLayout';
 
-export function App() {
-  return (
-    <main>
-      <h1>Episode N</h1>
-      <p>Protocol version: {PROTOCOL_VERSION}</p>
-    </main>
-  );
+export function App({
+  store = clientStore,
+  send = () => false,
+}: Partial<BookLayoutProps>) {
+  return <BookLayout store={store} send={send} />;
 }

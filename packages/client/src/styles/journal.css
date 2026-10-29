@@ -1,0 +1,97 @@
+.journal {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-color: var(--color-rule-light) transparent;
+}
+.journal-empty {
+  display: flex;
+  min-height: 340px;
+  height: 80%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-style: italic;
+  gap: 8px;
+}
+.chapter-ornament {
+  font-size: 52px;
+  color: var(--color-red-ink);
+  margin-bottom: 10px;
+}
+.beat-header {
+  font: 13px var(--font-label);
+  color: var(--color-ink-soft);
+  margin: 22px 0 14px;
+  text-align: center;
+}
+.intent-entry {
+  border-left: 1px solid var(--color-red-ink);
+  padding-left: 20px;
+  color: var(--color-red-ink);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.journal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.narration {
+  font-size: 18px;
+  line-height: 1.65;
+  margin: 16px 0;
+  white-space: pre-wrap;
+}
+.dialogue {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+.provisional,
+.struck {
+  color: var(--color-ink-soft);
+}
+.provisional .speaker,
+.struck .speaker {
+  color: inherit;
+}
+.dialogue small {
+  font-size: 12px;
+  font-style: italic;
+}
+.roll-stamp {
+  display: table;
+  font: 14px/1.4 var(--font-label);
+  padding: 4px 8px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper-deep);
+  margin: 8px 0;
+}
+.roll-stamp.success {
+  color: var(--color-good);
+}
+.roll-stamp.failure {
+  color: var(--color-bad);
+}
+.event-note {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  font-style: italic;
+  margin: 8px 0;
+}
+.episode-end {
+  text-align: center;
+  padding: 28px 8px;
+}
+.episode-end h3 {
+  font-size: 28px;
+  color: var(--color-red-ink);
+}
+.episode-end p {
+  margin-top: 12px;
+}
