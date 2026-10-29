@@ -9,6 +9,7 @@ import { initialRotation } from '../agents/peers/index.js';
 import { readExistingEventLog } from '../ontology/eventLog.js';
 import { knowledgeSlice } from '../ontology/queries/knowledge.js';
 import { sessionView } from './view.js';
+import { readTrace } from './readTrace.js';
 import { BeatRunner } from './BeatRunner.js';
 import { bootstrap } from './bootstrap.js';
 import type { Bootstrap, SessionOptions } from './bootstrap.js';
@@ -115,6 +116,15 @@ export class Session {
   }
   knowledge() {
     return knowledgeSlice(this.data.store, this.data.player);
+  }
+  trace(beat: number, attempt?: number) {
+    return readTrace(
+      this.data.dataDir,
+      this.id,
+      this.data.player,
+      beat,
+      attempt,
+    );
   }
   private emit(message: ServerMessage): void {
     this.options.onMessage?.(message);

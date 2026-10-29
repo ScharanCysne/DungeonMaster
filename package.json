@@ -25,7 +25,8 @@
     "gen:sample": "npm run gen:sample -w @dungeon/server --",
     "dm:sample": "npm run dm:sample -w @dungeon/server --",
     "agents:sample": "npm run agents:sample -w @dungeon/server --",
-    "play:cli": "npm run play:cli -w @dungeon/server --"
+    "play:cli": "npm run play:cli -w @dungeon/server --",
+    "server": "npm run server -w @dungeon/server --"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

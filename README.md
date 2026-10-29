@@ -37,6 +37,7 @@ npm run test:integration
 npm run graph:rebuild -- <sessionId>
 npm run content:check
 npm run graph:seed
+npm run server
 npm run build -w @dungeon/client
 ```
 
@@ -64,6 +65,13 @@ turns, tool calls, dialogue, verdicts, retry/fallback flags and per-role cost/la
 See the [peer](packages/server/src/agents/peers/README.md),
 [voice](packages/server/src/agents/npc-voice/README.md) and
 [critic](packages/server/src/agents/critic/README.md) rules.
+
+`npm run server` serves `/healthz` and the `/ws` game protocol at
+`127.0.0.1:8787` (override `HOST`/`PORT`). It uses the standard environment launcher
+and requires an Anthropic API key for play. Add `-- --neo4j` to use Neo4j;
+`DUNGEON_DEV=1` enables ground truth and debug requests. See the
+[server guide](packages/server/src/server/README.md) for driver ownership,
+visibility, reconnect and testing rules.
 
 The npm workspaces are `packages/shared` (protocol and future schemas),
 `packages/server` (server foundation), and `packages/client` (Vite and React).
