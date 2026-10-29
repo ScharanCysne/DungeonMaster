@@ -3,7 +3,7 @@ import type { EntityId } from '@dungeon/shared';
 import { sheetUrl, tavernMap } from './assets';
 import type { MapScenePort } from './bridge';
 import { EntityView } from './EntityView';
-import { integerFit } from './fit';
+import { mapFit } from './fit';
 import { TILE_SIZE } from './mapData';
 import { sampleCue, sampleMoves } from './motion';
 import type { RenderModel } from './renderModel';
@@ -63,7 +63,7 @@ export class TavernScene extends Phaser.Scene implements MapScenePort {
   }
 
   private fit = () => {
-    const fit = integerFit(
+    const fit = mapFit(
       this.scale.width,
       this.scale.height,
       tavernMap.width * TILE_SIZE,

@@ -58,7 +58,8 @@ sheet's warm red accents. Sprite resolution is persisted `sprite`, manifest ID
 override, first matching entity tag, then kind fallback.
 
 The scene draws this model using Phaser 4 `pixelArt`, `roundPixels`, nearest texture
-filtering and an integer-scaled container, centered in the canvas. ResizeObserver
+filtering and a container scaled by `mapFit`: whole numbers when 2× or more fits,
+otherwise a fractional fill, centered in the canvas. ResizeObserver
 resizes the canvas without CSS stretching. Below the native 416×256 size the frame
 scrolls at 1×. Selection silhouettes use `setTint(...).setTintMode(TintModes.FILL)`;
 the deprecated `setTintFill()` is a no-op in Phaser 4. Labels use Pixelify Sans.

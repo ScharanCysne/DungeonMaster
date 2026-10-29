@@ -1116,8 +1116,10 @@ comparison; V4's arrangement is reused for Inspector mode.
   *Pixelify Sans* for labels, headings and roll stamps, *JetBrains Mono* for ids and
   traces.
 - **Pixel art:** Phaser runs with `pixelArt: true` and `roundPixels: true`. The map is
-  drawn at the largest whole-number scale that fits the frame (letterboxed), so pixels
-  never blur. UI icons and portraits are the same sprites, also scaled by whole numbers.
+  drawn at the largest whole-number scale that fits the frame (letterboxed) whenever
+  2× or more fits. Below that it fills the frame with a fractional, nearest-neighbour
+  scale (user decision, 2026-10-29), because 1× is too small to read on laptop windows.
+  UI icons and portraits are the same sprites, scaled by whole numbers.
 - **Motion:** short and quiet. Ink-in narration, a stamp effect for rolls, movement
   tweens on the map. Everything respects `prefers-reduced-motion` (which turns off
   ink-in and tweens).
