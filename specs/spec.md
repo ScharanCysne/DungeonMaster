@@ -81,14 +81,14 @@ machine.
 | Area | Decision | Why |
 |---|---|---|
 | State authority | **Hybrid.** The engine owns hard mechanics (HP, position, inventory, containers, dice, combat) and exposes them as tools. The DM narrates freely, but creates all content (items, NPCs, containers, facts about the world) only by calling generator tools. Peers have the same powers as the player: they make requests to the DM and have no tools. A fidelity check rejects narration that contradicts game state. | LLMs are good at story and bad at bookkeeping. Content stays consistent because it is always created through a validated path. |
-| Runtime | Browser client (Phaser 3 + HTML UI) talks over WebSocket to a Node server that holds the game state, ontology, agent loop and API key. | Keeps the key off the client, allows saving to disk, and lets the agent loop run headless in tests. |
+| Runtime | Browser client (Phaser 4 + HTML UI) talks over WebSocket to a Node server that holds the game state, ontology, agent loop and API key. | Keeps the key off the client, allows saving to disk, and lets the agent loop run headless in tests. |
 | LLM | Claude, tiered, behind an `LlmProvider` interface we own. Strong model for the DM; fast, cheap models for peers, generators and the critic. Prompt caching for the stable part of the context. | The DM judges and narrates; the other roles are short, well-scoped calls. |
 | Player input | Click objects and characters to select them (several at once). Selected things appear as chips in the action bar. Free text says what to do with them ("use [rope] on [trapdoor]"). | Precise references without menus. Text keeps the D&D freedom. |
 | Time | Player-driven beats. Each submitted action runs one beat. Nothing happens while the player is idle. | Deterministic and debuggable. Ambient ticks can come later. |
 | Peers | 2–3 peers, each with a personality, a private goal and a secret. They only know what they have perceived or been told. | Makes the tavern feel alive and tests knowledge scoping. |
 | World seed | A hand-written seed (characters, tavern layout, key NPCs and containers, the quill's true location). Details are generated during play. | Runs can be repeated and compared; the generators still get exercised. |
 | Ontology store | Neo4j (Community, Docker) as a projection of an append-only event log. | Real graph queries plus free visual inspection in Neo4j Browser. The log keeps history safe and makes replay possible. |
-| Rendering | Phaser 3 for the map, with maps made in Tiled (`.tmj`). React for everything around it. | Tilemaps, sprites, camera and input come built in, and the same engine will serve the overworld later. |
+| Rendering | Phaser 4 for the map, with maps made in Tiled (`.tmj`). React for everything around it. | Tilemaps, sprites, camera and input come built in, and the same engine will serve the overworld later. |
 | Art | **Kenney 1-Bit Pack (CC0, 16×16), recoloured to the Codex palette**: dark-brown ink on parchment, red ink for selection and warm accents, so the map reads as an ink illustration on the book's left page. Chosen from a shortlist of four CC0 packs (`mocks/asset-packs/index.html`). Generated entities are mapped to the closest sprite by tag. | One cohesive style for tiles, characters and icons that matches the book UI; the most pieces of any CC0 pack. Trade-off: no animation and less colour, so characters are told apart by name labels and per-role ink tints. |
 | Rules | 5e-lite (see [Rules summary](#rules-summary)). | Enough for "do anything" to have consequences, without a full rulebook. |
 | Debug visibility | Live ontology graph panel, beat trace / LLM log, replay from the event log, per-agent knowledge view. | Episode N exists to test mechanics, so the machinery must be visible. |
@@ -165,7 +165,7 @@ packages/
     beat/              BeatRunner: orchestrates one beat end to end
     episode/           seed loader, episode lifecycle
     server.ts          HTTP + WebSocket wiring
-  client/            Vite + React + Phaser 3
+  client/            Vite + React + Phaser 4
     scenes/            TavernScene (Phaser)
     ui/                React components: layouts, journal, composer, party, satchel, appendix, inspector
     store/             client store + pure reducer for server messages
@@ -186,7 +186,7 @@ docker-compose.yml     Neo4j
 |---|---|
 | Language | TypeScript (strict), ES modules |
 | Server | Node 24 LTS, Fastify, `ws` |
-| Client | Vite, React, Phaser 3 (map only), Tailwind CSS, Zustand (client store), Cytoscape.js (graph view) |
+| Client | Vite, React, Phaser 4 (map only), Tailwind CSS, Zustand (client store), Cytoscape.js (graph view) |
 | Validation | zod |
 | Graph | Neo4j 5 Community in Docker, `neo4j-driver` |
 | LLM | `@anthropic-ai/sdk` behind `LlmProvider` |

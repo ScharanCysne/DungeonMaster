@@ -6,6 +6,7 @@ import {
   strikeProvisional,
 } from './journal';
 import type { ClientState } from './types';
+import { mapFeedback } from './mapFeedback';
 import { applyWorldEvents, snapshotWorld, visibleEvents } from './world';
 
 function startBeat(state: ClientState, number: number): ClientState {
@@ -27,6 +28,7 @@ function startBeat(state: ClientState, number: number): ClientState {
   return {
     ...state,
     mapCues: [],
+    mapFeedback: mapFeedback([], number),
     journal: { ...state.journal, entries },
     beat: {
       status: 'running',
@@ -49,6 +51,10 @@ export function applyServerMessage(
       return {
         ...state,
         world,
+        mapFeedback:
+          message.beat > state.mapFeedback.beat
+            ? mapFeedback([], message.beat)
+            : state.mapFeedback,
         beat:
           state.beat.status === 'idle'
             ? { status: 'idle', number: message.beat }
@@ -134,6 +140,10 @@ export function applyServerMessage(
         ...state,
         world,
         mapCues: [],
+        mapFeedback:
+          message.beat > state.world.beat && message.beat >= state.beat.number
+            ? mapFeedback(events, message.beat)
+            : state.mapFeedback,
         connection: { ...state.connection, lastSeenBeat: message.beat },
         beat:
           state.beat.status === 'ended' || state.beat.number > message.beat

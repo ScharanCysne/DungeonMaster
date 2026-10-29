@@ -13,6 +13,7 @@ import type {
   PlayerIntent,
   Position,
 } from '@dungeon/shared';
+import type { MapFeedback } from './mapFeedback';
 
 export type Phase = Extract<BeatProgressPayload, { kind: 'status' }>['phase'];
 export type MapCue = Extract<BeatProgressPayload, { kind: 'map_cue' }>;
@@ -69,6 +70,7 @@ export interface ClientState {
   };
   beat: BeatState;
   mapCues: MapCue[];
+  mapFeedback: MapFeedback;
   selection: { ids: EntityId[]; tooMany: boolean };
   composer: {
     text: string;
@@ -108,6 +110,7 @@ export function createInitialState(): ClientState {
     journal: { entries: [], reveal: null },
     beat: { status: 'idle', number: 0 },
     mapCues: [],
+    mapFeedback: { beat: 0, changed: [], moves: [] },
     selection: { ids: [], tooMany: false },
     composer: { text: '', history: [], pending: null },
     dev: {

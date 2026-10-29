@@ -28,6 +28,45 @@ witnessed check/attack events. Ground truth stays in the dev slice. Snapshot
 narration has no beat IDs, so it is temporary context until replayed results arrive.
 The newest beat has a completed reveal placeholder for Slice 16.
 
-The map preserves a 26:16 frame; Phaser, rich journal reveal, and appendix views
-arrive in Slices 15–17. Google Fonts are declared in HTML with local fallbacks;
-the build needs no network. Below 1100px, pages stack and bookmarks become a row.
+The map preserves a 26:16 frame. Rich journal reveal and appendix views arrive in
+Slices 16–17. Google Fonts are declared in HTML with local fallbacks; the build
+needs no network. Below 1100px, pages stack and bookmarks become a row. Companions
+and satchel scroll within their panels, including the final gold row.
+
+## Map module
+
+`src/map/MapView.tsx` owns one Phaser 4 game per mount; `game.ts` handles teardown,
+resize observation and live reduced-motion preferences. React page components stay
+presentational. The bridge forwards only world, selection, beat feedback and cue
+changes. Phaser emits `entity-clicked {id}`; the bridge rechecks visibility before
+toggling store selection. Empty tiles have no input handler. Keyboard input and
+autofocus are disabled in Phaser; cards and satchel rows retain Tab/Enter selection.
+
+Assets stay in `content/`: Vite imports the original sheet with `?url` and the TMJ
+and manifest with `?raw`. Production bundles contain the PNG and both JSON sources;
+there is no copied public asset tree. The dev server allows the repository root,
+and Vite environment-file loading is disabled. `mapData.ts` reads only decorative
+floor, walls and furniture layers in that order; collision and object layers never
+create entities. Positions come exclusively from the player's store snapshot.
+
+`palette.ts`, `fit.ts`, `renderModel.ts` and `motion.ts` are pure. Recolouring runs
+once per game boot into a canvas texture: alpha below 128 becomes transparent;
+otherwise RGB becomes red ink only when red exceeds both other channels by more
+than 40, and ink otherwise, retaining alpha. Characters use fill tints:
+player `#4b2520`, peers `#35424a`, NPCs `#2b1d12`. Tiles and objects retain the
+sheet's warm red accents. Sprite resolution is persisted `sprite`, manifest ID
+override, first matching entity tag, then kind fallback.
+
+The scene draws this model using Phaser 4 `pixelArt`, `roundPixels`, nearest texture
+filtering and an integer-scaled container, centered in the canvas. ResizeObserver
+resizes the canvas without CSS stretching. Below the native 416×256 size the frame
+scrolls at 1×. Selection silhouettes use `setTint(...).setTintMode(TintModes.FILL)`;
+the deprecated `setTintFill()` is a no-op in Phaser 4. Labels use Pixelify Sans.
+
+The reducer retains only the latest live beat's changed IDs and movement events.
+Markers clear on the next beat, and snapshot/replay cannot introduce old movement.
+The pure timeline samples every engine path at eight tiles/second in event order,
+including repeated moves by one entity; selection updates do not restart it.
+Progress cues only flip or hop one pixel, return to rest, and clear on pause/commit.
+Reduced motion snaps movement and omits cues. Tests mock the game boundary and use
+the real store and pure model; never import or boot Phaser/WebGL in jsdom.

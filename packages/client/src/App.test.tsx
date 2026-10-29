@@ -11,6 +11,8 @@ import { createClientStore } from './store';
 import { createInitialState } from './store/types';
 import { event, result, snapshot } from './testing/fixtures';
 
+vi.mock('./map/game', () => ({ createMapGame: () => ({ destroy() {} }) }));
+
 function setup() {
   const store = createClientStore(createInitialState());
   store.getState().receive(snapshot, 0);

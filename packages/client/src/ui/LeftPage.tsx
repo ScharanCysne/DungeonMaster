@@ -1,4 +1,5 @@
 import type { Character, EntityId, Node } from '@dungeon/shared';
+import type { ReactNode } from 'react';
 import type { ClientState, WorldState } from '../store/types';
 import { isCharacter, playerId } from '../store/world';
 
@@ -26,18 +27,16 @@ export function LocationHeader({
     </header>
   );
 }
-export function MapFrame({ mapId }: { mapId: string | null }) {
+export function MapFrame({
+  mapId,
+  children,
+}: {
+  mapId: string | null;
+  children: ReactNode;
+}) {
   return (
     <figure className="map-frame" aria-label="Tavern map">
-      <div className="map-placeholder">
-        <span className="map-ornament" aria-hidden="true">
-          ✠
-        </span>
-        <span>The ground floor</span>
-        <span className="map-subtitle">
-          A map of the tavern will appear here.
-        </span>
-      </div>
+      {children}
       <figcaption>
         ✠ {mapId ? 'ground floor · kitchen east' : 'awaiting the world'}
       </figcaption>
@@ -175,12 +174,14 @@ export function SatchelPanel({
   );
 }
 export function LeftPage({
+  map,
   world,
   beat,
   connection,
   selection,
   onToggle,
 }: {
+  map: ReactNode;
   world: WorldState;
   beat: number;
   connection: ClientState['connection'];
@@ -200,7 +201,7 @@ export function LeftPage({
         beat={beat}
         connection={connection}
       />
-      <MapFrame mapId={world.mapId} />
+      <MapFrame mapId={world.mapId}>{map}</MapFrame>
       <div className="possessions">
         <CompanionsPanel
           world={world}

@@ -2,8 +2,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 14px;
+  flex: 1;
+  min-height: 180px;
+  overflow: hidden;
+}
+.possessions > section {
   min-height: 0;
-  overflow: auto;
+  overflow-y: auto;
+  padding-bottom: 12px;
+  scrollbar-gutter: stable;
 }
 .section-label {
   font: 12px var(--font-label);

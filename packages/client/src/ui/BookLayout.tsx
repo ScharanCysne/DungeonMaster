@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { useStore } from 'zustand';
 import type { StoreApi } from 'zustand/vanilla';
 import type { ClientStore } from '../store';
+import { MapView } from '../map/MapView';
 import { AppendixTabs } from './Appendix';
 import { beatStatus } from './Composer';
 import { LeftPage } from './LeftPage';
@@ -49,6 +50,7 @@ export function BookLayout({ store, send }: BookLayoutProps) {
       <div className="book-spread">
         <div className="book">
           <LeftPage
+            map={<MapView store={store} />}
             world={state.world}
             beat={state.beat.number}
             connection={state.connection}
