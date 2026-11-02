@@ -1,112 +1,105 @@
-import type { EntityId, Node } from '@dungeon/shared';
-import type { JournalEntry } from '../store/types';
+import type { BeatTrace, EntityId, Node } from '@dungeon/shared';
+import { useEffect } from 'react';
+import type { BeatState, ClientState, JournalEntry } from '../store/types';
+import { JournalLine } from './JournalLine';
+import { revealSchedule } from './reveal';
+import { useJournalReveal } from './useJournalReveal';
+import { useJournalScroll } from './useJournalScroll';
 
 export function Journal({
   entries,
   entities,
   onToggle,
+  reveal = null,
+  beat,
+  devTools = false,
+  traces = {},
+  onTrace = () => {},
+  onRevealComplete,
 }: {
   entries: JournalEntry[];
   entities: Record<string, Node>;
   onToggle: (id: EntityId) => void;
+  reveal?: ClientState['journal']['reveal'];
+  beat?: BeatState;
+  devTools?: boolean;
+  traces?: Record<string, BeatTrace>;
+  onTrace?: (traceId: string) => void;
+  onRevealComplete?: (beat: number) => void;
 }) {
-  const name = (id: string) => entities[id]?.name ?? id;
+  const duration = revealSchedule(entries, reveal?.beat ?? null, 0).durationMs;
+  const { elapsed, instant, skip } = useJournalReveal(reveal, duration);
+  const visible = revealSchedule(
+    entries,
+    reveal?.beat ?? null,
+    elapsed,
+    instant,
+  );
+  const waiting =
+    beat?.status === 'running' &&
+    !entries.some(
+      (entry) =>
+        entry.beat === beat.number &&
+        entry.kind === 'dialogue' &&
+        entry.status === 'provisional',
+    );
+  const contentKey = JSON.stringify([visible.entries, waiting]);
+  const scroll = useJournalScroll(contentKey);
+  useEffect(() => {
+    if (visible.complete && reveal?.status === 'revealing')
+      onRevealComplete?.(reveal.beat);
+  }, [visible.complete, reveal, onRevealComplete]);
   return (
-    <section className="journal" aria-labelledby="journal-title" tabIndex={0}>
-      <h2 id="journal-title" className="section-label">
-        Journal
-      </h2>
-      {!entries.length && (
-        <div className="journal-empty">
-          <span className="chapter-ornament" aria-hidden="true">
-            ❧
-          </span>
-          <p>Every adventure begins with a word.</p>
-          <p className="text-ink-soft">The pages await your story.</p>
+    <div className="journal-panel">
+      <section
+        ref={scroll.viewport}
+        className="journal"
+        aria-labelledby="journal-title"
+        tabIndex={0}
+        onScroll={scroll.onScroll}
+        onClick={skip}
+      >
+        <div ref={scroll.content} className="journal-content">
+          <h2 id="journal-title" className="section-label">
+            Journal
+          </h2>
+          {!entries.length && (
+            <div className="journal-empty">
+              <span className="chapter-ornament" aria-hidden="true">
+                ❧
+              </span>
+              <p>Every adventure begins with a word.</p>
+              <p className="text-ink-soft">The pages await your story.</p>
+            </div>
+          )}
+          {visible.entries.map((entry) => (
+            <JournalLine
+              key={entry.id}
+              entry={entry}
+              entities={entities}
+              onToggle={onToggle}
+              stamping={visible.stamping.includes(entry.id)}
+              fallback={
+                devTools &&
+                entry.kind === 'narration' &&
+                !!entry.traceId &&
+                traces[entry.traceId]?.outcome === 'fallback'
+              }
+              onTrace={onTrace}
+            />
+          ))}
+          {waiting && (
+            <p className="quill-wait" role="status">
+              The Dungeon Master's quill scratches…
+            </p>
+          )}
         </div>
+      </section>
+      {scroll.hasNew && (
+        <button type="button" className="new-entries" onClick={scroll.jump}>
+          ↓ new entries
+        </button>
       )}
-      {entries.map((entry) => {
-        switch (entry.kind) {
-          case 'beat_header':
-            return (
-              <h3 className="beat-header" key={entry.id}>
-                — Beat {entry.beat} —
-              </h3>
-            );
-          case 'intent':
-            return (
-              <div className="intent-entry" key={entry.id}>
-                <p>You: {entry.text}</p>
-                <div className="journal-chips">
-                  {entry.selection.map((id) => (
-                    <button
-                      type="button"
-                      className="chip"
-                      key={id}
-                      disabled={!entities[id]}
-                      onClick={() => onToggle(id)}
-                    >
-                      {name(id)}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            );
-          case 'dialogue': {
-            const speaker = entities[entry.speaker];
-            return (
-              <p className={`dialogue ${entry.status}`} key={entry.id}>
-                <strong
-                  className={
-                    speaker && 'role' in speaker
-                      ? `speaker role-${speaker.role}`
-                      : 'speaker'
-                  }
-                >
-                  {name(entry.speaker)}:
-                </strong>{' '}
-                {entry.status === 'struck' ? (
-                  <>
-                    <s>{entry.text}</s> <small>(withdrawn)</small>
-                  </>
-                ) : (
-                  entry.text
-                )}
-                {entry.status === 'provisional' && (
-                  <small> (provisional)</small>
-                )}
-              </p>
-            );
-          }
-          case 'stamp':
-            return (
-              <p className={`roll-stamp ${entry.outcome}`} key={entry.id}>
-                {entry.text}
-              </p>
-            );
-          case 'narration':
-            return (
-              <p className="narration" key={entry.id}>
-                {entry.text}
-              </p>
-            );
-          case 'note':
-            return (
-              <p className="event-note" key={entry.id}>
-                ◆ {entry.text}
-              </p>
-            );
-          case 'episode_end':
-            return (
-              <section className="episode-end" key={entry.id}>
-                <h3>End of chapter</h3>
-                <p>{name(entry.holder)} holds the quill.</p>
-                <p>{entry.text}</p>
-                <p>{entry.beat} beats</p>
-              </section>
-            );
-        }
-      })}
-    </section>
+    </div>
   );
 }

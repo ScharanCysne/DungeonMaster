@@ -1,6 +1,7 @@
 .journal {
   flex: 1;
   min-height: 0;
+  min-width: 0;
   overflow-y: auto;
   padding-right: 8px;
   scrollbar-color: var(--color-rule-light) transparent;
@@ -94,4 +95,68 @@
 }
 .episode-end p {
   margin-top: 12px;
+}
+.journal-panel {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.journal-content {
+  display: flow-root;
+  padding-bottom: 24px;
+  overflow-wrap: anywhere;
+}
+.new-entries {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid var(--color-red-ink);
+  border-radius: 20px;
+  padding: 5px 14px;
+  color: var(--color-red-ink);
+  background: var(--color-paper);
+  box-shadow: 0 2px 8px var(--color-rule-light);
+}
+.dialogue {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.dialogue-portrait {
+  flex-shrink: 0;
+}
+.provisional .dialogue-portrait,
+.struck .dialogue-portrait {
+  opacity: 0.55;
+}
+.narration-entry {
+  position: relative;
+}
+.critic-fallback {
+  display: block;
+  margin: -12px 0 12px auto;
+  color: var(--color-red-ink);
+  font-size: 12px;
+  font-style: italic;
+  text-decoration: underline;
+}
+.quill-wait {
+  color: var(--color-ink-soft);
+  font-style: italic;
+  margin: 14px 0;
+}
+.stamping {
+  animation: ink-stamp 150ms ease-out;
+}
+@keyframes ink-stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.08) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
 }

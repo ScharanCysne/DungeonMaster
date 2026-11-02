@@ -9,6 +9,7 @@ import type { ClientState } from './types';
 export type ClientAction =
   | { type: 'selection_toggle'; id: EntityId }
   | { type: 'selection_clear' }
+  | { type: 'journal_revealed'; beat: number }
   | { type: 'composer_text'; text: string }
   | { type: 'composer_recall' }
   | { type: 'intent_sent'; intent: PlayerIntent }
@@ -45,6 +46,16 @@ export function applyClientAction(
         selection: { ids: [...ids, action.id], tooMany: false },
       };
     }
+    case 'journal_revealed':
+      return state.journal.reveal?.beat === action.beat
+        ? {
+            ...state,
+            journal: {
+              ...state.journal,
+              reveal: { beat: action.beat, status: 'complete' },
+            },
+          }
+        : state;
     case 'selection_clear':
       return { ...state, selection: { ids: [], tooMany: false } };
     case 'composer_text':

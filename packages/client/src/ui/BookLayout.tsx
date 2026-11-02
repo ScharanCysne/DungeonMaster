@@ -1,11 +1,10 @@
 import type { ClientMessage, EntityId } from '@dungeon/shared';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useStore } from 'zustand';
 import type { StoreApi } from 'zustand/vanilla';
 import type { ClientStore } from '../store';
 import { MapView } from '../map/MapView';
 import { AppendixTabs } from './Appendix';
-import { beatStatus } from './Composer';
 import { LeftPage } from './LeftPage';
 import { RightPage } from './RightPage';
 
@@ -27,20 +26,47 @@ export function BookLayout({ store, send }: BookLayoutProps) {
     window.addEventListener('keydown', keyDown);
     return () => window.removeEventListener('keydown', keyDown);
   }, [dispatch]);
+  const requestedTraces = useRef(new Set<string>());
+  useEffect(() => {
+    if (!state.dev.devTools || state.connection.status !== 'open') return;
+    for (const entry of state.journal.entries) {
+      if (
+        entry.kind !== 'narration' ||
+        !entry.traceId ||
+        entry.beat === null ||
+        state.dev.traces[entry.traceId] ||
+        requestedTraces.current.has(entry.traceId)
+      )
+        continue;
+      if (
+        send({
+          type: 'debug_request',
+          kind: 'trace',
+          target: String(entry.beat),
+        })
+      )
+        requestedTraces.current.add(entry.traceId);
+    }
+  }, [
+    state.journal.entries,
+    state.dev.devTools,
+    state.dev.traces,
+    state.connection.status,
+    send,
+  ]);
   const disabled =
     state.beat.status !== 'idle' ||
     state.connection.status !== 'open' ||
     state.world.mapId === null ||
     state.composer.pending !== null;
   const status =
-    beatStatus(state.beat) ||
-    (state.connection.status === 'closed'
+    state.connection.status === 'closed'
       ? 'Connection lost. Reconnecting…'
       : state.connection.status === 'connecting'
         ? 'Opening the book…'
         : state.composer.pending
           ? "The Dungeon Master's quill scratches…"
-          : '');
+          : '';
   return (
     <main className="desk">
       <header className="desk-heading">
@@ -60,6 +86,13 @@ export function BookLayout({ store, send }: BookLayoutProps) {
           <RightPage
             journal={{
               entries: state.journal.entries,
+              reveal: state.journal.reveal,
+              beat: state.beat,
+              devTools: state.dev.devTools,
+              traces: state.dev.traces,
+              onRevealComplete: (beat) =>
+                dispatch({ type: 'journal_revealed', beat }),
+              onTrace: () => dispatch({ type: 'appendix', tab: 'trace' }),
               entities: state.world.entities,
               onToggle,
             }}
@@ -69,6 +102,8 @@ export function BookLayout({ store, send }: BookLayoutProps) {
               text: state.composer.text,
               disabled,
               status,
+              beat: state.beat,
+              onClear: () => dispatch({ type: 'selection_clear' }),
               onToggle,
               onText: (text) => dispatch({ type: 'composer_text', text }),
               onRecall: () => dispatch({ type: 'composer_recall' }),

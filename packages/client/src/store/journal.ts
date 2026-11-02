@@ -168,6 +168,7 @@ export function commitJournal(
     id: `narration:${beat}`,
     beat,
     text: result.narration.text,
+    traceId: result.traceId,
   });
   next.push(
     ...remaining.map(({ line, index }): JournalEntry => ({

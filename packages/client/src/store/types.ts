@@ -41,6 +41,8 @@ export interface WorldState {
   party: CharacterId[];
   inventory: ItemId[];
   gold: number;
+  acquiredAt: Record<string, number>;
+  equipped: ItemId[];
 }
 export type JournalEntry = { id: string; beat: number | null } & (
   | { kind: 'beat_header' }
@@ -52,7 +54,8 @@ export type JournalEntry = { id: string; beat: number | null } & (
       status: 'provisional' | 'final' | 'struck';
     }
   | { kind: 'stamp'; text: string; outcome: 'success' | 'failure' | 'tie' }
-  | { kind: 'narration' | 'note'; text: string }
+  | { kind: 'narration'; text: string; traceId?: string }
+  | { kind: 'note'; text: string }
   | { kind: 'episode_end'; holder: EntityId; text: string }
 );
 export interface ClientState {
@@ -66,7 +69,7 @@ export interface ClientState {
   world: WorldState;
   journal: {
     entries: JournalEntry[];
-    reveal: { beat: number; status: 'complete' } | null;
+    reveal: { beat: number; status: 'revealing' | 'complete' } | null;
   };
   beat: BeatState;
   mapCues: MapCue[];
@@ -106,6 +109,8 @@ export function createInitialState(): ClientState {
       party: [],
       inventory: [],
       gold: 0,
+      acquiredAt: {},
+      equipped: [],
     },
     journal: { entries: [], reveal: null },
     beat: { status: 'idle', number: 0 },

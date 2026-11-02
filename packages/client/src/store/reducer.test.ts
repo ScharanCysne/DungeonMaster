@@ -138,7 +138,7 @@ describe('server messages', () => {
       }),
     ]);
     expect(next.beat.status).toBe('idle');
-    expect(next.journal.reveal).toEqual({ beat: 1, status: 'complete' });
+    expect(next.journal.reveal).toEqual({ beat: 1, status: 'revealing' });
   });
   it('strikes lines and records the pause, then keeps aborted lines struck through a retry', () => {
     const state = applyServerMessage(started(), peer);

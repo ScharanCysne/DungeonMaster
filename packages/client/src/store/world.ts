@@ -5,6 +5,7 @@ import type {
   WorldSnapshot,
 } from '@dungeon/shared';
 import type { WorldState } from './types';
+import { inventoryMetadata } from './inventory';
 
 export function isCharacter(node: Node | undefined): node is Character {
   return node !== undefined && 'role' in node;
@@ -27,7 +28,10 @@ export function visibleEvents(
           (!event.private || event.actor === player),
       );
 }
-export function snapshotWorld(message: WorldSnapshot): WorldState {
+export function snapshotWorld(
+  message: WorldSnapshot,
+  previous?: WorldState,
+): WorldState {
   return {
     beat: message.beat,
     mapId: message.mapId,
@@ -43,6 +47,8 @@ export function snapshotWorld(message: WorldSnapshot): WorldState {
     party: message.party,
     inventory: message.inventory,
     gold: message.gold,
+    acquiredAt: previous?.acquiredAt ?? {},
+    equipped: previous?.equipped ?? [],
   };
 }
 export function applyWorldEvents(
@@ -50,9 +56,15 @@ export function applyWorldEvents(
   events: GameEvent[],
   beat: number,
 ): WorldState {
-  if (beat <= world.beat) return world;
+  const metadata = inventoryMetadata(world, events, beat, playerId(world));
+  if (beat <= world.beat)
+    return metadata.acquiredAt === world.acquiredAt &&
+      metadata.equipped === world.equipped
+      ? world
+      : { ...world, ...metadata };
   const next = {
     ...world,
+    ...metadata,
     beat,
     entities: { ...world.entities },
     positions: { ...world.positions },

@@ -1,30 +1,17 @@
+import { activateOnEnter } from './keyboard';
 import type { EntityId } from '@dungeon/shared';
 import type { BeatState, ClientState, WorldState } from '../store/types';
+import { BeatStatus } from './BeatStatus';
+import { exampleVerbs, shouldRecall } from './composerModel';
 
-export function beatStatus(beat: BeatState): string {
-  if (beat.status === 'paused')
-    return `Paused: ${beat.reason.replaceAll('_', ' ')}. ${beat.retryInMs === null ? 'Waiting for you.' : `Retry in ${Math.ceil(beat.retryInMs / 1000)}s.`}`;
-  if (beat.status === 'ended') return 'The chapter has ended.';
-  if (beat.status !== 'running') return '';
-  const labels = {
-    peers: 'A peer is speaking…',
-    dm: 'DM is resolving…',
-    npc_voice: 'An NPC is finding their words…',
-    critic: 'Checking the narration…',
-    dm_retry: 'DM is revising…',
-    committing: 'Saving the beat…',
-  };
-  const label = beat.phase
-    ? labels[beat.phase]
-    : "The Dungeon Master's quill scratches…";
-  return `${label}${beat.toolCalls === null ? '' : ` ${beat.toolCalls} ${beat.toolCalls === 1 ? 'action' : 'actions'}`}`;
-}
 export function Composer({
   world,
   selection,
   text,
   disabled,
   status,
+  beat,
+  onClear,
   onToggle,
   onText,
   onRecall,
@@ -35,6 +22,8 @@ export function Composer({
   text: string;
   disabled: boolean;
   status: string;
+  beat: BeatState;
+  onClear: () => void;
   onToggle: (id: EntityId) => void;
   onText: (text: string) => void;
   onRecall: () => void;
@@ -42,13 +31,11 @@ export function Composer({
 }) {
   return (
     <div className="composer">
-      <p className="beat-status" role="status" aria-live="polite">
-        {status}
-      </p>
       <div className="selection-chips">
         {selection.ids.map((id) => (
           <button
             type="button"
+            onKeyDown={activateOnEnter}
             className="chip"
             key={id}
             onClick={() => onToggle(id)}
@@ -84,13 +71,22 @@ export function Composer({
           id="intent"
           type="text"
           autoComplete="off"
-          placeholder="I would like to…"
+          placeholder={exampleVerbs(selection.ids, world.entities)}
           value={text}
           maxLength={500}
-          disabled={disabled}
-          onChange={(event) => onText(event.target.value)}
+          disabled={beat.status === 'ended'}
+          onChange={(event) => onText(event.target.value.slice(0, 500))}
+          aria-describedby={text.length >= 450 ? 'intent-count' : undefined}
           onKeyDown={(event) => {
-            if (event.key === 'ArrowUp') {
+            if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
+              event.preventDefault();
+              if (!event.repeat) event.currentTarget.form?.requestSubmit();
+            }
+            if (event.key === 'Escape') onClear();
+            if (
+              event.key === 'ArrowUp' &&
+              shouldRecall(text, event.currentTarget.selectionStart)
+            ) {
               event.preventDefault();
               onRecall();
             }
@@ -104,6 +100,12 @@ export function Composer({
           Write
         </button>
       </form>
+      {text.length >= 450 && (
+        <p id="intent-count" className="intent-count">
+          {text.length}/500
+        </p>
+      )}
+      <BeatStatus beat={beat} fallback={status} />
     </div>
   );
 }

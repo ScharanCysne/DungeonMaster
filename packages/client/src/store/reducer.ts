@@ -47,7 +47,7 @@ export function applyServerMessage(
   switch (message.type) {
     case 'world_snapshot': {
       if (message.beat < state.world.beat) return state;
-      const world = snapshotWorld(message);
+      const world = snapshotWorld(message, state.world);
       return {
         ...state,
         world,
@@ -156,7 +156,10 @@ export function applyServerMessage(
         composer: { ...state.composer, pending: null },
         journal: {
           entries: commitJournal(state.journal.entries, message, events, names),
-          reveal: { beat: message.beat, status: 'complete' },
+          reveal: {
+            beat: message.beat,
+            status: message.beat < state.world.beat ? 'complete' : 'revealing',
+          },
         },
         dev: {
           ...state.dev,
