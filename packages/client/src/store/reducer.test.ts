@@ -151,6 +151,7 @@ describe('server messages', () => {
     });
     expect(paused.beat).toEqual({
       status: 'paused',
+      retryAt: 1000,
       number: 1,
       reason: 'llm_unavailable',
       attempt: 0,

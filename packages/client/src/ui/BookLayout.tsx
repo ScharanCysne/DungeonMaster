@@ -9,6 +9,9 @@ import { useDeveloperViews } from '../dev/useDeveloperViews';
 import { AppendixDrawer, AppendixTabs } from './Appendix';
 import { InspectorLayout } from './InspectorLayout';
 import { LeftPage } from './LeftPage';
+import { PauseOverlay } from './PauseOverlay';
+import { EpisodeEndPage } from './EpisodeEndPage';
+import { ReplayTimeline } from './ReplayTimeline';
 import { RightPage } from './RightPage';
 import type { ComponentProps } from 'react';
 
@@ -53,6 +56,7 @@ export function BookLayout({ store, send }: BookLayoutProps) {
     return () => window.removeEventListener('keydown', keyDown);
   }, [dispatch, store]);
   const disabled =
+    state.replay !== null ||
     state.beat.status !== 'idle' ||
     state.connection.status !== 'open' ||
     state.world.mapId === null ||
@@ -74,7 +78,34 @@ export function BookLayout({ store, send }: BookLayoutProps) {
       onToggle={onToggle}
     />
   );
+  const ending = state.journal.entries.findLast(
+    (entry) => entry.kind === 'episode_end',
+  );
   const story: ComponentProps<typeof RightPage> = {
+    timeline: state.replay ? (
+      <ReplayTimeline
+        beat={state.world.beat}
+        beats={state.replay.beats}
+        onSeek={(beat) => send({ type: 'replay_seek', beat })}
+      />
+    ) : null,
+    ending:
+      ending?.kind === 'episode_end' && state.beat.status === 'ended' ? (
+        <EpisodeEndPage
+          holder={ending.holder}
+          beat={state.beat.number}
+          recap={ending.text}
+          results={state.results}
+          entities={state.world.entities}
+          devTools={dev.devTools && !state.replay}
+          onReplay={() =>
+            send({ type: 'session_command', command: 'replay_session' })
+          }
+          onNewRun={() =>
+            send({ type: 'session_command', command: 'start_new_run' })
+          }
+        />
+      ) : null,
     journal: {
       entries: state.journal.entries,
       reveal: state.journal.reveal,
@@ -95,6 +126,7 @@ export function BookLayout({ store, send }: BookLayoutProps) {
       selection: state.selection,
       text: state.composer.text,
       disabled,
+      readOnly: state.replay !== null,
       status,
       beat: state.beat,
       rawIds: dev.inspector,
@@ -177,6 +209,22 @@ export function BookLayout({ store, send }: BookLayoutProps) {
             onToggle={(tab) => dispatch({ type: 'appendix', tab })}
           />
         </div>
+      )}
+      {state.beat.status === 'paused' && (
+        <PauseOverlay
+          pause={state.beat}
+          devTools={dev.devTools}
+          onCommand={(command) => send({ type: 'session_command', command })}
+          onTrace={(traceId) => {
+            send({
+              type: 'debug_request',
+              kind: 'trace',
+              target: traceId,
+            });
+            dispatch({ type: 'trace_focus', traceId });
+          }}
+          trace={dev.appendixTab === 'trace' ? view('trace') : null}
+        />
       )}
     </main>
   );

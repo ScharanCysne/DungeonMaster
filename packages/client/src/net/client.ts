@@ -123,7 +123,10 @@ export function createConnection(options: ConnectionOptions) {
       const message = parsed.data;
       const previousBeat = store.getState().world.beat;
       store.getState().receive(message, now());
-      if (message.type === 'world_snapshot') {
+      if (
+        message.type === 'world_snapshot' ||
+        message.type === 'replay_state'
+      ) {
         retries = 0;
         connection('open');
       }

@@ -18,8 +18,10 @@ declare module 'fastify' {
 
 export interface ServerOptions extends Omit<SessionOptions, 'onMessage'> {
   dev?: boolean;
+  replayId?: string;
   logStream?: Writable;
   sessionFactory?: NonNullable<HostOptions['sessionFactory']>;
+  onSessionStarted?: NonNullable<HostOptions['onSessionStarted']>;
 }
 
 export async function createServer(options: ServerOptions) {
@@ -44,6 +46,7 @@ export async function createServer(options: ServerOptions) {
     },
     app.log,
   );
+  if (options.replayId) await host.initializeReplay(options.replayId);
   const stops = new Set<() => void>();
   const sockets = new Set<ServerSocket>();
   await app.register(websocket, {

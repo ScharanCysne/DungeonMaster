@@ -18,3 +18,11 @@ export function pauseReason(error: unknown): PauseReason {
     return 'graph_unavailable';
   return 'internal_error';
 }
+
+export function pauseCode(error: unknown, reason: PauseReason): string {
+  if (error instanceof SessionError) return error.code;
+  if (error instanceof OntologyStoreError)
+    return `GRAPH_${error.kind.toUpperCase()}`;
+  if (error instanceof Error) return error.name;
+  return reason.toUpperCase();
+}

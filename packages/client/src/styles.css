@@ -4,6 +4,7 @@
 @import './styles/journal.css';
 @import './styles/composer.css';
 @import './styles/developer.css';
+@import './styles/session.css';
 
 @theme {
   --color-paper: #f6ecd6;

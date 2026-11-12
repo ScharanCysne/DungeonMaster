@@ -216,3 +216,36 @@ create SUPERSEDES. It is optional for existing v1 logs, matching
 `create_fact.supersedes`; learning/retraction remains a FactLearned projection effect.
 Character tile mirroring lives in the server's GraphNode extension; shared debug
 Character and Graph schemas remain unchanged.
+
+## Pause, chapter end and replay (Slice 18)
+
+- `paused.budgetStepUsd?` advertises the configured positive dollar increment for
+  budget pauses. `errorCode?` and `traceId?` identify the failed attempt and are
+  sent only in developer mode. `retryInMs: null` means no automatic retry remains;
+  the client measures a non-null delay from receipt time. `resumed` clears the pause.
+- `episode_ended.summary` already exists. It now includes the existing session
+  recap, or the winning beat's resolved narration before the first recap. No extra
+  generation call is made. Perspective filtering removes unsafe recap text. The
+  client derives acquisition from the winning beat's witnessed quill transfer;
+  absent that event it says “Out of sight.” Peer holders get a next-episode hook.
+- `session_command` adds `replay_session` and `start_new_run`, available only to
+  the live session's driver in developer mode after ending or saving. A fresh run
+  broadcasts `session_reset {sessionId}` before its seed snapshot. Reset clears
+  world, journal, last-seen beat, draft, selection and developer caches. A successful
+  `save_and_quit` broadcasts `session_saved {sessionId, beat}`; this stops the session
+  without inventing a quill holder or an episode victory.
+- Replay hello returns `replay_info {sessionId, beats, ended}` followed by
+  `replay_state {snapshot, results, ended?, groundTruth?}`. `beats` is the highest
+  committed beat; zero is the seed. `results` contains the original player-filtered
+  beat results through `snapshot.beat`. `ended` is an `episode_ended` message only
+  when the selected beat includes the end. `groundTruth` supplies the selected
+  graph, including at beat zero, only with server developer mode enabled.
+- `replay_seek {beat}` returns one atomic `replay_state`; each connection has its
+  own cursor. The client replaces its state and developer caches so backward seeks
+  cannot retain future inventory, narration, knowledge or hidden entities. Debug
+  requests use that cursor, and future trace requests are refused. Reconnection
+  uses `hello.lastSeenBeat` as the requested cursor, capped at the last beat.
+- Replay refuses every intent and session command with `READ_ONLY`. Out-of-range
+  seeks use `BAD_REPLAY_BEAT`; seeking a live session uses `NOT_REPLAY`. Replay and
+  lifecycle objects use strict schemas without coercion. Log `v` remains the
+  integer major version 1; unsupported versions name both found and supported.

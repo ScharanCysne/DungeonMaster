@@ -59,3 +59,11 @@ IDs. Mentions become selection IDs and are removed from intent text. Commands:
 `/look`, `/inventory`, `/retry`, `/quit`, `/budget +5` (or the configured step).
 The CLI contains presentation and input handling only. Both diagnostic samples
 remain unchanged and keep their existing manual wiring.
+
+Slice 18 adds budget-step and developer diagnostic fields to pause messages,
+recomputed countdowns on reconnect, and `session_saved` acknowledgement after
+summary persistence. Projection failures link to the committed beat's trace.
+The chapter summary reuses the current recap or, for a short run, the winning
+beat's narration; it does not make another provider call. Live and replay delivery
+apply the same perspective filter to this summary. Host-only replay/new-run commands
+are refused by Session itself; the host owns the transition and driver/dev checks.

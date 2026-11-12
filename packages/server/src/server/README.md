@@ -68,3 +68,48 @@ If the execution sandbox denies binding with EPERM, those tests explicitly skip;
 direct SessionHost, history, visibility and heartbeat tests still run. No network
 provider calls are made. The optional CLI WebSocket mode is deferred; `play:cli`
 continues to use Session in process.
+
+## Pause, chapter end and replay
+
+Pause messages include the configured budget increment, and only in developer
+mode the underlying error code and attempt trace ID. Reconnecting recomputes the
+remaining countdown. The existing 5/10/20/40/60-second schedule stops within ten
+minutes. Saving acknowledges with `session_saved`; committed logs remain available.
+Chapter summaries use the existing recap, falling back to the winning narration
+for short runs. The same perspective boundary filters summaries during live play,
+reconnection and replay.
+
+`npm run replay -- <sessionId>` uses `scripts/replay.mjs` and `loadProjectEnv`,
+serving the same port and client WebSocket endpoint as `npm run server`. No API key
+or provider calls are needed. `--neo4j` follows the live server's store option:
+the validated committed log rebuilds the configured graph at startup. Missing logs
+name their expected path; unknown major versions name found and supported versions.
+Replay never repairs or writes the source event log, including an incomplete tail.
+
+`createServer({ replayId, provider, ... })` opens replay before serving. The provider
+is unused; tests inject one that throws on every call. `ReplayArchive` checkpoints
+both engine and player history (MemoryStore, remembered visibility and filtered
+results) every ten beats, including beat zero. A seek clones the nearest checkpoint
+and applies at most nine beats. Each viewer has its own MemoryStore cursor, so
+simultaneous seeks and graph/knowledge requests cannot change another viewer's
+perspective. A configured Neo4j graph retains the full session projection; cursor
+debug queries use the corresponding in-memory projection. Traces beyond the cursor
+are refused. Engine replay retains the existing `fromLog` semantics: persisted hard
+state is rebuilt; transient dice receipts are unnecessary in a read-only session.
+
+Hello sends `replay_info`, then one atomic `replay_state` containing the chosen
+snapshot, filtered historical results and optional ending. Developer mode adds
+ground truth, including at the seed. `replay_seek` changes that cursor; intents and
+all session commands return `READ_ONLY`. See the shared schema notes for details.
+
+The live end-page driver can send developer-only `replay_session` to switch all
+attached viewers to beat zero of that log, or `start_new_run` to start a new Session
+from content seed with a fresh ID. This explicitly uses `Session.start`, even when
+the initial session factory resumed a saved run. Reset plus seed snapshot broadcasts
+clear old client state. `onSessionStarted` lets the launcher rotate per-session
+logging for both initial and new runs. Replay has no new-run control because all
+session commands are refused there; restart the live server to leave replay mode.
+
+Deterministic suites cover checkpoint bounds, live/replayed hard state and player
+perspective, independent cursors, developer gating, read-only commands, immutable
+source logs, version/path errors, launcher errors and seed resets.

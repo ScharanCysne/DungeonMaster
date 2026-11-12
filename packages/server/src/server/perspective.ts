@@ -192,8 +192,13 @@ export function playerPerspective(
         )
           return;
       }
-      if (message.type === 'episode_ended')
-        return safe(message) ? message : undefined;
+      if (message.type === 'episode_ended') {
+        if (!safe(message.holder)) return;
+        return {
+          ...message,
+          summary: text(message.summary) || 'The chapter closes.',
+        };
+      }
       if (message.type === 'error')
         return {
           ...message,

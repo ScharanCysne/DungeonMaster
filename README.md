@@ -23,8 +23,7 @@ npm run dev -w @dungeon/client
 ```
 
 Open the URL printed by Vite for the client. Neo4j Browser is at
-<http://localhost:7474>. This scaffold renders the episode heading and shared
-protocol version; unit tests and the client do not require Neo4j or an API key.
+<http://localhost:7474>. The client renders the Codex book, journal and map; unit tests and the client do not require Neo4j or an API key.
 
 Development checks:
 
@@ -38,6 +37,7 @@ npm run graph:rebuild -- <sessionId>
 npm run content:check
 npm run graph:seed
 npm run server
+npm run replay -- <sessionId>
 npm run build -w @dungeon/client
 ```
 
@@ -73,6 +73,15 @@ and requires an Anthropic API key for play. Add `-- --neo4j` to use Neo4j;
 [server guide](packages/server/src/server/README.md) for driver ownership,
 visibility, reconnect and testing rules.
 
+`npm run replay -- <sessionId>` opens a read-only replay from
+`data/sessions/<sessionId>/events.jsonl`, using the same server port and client.
+Start the client separately with `npm run dev -w @dungeon/client`. Replay requires
+no API key or LLM calls; the timeline seeks from the seed to the last committed
+beat. Add `--neo4j` after the ID to rebuild that configured graph, and use
+`DUNGEON_DEV=1` for the Inspector and ground truth. The end-of-chapter developer
+buttons also open replay or start a fresh run from the seed. Pause, budget and
+chapter pages work in both book and Inspector layouts.
+
 The npm workspaces are `packages/shared` (protocol and future schemas),
 `packages/server` (server foundation), and `packages/client` (Vite and React).
 Shared exports point directly at TypeScript source, so no shared build is required.
@@ -80,5 +89,5 @@ Shared exports point directly at TypeScript source, so no shared build is requir
 See [specs/](specs/) for the source of truth and
 [the implementation plan](specs/implementation-plan.md) for slice boundaries. The
 full developer command list is in [the spec](specs/spec.md#developer-commands);
-combined server/client development, end-to-end tests, evals, engine replay and
+combined server/client development, end-to-end tests, evals and
 graph verification arrive in later slices.

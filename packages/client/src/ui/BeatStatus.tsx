@@ -11,7 +11,7 @@ export function BeatStatus({
 }) {
   const [now, setNow] = useState(Date.now);
   useEffect(() => {
-    if (beat.status !== 'running') return;
+    if (beat.status !== 'running' && beat.status !== 'paused') return;
     setNow(Date.now());
     const timer = window.setInterval(() => setNow(Date.now()), 1000);
     return () => window.clearInterval(timer);

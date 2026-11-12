@@ -1,3 +1,4 @@
+import { endEpisode, replaceReplay, resetSession } from './session';
 import type { ServerMessage } from '@dungeon/shared';
 import {
   beatHeader,
@@ -46,6 +47,19 @@ export function applyServerMessage(
   message: ServerMessage,
 ): ClientState {
   switch (message.type) {
+    case 'replay_info':
+      return { ...state, replay: message };
+    case 'replay_state':
+      return replaceReplay(state, message);
+    case 'session_reset':
+      return resetSession(state);
+    case 'session_saved':
+      return {
+        ...state,
+        mapCues: [],
+        beat: { status: 'saved', number: message.beat },
+        composer: { ...state.composer, pending: null },
+      };
     case 'world_snapshot': {
       if (message.beat < state.world.beat) return state;
       const world = snapshotWorld(message, state.world);
@@ -140,6 +154,7 @@ export function applyServerMessage(
       return {
         ...state,
         world,
+        results: [...state.results, { ...message, events }],
         mapCues: [],
         mapFeedback:
           message.beat > state.world.beat && message.beat >= state.beat.number
@@ -169,6 +184,10 @@ export function applyServerMessage(
     case 'paused':
       return {
         ...state,
+        dev: {
+          ...state.dev,
+          devTools: state.dev.devTools || message.errorCode !== undefined,
+        },
         mapCues: [],
         beat: {
           status: 'paused',
@@ -176,6 +195,15 @@ export function applyServerMessage(
           reason: message.reason,
           attempt: message.attempt,
           retryInMs: message.retryInMs,
+          retryAt:
+            message.retryInMs === null
+              ? null
+              : state.connection.receivedAt + message.retryInMs,
+          ...(message.budgetStepUsd === undefined
+            ? {}
+            : { budgetStepUsd: message.budgetStepUsd }),
+          ...(message.errorCode ? { errorCode: message.errorCode } : {}),
+          ...(message.traceId ? { traceId: message.traceId } : {}),
         },
         journal: {
           ...state.journal,
@@ -190,30 +218,8 @@ export function applyServerMessage(
           ],
         },
       };
-    case 'episode_ended': {
-      const id = `end:${message.beat}`;
-      return {
-        ...state,
-        mapCues: [],
-        beat: { status: 'ended', number: message.beat, holder: message.holder },
-        composer: { ...state.composer, pending: null },
-        journal: {
-          ...state.journal,
-          entries: state.journal.entries.some((entry) => entry.id === id)
-            ? state.journal.entries
-            : [
-                ...state.journal.entries,
-                {
-                  kind: 'episode_end',
-                  id,
-                  beat: message.beat,
-                  holder: message.holder,
-                  text: message.summary,
-                },
-              ],
-        },
-      };
-    }
+    case 'episode_ended':
+      return endEpisode(state, message);
     case 'error':
       if (
         ['DEBUG_DISABLED', 'TRACE_NOT_FOUND', 'BAD_TARGET'].includes(

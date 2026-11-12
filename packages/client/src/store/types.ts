@@ -12,6 +12,8 @@ import type {
   PauseReason,
   PlayerIntent,
   Position,
+  ReplayInfo,
+  BeatResult,
 } from '@dungeon/shared';
 import type { MapFeedback } from './mapFeedback';
 
@@ -30,8 +32,13 @@ export type BeatState = { number: number } & (
       reason: PauseReason;
       retryInMs: number | null;
       attempt: number;
+      retryAt?: number | null;
+      budgetStepUsd?: number;
+      errorCode?: string;
+      traceId?: string;
     }
   | { status: 'ended'; holder: EntityId }
+  | { status: 'saved' }
 );
 export interface WorldState {
   beat: number;
@@ -59,6 +66,8 @@ export type JournalEntry = { id: string; beat: number | null } & (
   | { kind: 'episode_end'; holder: EntityId; text: string }
 );
 export interface ClientState {
+  replay: ReplayInfo | null;
+  results: BeatResult[];
   connection: {
     status: 'connecting' | 'open' | 'closed';
     retries: number;
@@ -101,6 +110,8 @@ export interface ClientState {
 }
 export function createInitialState(): ClientState {
   return {
+    replay: null,
+    results: [],
     connection: {
       status: 'connecting',
       retries: 0,

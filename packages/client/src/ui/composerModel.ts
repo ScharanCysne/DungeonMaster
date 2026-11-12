@@ -27,8 +27,16 @@ export function shouldRecall(text: string, caret: number | null): boolean {
   return text.length === 0 || caret === 0;
 }
 export function beatStatus(beat: BeatState, now: number): string {
-  if (beat.status === 'paused')
-    return `Paused: ${beat.reason.replaceAll('_', ' ')}. ${beat.retryInMs === null ? 'Waiting for you.' : `Retry in ${Math.ceil(beat.retryInMs / 1000)}s.`}`;
+  if (beat.status === 'paused') {
+    const remaining =
+      beat.retryAt === undefined
+        ? beat.retryInMs
+        : beat.retryAt === null
+          ? null
+          : Math.max(0, beat.retryAt - now);
+    return `Paused: ${beat.reason.replaceAll('_', ' ')}. ${remaining === null ? 'Waiting for you.' : `Retry in ${Math.ceil(remaining / 1000)}s.`}`;
+  }
+  if (beat.status === 'saved') return 'Session saved. You can close the book.';
   if (beat.status === 'ended') return 'The chapter has ended.';
   if (beat.status !== 'running') return '';
   const labels = {

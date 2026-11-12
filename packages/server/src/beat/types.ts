@@ -55,5 +55,7 @@ export type SessionState =
       beat: number;
       attempt: number;
       retryAt: number | null;
+      errorCode?: string;
+      traceId?: string;
     }
   | { status: 'ended' };

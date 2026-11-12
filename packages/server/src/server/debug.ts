@@ -7,7 +7,7 @@ import { RequestError } from './wire.js';
 
 export async function debugResponse(
   request: DebugRequest,
-  session: Session,
+  session: Pick<Session, 'beat' | 'trace'>,
   store: OntologyStore,
   player: CharacterId,
 ): Promise<DebugResponse> {

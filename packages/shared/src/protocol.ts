@@ -33,14 +33,26 @@ export const debugRequestSchema = z.strictObject({
 export type DebugRequest = z.infer<typeof debugRequestSchema>;
 export const sessionCommandSchema = z.strictObject({
   type: z.literal('session_command'),
-  command: z.enum(['retry_now', 'save_and_quit', 'raise_budget']),
+  command: z.enum([
+    'retry_now',
+    'save_and_quit',
+    'raise_budget',
+    'replay_session',
+    'start_new_run',
+  ]),
 });
 export type SessionCommand = z.infer<typeof sessionCommandSchema>;
+export const replaySeekSchema = z.strictObject({
+  type: z.literal('replay_seek'),
+  beat: beatSchema,
+});
+export type ReplaySeek = z.infer<typeof replaySeekSchema>;
 export const clientMessageSchema = z.discriminatedUnion('type', [
   helloSchema,
   playerIntentSchema,
   debugRequestSchema,
   sessionCommandSchema,
+  replaySeekSchema,
 ]);
 export type ClientMessage = z.infer<typeof clientMessageSchema>;
 export const worldSnapshotSchema = z.strictObject({
@@ -109,6 +121,30 @@ export const episodeEndedSchema = z.strictObject({
   summary: z.string(),
 });
 export type EpisodeEnded = z.infer<typeof episodeEndedSchema>;
+export const replayInfoSchema = z.strictObject({
+  type: z.literal('replay_info'),
+  sessionId: z.string().min(1),
+  beats: beatSchema,
+  ended: z.boolean(),
+});
+export type ReplayInfo = z.infer<typeof replayInfoSchema>;
+export const replayStateSchema = z.strictObject({
+  type: z.literal('replay_state'),
+  snapshot: worldSnapshotSchema,
+  results: z.array(beatResultSchema),
+  ended: episodeEndedSchema.optional(),
+  groundTruth: graphSchema.optional(),
+});
+export type ReplayState = z.infer<typeof replayStateSchema>;
+export const sessionResetSchema = z.strictObject({
+  type: z.literal('session_reset'),
+  sessionId: z.string().min(1),
+});
+export const sessionSavedSchema = z.strictObject({
+  type: z.literal('session_saved'),
+  sessionId: z.string().min(1),
+  beat: beatSchema,
+});
 export const debugResponseSchema = z.discriminatedUnion('kind', [
   z.strictObject({
     type: z.literal('debug_response'),
@@ -146,6 +182,9 @@ export const pausedSchema = z.strictObject({
   beat: beatSchema,
   attempt: z.int().nonnegative(),
   retryInMs: z.int().nonnegative().nullable(),
+  budgetStepUsd: z.number().positive().optional(),
+  errorCode: z.string().min(1).optional(),
+  traceId: z.string().min(1).optional(),
 });
 export type Paused = z.infer<typeof pausedSchema>;
 export const resumedSchema = z.strictObject({
@@ -163,5 +202,9 @@ export const serverMessageSchema = z.discriminatedUnion('type', [
   errorMessageSchema,
   pausedSchema,
   resumedSchema,
+  replayInfoSchema,
+  replayStateSchema,
+  sessionResetSchema,
+  sessionSavedSchema,
 ]);
 export type ServerMessage = z.infer<typeof serverMessageSchema>;

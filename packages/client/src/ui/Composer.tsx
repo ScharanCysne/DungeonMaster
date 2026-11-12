@@ -17,6 +17,7 @@ export function Composer({
   onRecall,
   onSubmit,
   rawIds = false,
+  readOnly = false,
 }: {
   world: WorldState;
   selection: ClientState['selection'];
@@ -30,6 +31,7 @@ export function Composer({
   onRecall: () => void;
   onSubmit: () => void;
   rawIds?: boolean;
+  readOnly?: boolean;
 }) {
   return (
     <div className="composer">
@@ -77,7 +79,9 @@ export function Composer({
           placeholder={exampleVerbs(selection.ids, world.entities)}
           value={text}
           maxLength={500}
-          disabled={beat.status === 'ended'}
+          disabled={
+            readOnly || beat.status === 'ended' || beat.status === 'saved'
+          }
           onChange={(event) => onText(event.target.value.slice(0, 500))}
           aria-describedby={text.length >= 450 ? 'intent-count' : undefined}
           onKeyDown={(event) => {
@@ -108,7 +112,13 @@ export function Composer({
           {text.length}/500
         </p>
       )}
-      <BeatStatus beat={beat} fallback={status} />
+      {readOnly ? (
+        <p className="beat-status" role="status">
+          Replay - read only
+        </p>
+      ) : (
+        <BeatStatus beat={beat} fallback={status} />
+      )}
     </div>
   );
 }

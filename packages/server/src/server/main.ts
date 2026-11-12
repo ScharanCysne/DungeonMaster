@@ -3,12 +3,16 @@ import { join, resolve } from 'node:path';
 import { Writable } from 'node:stream';
 import { configSchema } from '@dungeon/shared';
 import { AnthropicProvider } from '../agents/llm/AnthropicProvider.js';
-import { Session } from '../beat/Session.js';
+import { readRebuildLog } from '../ontology/rebuild.js';
 import { MemoryStore } from '../ontology/MemoryStore.js';
 import { Neo4jStore } from '../ontology/Neo4jStore.js';
 import { loadNeo4jConfig } from '../config/neo4j.js';
 import { createServer } from './index.js';
 
+const replayAt = process.argv.indexOf('--replay');
+const replayId = replayAt < 0 ? undefined : process.argv[replayAt + 1];
+if (replayAt >= 0 && (!replayId || replayId.startsWith('--')))
+  throw new Error('Usage: npm run replay -- <sessionId> [--neo4j]');
 const dev = process.env.DUNGEON_DEV === '1';
 const config = configSchema.parse({
   budget: {
@@ -24,10 +28,17 @@ const port = Number(process.env.PORT ?? 8787);
 if (!Number.isSafeInteger(port) || port < 0 || port > 65535)
   throw new Error('PORT must be an integer from 0 to 65535.');
 const dataDir = resolve(process.env.DUNGEON_DATA_DIR ?? 'data');
-const provider = new AnthropicProvider({
-  apiKey: process.env.ANTHROPIC_API_KEY ?? '',
-  config,
-});
+if (replayId) await readRebuildLog(dataDir, replayId);
+const provider = replayId
+  ? {
+      complete() {
+        throw new Error('Replay must never call an LLM provider.');
+      },
+    }
+  : new AnthropicProvider({
+      apiKey: process.env.ANTHROPIC_API_KEY ?? '',
+      config,
+    });
 const store = process.argv.includes('--neo4j')
   ? await Neo4jStore.connect(loadNeo4jConfig())
   : new MemoryStore();
@@ -46,15 +57,15 @@ const app = await createServer({
   dev,
   dataDir,
   logStream,
-  async sessionFactory(options) {
-    const session = await Session.start(options);
+  ...(replayId ? { replayId } : {}),
+  async onSessionStarted(session) {
+    if (file) await new Promise<void>((resolve) => file?.end(resolve));
     const directory = join(dataDir, 'sessions', session.id);
     mkdirSync(directory, { recursive: true });
     file = createWriteStream(join(directory, 'server.log'), {
       flags: 'a',
       mode: 0o600,
     });
-    return session;
   },
 });
 app.addHook('onClose', async () => {

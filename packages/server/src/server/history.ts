@@ -15,7 +15,7 @@ import { tilesIn } from '../engine/spatial.js';
 import type { WalkabilityGrid } from '../engine/state.js';
 
 export class PlayerHistory {
-  readonly store = new MemoryStore();
+  store = new MemoryStore();
   readonly results: BeatResult[] = [];
   #offset = 0;
   #beat = 0;
@@ -26,6 +26,21 @@ export class PlayerHistory {
     readonly dev: boolean,
     readonly grid: WalkabilityGrid,
   ) {}
+
+  clone(): PlayerHistory {
+    const copy = new PlayerHistory(
+      this.player,
+      this.mapId,
+      this.dev,
+      this.grid,
+    );
+    copy.store = this.store.clone();
+    copy.results.push(...structuredClone(this.results));
+    copy.#offset = this.#offset;
+    copy.#beat = this.#beat;
+    copy.#seen = new Set(this.#seen);
+    return copy;
+  }
 
   async perspective() {
     const graph: Graph = {

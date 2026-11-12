@@ -42,6 +42,8 @@ it('pauses, schedules 5 seconds, then reruns once with attempt + 1', async () =>
     beat: 1,
     attempt: 0,
     retryAt: 5000,
+    errorCode: 'LlmUnavailableError',
+    traceId: 'beat-1-0',
   });
   await expect(session.submitIntent(playerIntent())).rejects.toThrow(
     'SESSION_PAUSED',

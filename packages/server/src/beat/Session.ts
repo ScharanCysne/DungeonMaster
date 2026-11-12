@@ -1,11 +1,12 @@
 import { playerIntentSchema, sessionCommandSchema } from '@dungeon/shared';
 import type {
   PauseReason,
+  PeerRotationState,
   PlayerIntent,
   ServerMessage,
   SessionCommand,
 } from '@dungeon/shared';
-import { initialRotation } from '../agents/peers/index.js';
+import { sessionProgress } from './sessionProgress.js';
 import { readExistingEventLog } from '../ontology/eventLog.js';
 import { knowledgeSlice } from '../ontology/queries/knowledge.js';
 import { sessionView } from './view.js';
@@ -14,6 +15,7 @@ import { BeatRunner } from './BeatRunner.js';
 import { bootstrap } from './bootstrap.js';
 import type { Bootstrap, SessionOptions } from './bootstrap.js';
 import { pauseReason, SessionError } from './errors.js';
+import { pauseDiagnostics, pausedMessage } from './pausedMessage.js';
 import { RetrySchedule } from './retry.js';
 import { saveBudget, writeSummary } from './sessionStorage.js';
 import type { RunResult, SessionState } from './types.js';
@@ -23,7 +25,7 @@ export class Session {
   #busy = false;
   #pending: PlayerIntent | undefined;
   #projectionPending = false;
-  #rotation = initialRotation();
+  #rotation: PeerRotationState;
   #recap: string | undefined;
   #attempt = 0;
   #beat: number;
@@ -35,22 +37,14 @@ export class Session {
     private readonly data: Bootstrap,
     private readonly options: SessionOptions,
   ) {
-    this.#beat = data.records.at(-1)?.beat ?? 0;
+    const progress = sessionProgress(data);
+    this.#beat = progress.beat;
     this.#cost = data.totals.costUsd;
     this.#budget = data.budget;
-    this.#attempt =
-      Math.max(
-        -1,
-        ...data.totals.attempts
-          .filter(({ beat }) => beat === this.#beat + 1)
-          .map(({ attempt }) => attempt),
-      ) + 1;
-    for (const event of data.records) {
-      if (event.type === 'BeatCommitted' && event.payload.rotation)
-        this.#rotation = event.payload.rotation;
-      if (event.type === 'RecapUpdated') this.#recap = event.payload.text;
-      if (event.type === 'EpisodeEnded') this.#state = { status: 'ended' };
-    }
+    this.#attempt = progress.attempt;
+    this.#rotation = progress.rotation;
+    this.#recap = progress.recap;
+    this.#state = progress.state;
     this.#retry = new RetrySchedule(
       data.clock,
       data.config.timeouts.pauseAutoRetryMs,
@@ -95,6 +89,9 @@ export class Session {
   }
   get budgetUsd() {
     return this.#budget;
+  }
+  get pauseMessage() {
+    return pausedMessage(this.#state, this.data);
   }
   get rotation() {
     return structuredClone(this.#rotation);
@@ -177,7 +174,11 @@ export class Session {
         await this.writeSummary();
       } else if (result.pause) {
         this.#projectionPending = result.pause.projection ?? false;
-        this.pause(result.pause.reason);
+        this.pause(
+          result.pause.reason,
+          result.pause.error,
+          result.result.traceId,
+        );
       } else if (this.#cost >= this.#budget) this.pause('budget');
       else this.#state = { status: 'running' };
       return result;
@@ -193,32 +194,26 @@ export class Session {
           message:
             'The episode is committed, but its summary could not be written. Use /quit to try saving again.',
         });
-      } else this.pause(pauseReason(error));
+      } else this.pause(pauseReason(error), error);
       return result;
     } finally {
       this.#busy = false;
     }
   }
 
-  private pause(reason: PauseReason): void {
+  private pause(reason: PauseReason, error?: unknown, traceId?: string): void {
+    const pause = { reason, beat: this.#beat + 1, attempt: this.#attempt };
     const retryAt = this.#retry.schedule(reason, async () => {
       await this.retry(false);
     });
     this.#state = {
       status: 'paused',
-      reason,
-      beat: this.#beat + 1,
-      attempt: this.#attempt,
+      ...pause,
       retryAt,
+      ...pauseDiagnostics(this.#state, pause, error, traceId),
     };
-    this.emit({
-      type: 'paused',
-      reason,
-      beat: this.#beat + 1,
-      attempt: this.#attempt,
-      retryInMs:
-        retryAt === null ? null : Math.max(0, retryAt - this.data.clock.now()),
-    });
+    const message = this.pauseMessage;
+    if (message) this.emit(message);
   }
 
   private async retry(manual: boolean): Promise<RunResult | undefined> {
@@ -255,7 +250,7 @@ export class Session {
       if (this.#pending) this.#attempt++;
       else this.#retry.reset();
     } catch (error) {
-      this.pause(pauseReason(error));
+      this.pause(pauseReason(error), error);
       return;
     } finally {
       this.#busy = false;
@@ -265,6 +260,11 @@ export class Session {
 
   async command(raw: SessionCommand): Promise<RunResult | undefined> {
     const { command } = sessionCommandSchema.parse(raw);
+    if (command === 'replay_session' || command === 'start_new_run')
+      throw new SessionError(
+        'HOST_COMMAND',
+        'This command requires the session host.',
+      );
     if (this.#busy)
       throw new SessionError('BEAT_IN_PROGRESS', 'A beat is already running.');
     if (command === 'save_and_quit') {
@@ -272,6 +272,11 @@ export class Session {
       this.#state = { status: 'ended' };
       await this.drain();
       await this.writeSummary();
+      this.emit({
+        type: 'session_saved',
+        sessionId: this.id,
+        beat: this.#beat,
+      });
       return;
     }
     if (this.#state.status === 'ended')

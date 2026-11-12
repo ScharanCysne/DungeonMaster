@@ -1,39 +1,38 @@
 import type { FastifyBaseLogger } from 'fastify';
+import { resolve } from 'node:path';
+import { ReplayArchive } from '../replay/ReplayArchive.js';
+import { ReplayConnections } from '../replay/ReplayConnections.js';
+import { SessionDelivery } from './delivery.js';
+import { sendLifecycle } from './lifecycle.js';
 import type { ServerSocket } from './socket.js';
-import type {
-  ClientMessage,
-  EntityId,
-  Hello,
-  ServerMessage,
-} from '@dungeon/shared';
+import type { ClientMessage, Hello } from '@dungeon/shared';
 import { Session } from '../beat/Session.js';
 import type { SessionOptions } from '../beat/bootstrap.js';
-import { systemClock } from '../beat/Clock.js';
 import type { EpisodeContent } from '../beat/types.js';
 import type { OntologyStore } from '../ontology/OntologyStore.js';
 import { PlayerHistory } from './history.js';
 import { debugResponse } from './debug.js';
 import { connect } from './connection.js';
-import { RequestError, send, serializeServerMessage } from './wire.js';
+import { RequestError, send } from './wire.js';
 
 export interface HostOptions extends Omit<SessionOptions, 'onMessage'> {
   content: EpisodeContent;
   store: OntologyStore;
   dev: boolean;
+  replayId?: string;
   sessionFactory?: (options: SessionOptions) => Promise<Session>;
+  onSessionStarted?: (session: Session) => Promise<void>;
 }
 
 export class SessionHost {
   readonly attached = new Set<ServerSocket>();
-  readonly history: PlayerHistory;
+  history: PlayerHistory;
+  replay: ReplayConnections | undefined;
+  #transitioning = false;
   session: Session | undefined;
   #starting: Promise<Session> | undefined;
-  #tail = Promise.resolve();
-  #failure: Error | undefined;
-  #sentBeat = new Map<ServerSocket, number>();
+  readonly delivery = new SessionDelivery(this);
   #operations = new Set<Promise<void>>();
-  #started: { beat: number; time: number; cost: number } | undefined;
-  #focus: EntityId | undefined;
   constructor(
     readonly options: HostOptions,
     readonly logger: FastifyBaseLogger,
@@ -50,116 +49,21 @@ export class SessionHost {
     );
   }
 
-  private enqueue(task: () => Promise<void>): Promise<void> {
-    const operation = this.#tail.then(task);
-    this.#tail = operation.catch((error: unknown) => {
-      if (error instanceof RequestError) return;
-      this.#failure ??=
-        error instanceof Error ? error : new Error('Delivery failed');
-      this.logger.error({ code: 'SERVER_FAILURE' }, 'Server delivery failed');
-      for (const socket of this.attached)
-        socket.close(1011, 'Server delivery failed');
-    });
-    return operation;
+  flush() {
+    return this.delivery.flush();
   }
-
-  async flush() {
-    await this.#tail;
-    if (this.#failure) throw this.#failure;
-  }
-
   fail(error: Error) {
-    this.#failure ??= error;
-    this.logger.error(
-      { code: 'INVALID_SERVER_MESSAGE' },
-      'Server validation failed',
-    );
-  }
-
-  private observe = (message: ServerMessage) => {
-    try {
-      serializeServerMessage(message);
-    } catch (error) {
-      this.#failure ??=
-        error instanceof Error ? error : new Error('Invalid server message');
-      throw error;
-    }
-    if (!this.session) return;
-    const records = this.session?.records;
-    const focus = this.#focus;
-    void this.enqueue(async () => {
-      if (message.type === 'beat_started')
-        this.#started = {
-          beat: message.beat,
-          time: (this.options.clock ?? systemClock).now(),
-          cost: this.session?.costUsd ?? 0,
-        };
-      if (records && message.type === 'beat_result')
-        await this.history.sync(records);
-      if (message.type === 'beat_result' || message.type === 'paused')
-        await this.logBeat(
-          message.type === 'beat_result' ? 'committed' : 'aborted',
-        );
-      if (message.type === 'paused')
-        this.logger.warn(
-          { reason: message.reason, beat: message.beat },
-          'Session paused',
-        );
-      const filtered =
-        message.type === 'beat_result'
-          ? this.history.results.find(({ beat }) => beat === message.beat)
-          : this.session
-            ? (await this.history.perspective()).message(message)
-            : undefined;
-      if (filtered)
-        for (const socket of this.attached) {
-          if (filtered.type === 'beat_result') {
-            if (filtered.beat <= (this.#sentBeat.get(socket) ?? -1)) continue;
-            this.#sentBeat.set(socket, filtered.beat);
-          }
-          send(socket, filtered);
-        }
-      if (message.type === 'beat_started' && focus) {
-        const cue = (await this.history.perspective()).message({
-          type: 'beat_progress',
-          beat: message.beat,
-          progress: {
-            kind: 'map_cue',
-            entity: this.history.player,
-            cue: 'look_at',
-            target: focus,
-          },
-        });
-        if (cue) for (const socket of this.attached) send(socket, cue);
-      }
-    }).catch(() => {});
-  };
-
-  private async logBeat(outcome: 'committed' | 'aborted') {
-    const started = this.#started;
-    if (!started || !this.session) return;
-    this.#started = undefined;
-    const trace = await this.session.trace(started.beat).catch(() => undefined);
-    this.logger.info(
-      {
-        beat: started.beat,
-        outcome: trace?.outcome ?? outcome,
-        latency:
-          trace?.latencyMs ??
-          (this.options.clock ?? systemClock).now() - started.time,
-        cost: trace?.costUsd ?? this.session.costUsd - started.cost,
-      },
-      'Beat finished',
-    );
+    this.delivery.fail(error);
   }
 
   private start() {
     this.#starting ??= (this.options.sessionFactory ?? Session.start)({
       ...this.options,
-      onMessage: this.observe,
+      onMessage: this.delivery.observe,
     }).then(async (session) => {
       this.session = session;
       await this.history.sync(session.records);
+      await this.options.onSessionStarted?.(session);
       return session;
     });
     return this.#starting;
@@ -168,8 +72,15 @@ export class SessionHost {
   async hello(socket: ServerSocket, message: Hello) {
     if (message.episodeId !== this.options.content.seed.episodeId)
       throw new RequestError('UNKNOWN_EPISODE', 'This server hosts episode-n.');
+    if (this.replay) {
+      await this.replay.hello(socket, message);
+      this.attached.add(socket);
+      return;
+    }
+    if (this.#transitioning)
+      throw new RequestError('SESSION_CHANGING', 'The session is changing.');
     const session = await this.start();
-    await this.enqueue(async () => {
+    await this.delivery.enqueue(async () => {
       if (socket.readyState !== socket.OPEN) return;
       if (
         message.lastSeenBeat !== undefined &&
@@ -185,48 +96,26 @@ export class SessionHost {
         for (const result of this.history.results)
           if (result.beat > message.lastSeenBeat) send(socket, result);
       this.attached.add(socket);
-      this.#sentBeat.set(socket, snapshot.beat);
-      const state = session.state;
-      if (state.status === 'paused')
-        send(socket, {
-          type: 'paused',
-          reason: state.reason,
-          beat: state.beat,
-          attempt: state.attempt,
-          retryInMs:
-            state.retryAt === null
-              ? null
-              : Math.max(
-                  0,
-                  state.retryAt - (this.options.clock ?? systemClock).now(),
-                ),
-        });
-      else if (
+      this.delivery.sentBeat.set(socket, snapshot.beat);
+      await sendLifecycle(socket, session, this.history, this.options.dev);
+      if (
         session.busy &&
-        this.#started &&
-        this.#started.beat > snapshot.beat
+        this.delivery.started &&
+        this.delivery.started.beat > snapshot.beat
       )
-        send(socket, { type: 'beat_started', beat: this.#started.beat });
-      if (state.status === 'ended') {
-        const ended = session.records.findLast(
-          (event) => event.type === 'EpisodeEnded',
-        );
-        if (ended) {
-          const message = (await this.history.perspective()).message({
-            type: 'episode_ended',
-            beat: ended.beat,
-            holder: ended.payload.holder,
-            summary: ended.payload.summary,
-          });
-          if (message) send(socket, message);
-        }
-      }
+        send(socket, {
+          type: 'beat_started',
+          beat: this.delivery.started.beat,
+        });
     });
   }
 
   async dispatch(socket: ServerSocket, message: Exclude<ClientMessage, Hello>) {
     if (message.type === 'debug_request' && !this.options.dev)
       throw new RequestError('DEBUG_DISABLED', 'Developer views are disabled.');
+    if (this.replay) return this.replay.dispatch(socket, message);
+    if (this.#transitioning)
+      throw new RequestError('SESSION_CHANGING', 'The session is changing.');
     const session = this.session;
     if (!session || !this.attached.has(socket))
       throw new RequestError(
@@ -250,19 +139,97 @@ export class SessionHost {
         'NOT_DRIVER',
         'This connection observes the session; the driver controls it.',
       );
+    if (message.type === 'replay_seek')
+      throw new RequestError('NOT_REPLAY', 'This is a live session.');
+    if (
+      message.type === 'session_command' &&
+      (message.command === 'replay_session' ||
+        message.command === 'start_new_run')
+    ) {
+      await this.changeSession(message.command);
+      return;
+    }
     if (message.type === 'player_intent') {
-      if (!session.busy) this.#focus = message.selection[0];
+      if (!session.busy) this.delivery.focus = message.selection[0];
       await session.submitIntent(message);
     } else await session.command(message);
     await this.flush();
+  }
+
+  async initializeReplay(id: string) {
+    this.replay = new ReplayConnections(
+      await ReplayArchive.open({
+        sessionId: id,
+        dataDir: this.options.dataDir ?? resolve('data'),
+        grid: this.options.content.grid,
+        dev: this.options.dev,
+        store: this.options.store,
+      }),
+    );
+  }
+
+  private async changeSession(command: 'replay_session' | 'start_new_run') {
+    if (!this.options.dev)
+      throw new RequestError('DEBUG_DISABLED', 'Developer views are disabled.');
+    if (!this.session || this.session.state.status !== 'ended')
+      throw new RequestError(
+        'EPISODE_RUNNING',
+        'Finish or save this session first.',
+      );
+    this.#transitioning = true;
+    try {
+      await this.session.drain();
+      await this.flush();
+      if (command === 'replay_session') {
+        await this.initializeReplay(this.session.id);
+        for (const socket of this.attached)
+          await this.replay?.hello(socket, {
+            type: 'hello',
+            episodeId: this.options.content.seed.episodeId,
+          });
+      } else {
+        const options = { ...this.options };
+        delete options.sessionId;
+        let active = false;
+        const session = await Session.start({
+          ...options,
+          onMessage: (message) => {
+            if (active) this.delivery.observe(message);
+          },
+        });
+        this.session = session;
+        await this.options.onSessionStarted?.(session);
+        this.#starting = Promise.resolve(session);
+        this.history = new PlayerHistory(
+          this.history.player,
+          this.history.mapId,
+          this.options.dev,
+          this.options.content.grid,
+        );
+        await this.history.sync(session.records);
+        active = true;
+        const snapshot = await this.history.snapshot();
+        this.delivery.focus = undefined;
+        this.delivery.started = undefined;
+        for (const socket of this.attached) {
+          send(socket, { type: 'session_reset', sessionId: session.id });
+          send(socket, snapshot);
+          this.delivery.sentBeat.set(socket, 0);
+          await sendLifecycle(socket, session, this.history, this.options.dev);
+        }
+      }
+    } finally {
+      this.#transitioning = false;
+    }
   }
 
   connect(socket: ServerSocket) {
     connect(this, socket);
   }
   detach(socket: ServerSocket) {
+    this.replay?.detach(socket);
     this.attached.delete(socket);
-    this.#sentBeat.delete(socket);
+    this.delivery.sentBeat.delete(socket);
   }
   track(operation: Promise<void>) {
     this.#operations.add(operation);
@@ -279,7 +246,7 @@ export class SessionHost {
           command: 'save_and_quit',
         });
     }
-    await this.#tail;
+    await this.delivery.settled();
   }
   async idle() {
     await Promise.all(this.#operations);

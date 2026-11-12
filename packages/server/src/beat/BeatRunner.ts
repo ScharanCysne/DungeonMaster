@@ -128,7 +128,7 @@ export class BeatRunner {
         );
         if (!quest) throw new Error('Missing episode quest.');
         const character = work.state.characters.get(holder);
-        const summary = `${character?.name ?? holder} obtained the quill after ${input.beat} beats.${character?.role === 'peer' ? ' A companion holds the quill as the next chapter begins.' : ''}`;
+        const summary = `${character?.name ?? holder} obtained the quill after ${input.beat} beats. ${recap ?? review.narration.text}`;
         drafts.push({
           type: 'EpisodeEnded',
           payload: { holder, questId: quest.id, summary },

@@ -34,6 +34,9 @@ export function useDeveloperViews(
   }, [knowledgeOpen, chosen, dev.revision, connection.status, send]);
   const requested = useRef(new Set<string>());
   useEffect(() => {
+    requested.current.clear();
+  }, [state.replay, state.world.beat]);
+  useEffect(() => {
     if (connection.status !== 'open') {
       requested.current.clear();
       return;

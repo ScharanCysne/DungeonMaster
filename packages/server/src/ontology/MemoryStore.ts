@@ -45,6 +45,9 @@ export class MemoryStore implements OntologyStore {
     copy.#edges = structuredClone(this.#edges);
     return copy;
   }
+  clone(): MemoryStore {
+    return this.#copy();
+  }
   apply(mutations: readonly GraphMutation[]): Promise<void> {
     return Promise.resolve().then(() => {
       const next = this.#copy();

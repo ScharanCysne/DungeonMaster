@@ -86,6 +86,13 @@ export class Engine {
     return structuredClone(this.#state);
   }
 
+  replay(records: readonly GameEvent[]): void {
+    for (const record of records)
+      this.#state = reduceEvent(this.#state, record, this.#state.grid);
+    this.#pending = [];
+    this.#start = this.snapshot();
+  }
+
   snapshot(): EngineSnapshot {
     return structuredClone({
       state: this.#state,

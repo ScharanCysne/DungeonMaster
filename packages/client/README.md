@@ -123,7 +123,7 @@ not guessed. Other characters' equipment never contributes badges.
 Beat narration retains its trace ID. With dev tools enabled the layout requests
 committed beat traces; a trace outcome of `fallback` adds the **critic fallback**
 margin link to the Trace appendix, without changing narration. No fallback is
-inferred from prose. Trace navigation is described below; chapter-end actions remain Slice 18.
+inferred from prose. Trace navigation is described below; chapter-end actions are described below.
 
 Tests use Vitest + React Testing Library, fake clocks, mocked media preferences,
 and explicit scroll geometry. They cover scheduler boundaries, skip and reduced
@@ -220,3 +220,38 @@ Tests mock only the Cytoscape adapter and Phaser game boundary. Pure models and 
 cover detection/disabled behavior, fetch and refresh, graph colouring/changes,
 provenance and selection, trace failures/metrics/retries, knowledge/DM gating,
 map overlays, fallback navigation and layout/keyboard/state preservation.
+
+## Pause, chapter end and replay (Slice 18)
+
+Both book and Inspector use the same presentational session components. Pauses
+show a parchment overlay with plain-language reasons and a receipt-relative
+countdown. Retry now and Save and quit send session commands. Budget pauses use
+the server-advertised dollar step for Raise by $N and offer Stop. Automatic retry
+scheduling remains on the server; the client displays “Checking” at zero and
+waits for the next pause/resume message. Provisional dialogue remains struck.
+Developer pauses show the underlying error code and a trace link that opens the
+attempt card inside the overlay. Saving closes the overlay and disables writing.
+
+An episode ending replaces the journal viewport with the final chapter page.
+It shows the holder's visible name, beat count and server recap. Acquisition uses
+only the winning beat's witnessed quill transfer (pickup, gift, purchase, theft or
+loot); otherwise it says “Out of sight.” A peer holder gets a next-episode hook
+without revealing a private agenda. Developer buttons send `replay_session` or
+`start_new_run`; the latter waits for `session_reset` and a fresh seed snapshot.
+The composer stays disabled after ending.
+
+`replay_info` enables the timeline above the journal, with previous/next, a beat
+slider and the current/total count. Beat zero is the seed. Every seek sends
+`replay_seek`; `replay_state` atomically replaces world and filtered journal history.
+Inventory badges are reconstructed without reapplying old HP, gold or position
+changes over the authoritative snapshot. Selection, draft, animation, trace, graph
+and knowledge caches reset on a seek, while layout, DM view and appendix choices
+are preserved. Open developer views refetch at the selected beat. The map uses the
+same store subscription as live play. All views therefore move backward together.
+The composer input and submit action are disabled with “Replay - read only”.
+The ending is shown only at the ending beat, without live-session action buttons.
+
+RTL fake-timer tests cover all pause reasons, custom budget steps, countdowns,
+commands, trace navigation, resumed/save cleanup, final pages and hooks, and both
+layouts. Pure reducer tests cover backward seeks, metadata, cache resets and new
+runs. Server tests cover perspective parity and the nine-beat replay bound.
