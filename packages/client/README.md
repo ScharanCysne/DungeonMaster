@@ -31,7 +31,7 @@ marks it complete, ignoring callbacks from older beats. Historical replay below
 the snapshot beat is instant. Already-visible progress lines stay visible when
 finalised, so commit never makes a peer line disappear.
 
-The map preserves a 26:16 frame. Appendix views arrive in Slice 17. Google Fonts are declared in HTML with local fallbacks; the build
+The map preserves a 26:16 frame. Google Fonts are declared in HTML with local fallbacks; the build
 needs no network. Below 1100px, pages stack and bookmarks become a row. Companions
 and satchel scroll within their panels, including the final gold row.
 
@@ -39,7 +39,7 @@ and satchel scroll within their panels, including the final gold row.
 
 `src/map/MapView.tsx` owns one Phaser 4 game per mount; `game.ts` handles teardown,
 resize observation and live reduced-motion preferences. React page components stay
-presentational. The bridge forwards only world, selection, beat feedback and cue
+presentational. The bridge forwards world, selection, beat feedback, cue and DM-overlay
 changes. Phaser emits `entity-clicked {id}`; the bridge rechecks visibility before
 toggling store selection. Empty tiles have no input handler. Keyboard input and
 autofocus are disabled in Phaser; cards and satchel rows retain Tab/Enter selection.
@@ -49,7 +49,7 @@ and manifest with `?raw`. Production bundles contain the PNG and both JSON sourc
 there is no copied public asset tree. The dev server allows the repository root,
 and Vite environment-file loading is disabled. `mapData.ts` reads only decorative
 floor, walls and furniture layers in that order; collision and object layers never
-create entities. Positions come exclusively from the player's store snapshot.
+create entities. Normal positions come from the player's store snapshot; DM placement is described below.
 
 `palette.ts`, `fit.ts`, `renderModel.ts` and `motion.ts` are pure. Recolouring runs
 once per browser module lifetime into a shared canvas: alpha below 128 becomes transparent;
@@ -123,8 +123,7 @@ not guessed. Other characters' equipment never contributes badges.
 Beat narration retains its trace ID. With dev tools enabled the layout requests
 committed beat traces; a trace outcome of `fallback` adds the **critic fallback**
 margin link to the Trace appendix, without changing narration. No fallback is
-inferred from prose. Full trace navigation and chapter-end actions remain Slices
-17–18.
+inferred from prose. Trace navigation is described below; chapter-end actions remain Slice 18.
 
 Tests use Vitest + React Testing Library, fake clocks, mocked media preferences,
 and explicit scroll geometry. They cover scheduler boundaries, skip and reduced
@@ -132,3 +131,92 @@ motion, scroll following, provisional lifecycle, submission/drafts/history/limit
 status ticks, cards/badges, keyboard selection, and inventory replay metadata.
 Run from the root: `npm run lint`, `npm run typecheck`, `npm test`, and
 `npm run build -w @dungeon/client`. No test boots Phaser/WebGL or requires network.
+
+## Appendix, DM view and Inspector (Slice 17)
+
+Developer mode starts unknown. A successful `debug_response` or a beat carrying
+`groundTruth` enables the DM and Inspector toggles; no client environment flag is
+used. The three bookmarks remain available to probe the server. `DEBUG_DISABLED`
+shows “Developer views are disabled on this server (DUNGEON_DEV)”, clears debug
+caches and overlays, and returns to the book without changing the draft or selection.
+Other debug errors stay in the appendix instead of becoming composer errors.
+
+Opening a bookmark requests its view; open views refresh on every accepted
+`beat_result`. Inspector requests all three. Selection changes refresh the graph;
+agent changes refresh knowledge. Responses are cached by the plain dev reducer.
+Committed narration traces are fetched in developer mode even with the drawer
+closed, so fallback margin links can appear. The hooks live at the layout boundary;
+views receive data and callbacks and never access the store or socket directly.
+
+Graph focus is the ordered selection, or the player. The actual v1 protocol uses
+`target: ids.join(',')`; the server always unions **depth-one** neighbourhoods, so
+there are no unsupported `focus`/`depth` fields on the wire. `graphModel.ts` sorts
+nodes by ID and edges by type/from/to. The thin Cytoscape adapter uses **concentric**
+layout, with unique ID-order ranks, six ranks per ring, a fixed start angle,
+clockwise ordering and no animation or randomness. Identical input and viewport
+produce the same arrangement. The keyboard node list provides the same popover and
+selection action as the canvas. Facts, quests, events and unseen entities only open
+details; visible entity clicks also toggle selection.
+
+Type colours match the prototype legend. Dashed red borders/lines indicate changes
+from provenance in the latest beat, comparisons with the previous ground-truth graph
+(or previous graph response when truth is unavailable), and witnessed map-change IDs
+for nodes. Seed beat zero is not highlighted. Removed nodes/edges are absent from the
+new graph. Without a prior graph, older mutations cannot be inferred.
+
+There is **no edge visibility flag** in the protocol. DM-only styling is a conservative
+client interpretation: an edge with an endpoint absent from the visible world;
+another character's KNOWS, WITNESSED, CARRIES or EQUIPPED edge; or any HAS_SECRET,
+WANTS, PURSUES or ATTITUDE edge. These edges get ordinary dashed rule ink only in DM
+view; changed edges always get dashed red ink. The debug graph itself is privileged
+server data in either mode; this styling is not an authorization boundary.
+
+“Open in Neo4j Browser” points to `http://localhost:7474/browser/?cmd=edit&arg=…`
+with a URL-encoded Cypher query matching focus IDs and their adjacent relationships.
+It prefills an editable query, requiring Browser support for these URL parameters,
+a running Browser and a selected database. It does not execute a query or connect
+from the game client; a memory-backed server need not have a corresponding Neo4j
+world. The one-hop query is label-independent and quotes IDs as JSON strings.
+
+Trace cards keep the latest attempt of each beat, newest first. Validated provider
+response blocks supply tool uses; subsequent request histories supply their results,
+including engine rejection messages. Repeated request history never creates duplicate
+tool rows. A result absent from the wire trace (often the final `narrate` call, because
+there is no next DM request) is explicitly marked unknown, not inferred successful.
+Critic call outputs and `CriticRejected` events preserve issues even after a successful
+retry. Retry count is critic calls minus one; session attempt is shown separately.
+Cache hit percentage is `cacheRead / (input + cacheRead + cacheWrite)`, since provider
+input usage excludes cached reads/writes; empty usage gives 0%. Raw JSON is collapsible.
+Fallback links open and focus the matching beat's card without altering narration.
+
+Knowledge offers party and known visible characters, plus ground-truth characters
+in DM mode. Goals use quest objectives supplied by the knowledge slice. Known facts
+show source, confidence and learning beat, followed by secrets and attitudes. The
+latest leak check is labelled beat-wide because the wire has no per-character check
+result. Truth flags and the unknown-fact list require both DM view and ground truth;
+secrets count as known. Switching DM off also removes hidden agents from the picker.
+
+The pure map model adds gold dashed outlines and holder notes from ground truth.
+Hidden containers have exact tiles. Held items use their holder's position; other
+hidden entities with only LOCATED_IN use the location's top-left tile and explicitly
+say “location only; tile unknown”. Entities with no recoverable position are omitted.
+Hidden sprites cannot select unseen IDs. Visible holders also receive `holds item:…`
+notes. No map overlay is built without current ground truth, and Phaser only draws
+model fields. Truth from a previous beat is discarded if the next result omits it.
+
+Backtick or the small header toggle switches to the Codex-coloured Inspector:
+party/satchel/knowledge left, map and journal/composer centre, graph and trace right.
+Composer and journal chips show raw IDs. The Phaser island is **destroyed and
+recreated**, rather than re-parented, on each layout switch; its existing teardown
+removes subscriptions, resize/media observers and the old game. The new instance
+renders current store state. Selection, draft text and journal scroll/follow state
+stay in the store. Drawer opening keeps the story mounted but inert, moves keyboard
+focus into the drawer, and closing restores focus. Escape in the drawer closes it
+without clearing selection. Backtick ignores inputs, textareas, selects, editable
+content, composition, modifiers and repeats. Native controls and the graph node list
+keep both layouts keyboard reachable.
+
+Tests mock only the Cytoscape adapter and Phaser game boundary. Pure models and RTL
+cover detection/disabled behavior, fetch and refresh, graph colouring/changes,
+provenance and selection, trace failures/metrics/retries, knowledge/DM gating,
+map overlays, fallback navigation and layout/keyboard/state preservation.

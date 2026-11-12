@@ -77,18 +77,18 @@ describe('local actions', () => {
   });
   it('toggles developer options and appendix, selects an agent, preserving the game state', () => {
     const initial = seeded();
+    initial.dev.devTools = true;
     let state = applyClientAction(freeze(initial), {
       type: 'dev_toggle',
       key: 'dmView',
     });
     state = applyClientAction(state, { type: 'dev_toggle', key: 'inspector' });
-    state = applyClientAction(state, { type: 'dev_toggle', key: 'devTools' });
     state = applyClientAction(state, { type: 'agent', id: 'char:ilsa' });
     state = applyClientAction(state, { type: 'appendix', tab: 'graph' });
     expect(state.dev).toMatchObject({
       dmView: true,
       inspector: true,
-      devTools: false,
+      devTools: true,
       chosenAgent: 'char:ilsa',
       appendixTab: 'graph',
     });

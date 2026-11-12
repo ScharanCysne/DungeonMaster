@@ -1,3 +1,5 @@
+import { useLayoutEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import type { DebugKind } from '@dungeon/shared';
 
 const tabs: { kind: DebugKind; label: string }[] = [
@@ -32,12 +34,32 @@ export function AppendixTabs({
 export function AppendixDrawer({
   tab,
   onClose,
+  children,
 }: {
   tab: DebugKind;
   onClose: () => void;
+  children: ReactNode;
 }) {
+  const panel = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const previous = document.activeElement;
+    panel.current?.focus();
+    return () => {
+      if (previous instanceof HTMLElement && previous.isConnected)
+        previous.focus();
+    };
+  }, []);
   return (
     <section
+      ref={panel}
+      tabIndex={-1}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') {
+          event.stopPropagation();
+          event.preventDefault();
+          onClose();
+        }
+      }}
       className="appendix-drawer"
       id="appendix-drawer"
       aria-labelledby="appendix-title"
@@ -48,10 +70,7 @@ export function AppendixDrawer({
           close ×
         </button>
       </header>
-      <div className="appendix-placeholder">
-        <span aria-hidden="true">❧</span>
-        <p>This page is yet to be written.</p>
-      </div>
+      <div className="appendix-content">{children}</div>
     </section>
   );
 }

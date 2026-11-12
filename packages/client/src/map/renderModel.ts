@@ -8,6 +8,7 @@ import type {
 } from '@dungeon/shared';
 import type { ClientState, MapCue } from '../store/types';
 import type { TavernMap } from './mapData';
+import { dmOverlay } from './dmOverlay';
 import { ROLE_INK } from './palette';
 
 type MapEntity = Character | Container | Item;
@@ -20,6 +21,8 @@ export interface MapSprite {
   selected: boolean;
   changed: boolean;
   label: string;
+  dmNote?: string;
+  dmOnly?: boolean;
 }
 export interface MapTween {
   key: string;
@@ -89,6 +92,33 @@ export function renderModel(
       ];
     },
   );
+  if (state.dev.devTools && state.dev.dmView && state.dev.groundTruth) {
+    for (const overlay of dmOverlay(state.dev.groundTruth, state.world)) {
+      const { entity, tile, note, hidden } = overlay;
+      if (
+        tile.x < 0 ||
+        tile.y < 0 ||
+        tile.x >= map.width ||
+        tile.y >= map.height
+      )
+        continue;
+      const existing = sprites.find((sprite) => sprite.id === entity.id);
+      if (existing) existing.dmNote = note;
+      else
+        sprites.push({
+          id: entity.id,
+          frame: resolveFrame(entity, manifest),
+          x: tile.x,
+          y: tile.y,
+          tint: null,
+          selected: false,
+          changed: false,
+          label: entity.name,
+          dmNote: note,
+          dmOnly: hidden,
+        });
+    }
+  }
   const visible = new Map(sprites.map((sprite) => [sprite.id, sprite]));
   let startMs = 0;
   const tweens = state.mapFeedback.moves.flatMap((event) => {

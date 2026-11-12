@@ -1,0 +1,189 @@
+.developer-toggles {
+  display: flex;
+  gap: 12px;
+  font: 12px var(--font-label);
+}
+.developer-toggles button {
+  border: 1px solid var(--color-rule);
+  padding: 4px 8px;
+}
+.developer-toggles [aria-pressed='true'] {
+  color: var(--color-red-ink);
+  outline: 1px solid;
+}
+.appendix-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding-top: 12px;
+}
+.graph-view {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.graph-canvas {
+  height: 320px;
+  min-height: 200px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+}
+.graph-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 12px;
+}
+.graph-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.graph-legend i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  border: 1px solid var(--color-binding);
+}
+.graph-nodes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.graph-nodes button,
+.node-popover button {
+  text-decoration: underline;
+}
+.node-popover,
+.trace-card {
+  border: 1px solid var(--color-rule);
+  padding: 10px;
+  margin: 8px 0;
+  background: var(--color-paper-deep);
+}
+.node-popover header {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+.node-popover dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+}
+.appendix-content pre,
+.inspector-layout pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 11px var(--font-mono);
+}
+.trace-view {
+  font: 12px var(--font-mono);
+}
+.trace-card h3 {
+  font: 16px var(--font-label);
+  color: var(--color-red-ink);
+  margin-bottom: 8px;
+}
+.trace-card h4,
+.knowledge-view h3 {
+  margin-top: 12px;
+  font-weight: bold;
+}
+.trace-tool {
+  border-bottom: 1px dashed var(--color-rule);
+  padding-bottom: 8px;
+}
+.bad,
+.changed-key {
+  color: var(--color-red-ink);
+}
+.good {
+  color: var(--color-good);
+}
+.truth-flag {
+  color: var(--color-red-ink);
+  border: 1px dashed var(--color-rule);
+  padding: 0 4px;
+}
+.knowledge-view select {
+  max-width: 100%;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+  padding: 4px;
+}
+.knowledge-view small {
+  color: var(--color-ink-soft);
+}
+.knowledge-view p {
+  overflow-wrap: anywhere;
+}
+.graph-view > a {
+  color: var(--color-red-ink);
+  text-decoration: underline;
+  font-size: 12px;
+}
+.inspector-layout {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 250px minmax(420px, 1fr) minmax(330px, 0.85fr);
+  gap: 10px;
+}
+.inspector-party,
+.inspector-centre,
+.inspector-debug {
+  min-height: 0;
+  min-width: 0;
+}
+.inspector-party {
+  overflow: auto;
+  background: var(--color-paper);
+  padding: 12px;
+  border: 1px solid var(--color-binding);
+}
+.inspector-party > section {
+  margin-bottom: 16px;
+}
+.inspector-party .party-card {
+  padding: 4px;
+}
+.inspector-centre {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.inspector-centre .map-frame {
+  max-height: 44dvh;
+}
+.inspector-centre .right-page {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid var(--color-binding);
+}
+.inspector-debug {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+}
+.inspector-debug > section {
+  min-height: 0;
+  overflow: auto;
+  padding: 10px;
+  background: var(--color-paper);
+  border: 1px solid var(--color-binding);
+}
+.inspector-debug .graph-canvas {
+  height: 230px;
+}
+@media (width < 1100px) {
+  .inspector-layout {
+    grid-template-columns: 1fr;
+  }
+  .inspector-centre .right-page {
+    min-height: 500px;
+  }
+  .inspector-debug {
+    grid-template-rows: auto auto;
+  }
+}

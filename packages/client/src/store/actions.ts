@@ -10,10 +10,12 @@ export type ClientAction =
   | { type: 'selection_toggle'; id: EntityId }
   | { type: 'selection_clear' }
   | { type: 'journal_revealed'; beat: number }
+  | { type: 'journal_scroll'; scroll: ClientState['journal']['scroll'] }
+  | { type: 'trace_focus'; traceId: string }
   | { type: 'composer_text'; text: string }
   | { type: 'composer_recall' }
   | { type: 'intent_sent'; intent: PlayerIntent }
-  | { type: 'dev_toggle'; key: 'devTools' | 'dmView' | 'inspector' }
+  | { type: 'dev_toggle'; key: 'dmView' | 'inspector' }
   | { type: 'appendix'; tab: DebugKind | null }
   | { type: 'agent'; id: CharacterId | null }
   | {
@@ -46,6 +48,13 @@ export function applyClientAction(
         selection: { ids: [...ids, action.id], tooMany: false },
       };
     }
+    case 'journal_scroll':
+      return { ...state, journal: { ...state.journal, scroll: action.scroll } };
+    case 'trace_focus':
+      return {
+        ...state,
+        dev: { ...state.dev, appendixTab: 'trace', traceFocus: action.traceId },
+      };
     case 'journal_revealed':
       return state.journal.reveal?.beat === action.beat
         ? {
@@ -83,6 +92,7 @@ export function applyClientAction(
         connection: { ...state.connection, error: null },
       };
     case 'dev_toggle':
+      if (!state.dev.devTools) return state;
       return {
         ...state,
         dev: { ...state.dev, [action.key]: !state.dev[action.key] },

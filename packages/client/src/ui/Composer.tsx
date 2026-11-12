@@ -16,6 +16,7 @@ export function Composer({
   onText,
   onRecall,
   onSubmit,
+  rawIds = false,
 }: {
   world: WorldState;
   selection: ClientState['selection'];
@@ -28,6 +29,7 @@ export function Composer({
   onText: (text: string) => void;
   onRecall: () => void;
   onSubmit: () => void;
+  rawIds?: boolean;
 }) {
   return (
     <div className="composer">
@@ -41,7 +43,8 @@ export function Composer({
             onClick={() => onToggle(id)}
             aria-label={`Remove ${world.entities[id]?.name ?? id} from selection`}
           >
-            {world.entities[id]?.name ?? id} <span aria-hidden="true">×</span>
+            {rawIds ? id : (world.entities[id]?.name ?? id)}{' '}
+            <span aria-hidden="true">×</span>
           </button>
         ))}
         {!selection.ids.length && (

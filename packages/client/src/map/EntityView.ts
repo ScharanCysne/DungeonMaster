@@ -8,6 +8,8 @@ export class EntityView {
   readonly sprite: Phaser.GameObjects.Image;
   private readonly outline: Phaser.GameObjects.Image[];
   private readonly label: Phaser.GameObjects.Text;
+  private readonly dmOutline: Phaser.GameObjects.Graphics;
+  private readonly dmLabel: Phaser.GameObjects.Text;
   private readonly marker: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene, model: MapSprite) {
@@ -50,12 +52,32 @@ export class EntityView {
         ],
         true,
       );
+    this.dmOutline = scene.add.graphics().lineStyle(1, 0xd4af37);
+    for (let offset = -9; offset < 9; offset += 5) {
+      this.dmOutline.lineBetween(offset, -9, offset + 3, -9);
+      this.dmOutline.lineBetween(offset, 9, offset + 3, 9);
+      this.dmOutline.lineBetween(-9, offset, -9, offset + 3);
+      this.dmOutline.lineBetween(9, offset, 9, offset + 3);
+    }
+    this.dmLabel = scene.add
+      .text(0, 10, '', {
+        fontFamily: 'monospace',
+        fontSize: '7px',
+        color: '#825320',
+        backgroundColor: PAPER,
+      })
+      .setOrigin(0.5, 0);
+    this.root.add([this.dmOutline, this.dmLabel]);
     this.root.add([...this.outline, this.sprite, this.marker, this.label]);
     this.refresh(model);
   }
 
   refresh(model: MapSprite) {
     this.sprite.setFrame(model.frame);
+    this.dmOutline.setVisible(!!model.dmNote);
+    this.dmLabel.setText(model.dmNote ?? '').setVisible(!!model.dmNote);
+    if (model.dmOnly) this.sprite.disableInteractive();
+    else this.sprite.setInteractive({ useHandCursor: true });
     if (model.tint === null)
       this.sprite.clearTint().setTintMode(Phaser.TintModes.MULTIPLY);
     else this.sprite.setTint(model.tint).setTintMode(Phaser.TintModes.FILL);

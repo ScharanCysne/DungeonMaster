@@ -6,6 +6,7 @@ import {
   strikeProvisional,
 } from './journal';
 import type { ClientState } from './types';
+import { reduceDev } from './dev';
 import { mapFeedback } from './mapFeedback';
 import { applyWorldEvents, snapshotWorld, visibleEvents } from './world';
 
@@ -155,16 +156,14 @@ export function applyServerMessage(
         },
         composer: { ...state.composer, pending: null },
         journal: {
+          ...state.journal,
           entries: commitJournal(state.journal.entries, message, events, names),
           reveal: {
             beat: message.beat,
             status: message.beat < state.world.beat ? 'complete' : 'revealing',
           },
         },
-        dev: {
-          ...state.dev,
-          groundTruth: message.groundTruth ?? state.dev.groundTruth,
-        },
+        dev: reduceDev(state.dev, message),
       };
     }
     case 'paused':
@@ -216,6 +215,12 @@ export function applyServerMessage(
       };
     }
     case 'error':
+      if (
+        ['DEBUG_DISABLED', 'TRACE_NOT_FOUND', 'BAD_TARGET'].includes(
+          message.code,
+        )
+      )
+        return { ...state, dev: reduceDev(state.dev, message) };
       return {
         ...state,
         connection: { ...state.connection, error: message },
@@ -225,17 +230,7 @@ export function applyServerMessage(
           pending: null,
         },
       };
-    case 'debug_response': {
-      const dev = { ...state.dev };
-      if (message.kind === 'trace')
-        dev.traces = { ...dev.traces, [message.data.traceId]: message.data };
-      if (message.kind === 'knowledge')
-        dev.knowledge = {
-          ...dev.knowledge,
-          [message.data.character.id]: message.data,
-        };
-      if (message.kind === 'graph') dev.graph = message.data;
-      return { ...state, dev };
-    }
+    case 'debug_response':
+      return { ...state, dev: reduceDev(state.dev, message) };
   }
 }

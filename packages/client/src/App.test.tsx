@@ -13,6 +13,10 @@ import { createClientStore } from './store';
 import { createInitialState } from './store/types';
 import { event, result, snapshot } from './testing/fixtures';
 
+vi.mock('./dev/cytoscapeAdapter', () => ({
+  mountGraph: () => ({ destroy() {} }),
+}));
+
 vi.mock('./map/game', () => ({ createMapGame: () => ({ destroy() {} }) }));
 
 function setup() {
@@ -141,7 +145,7 @@ test('renders provisional and withdrawn dialogue accessibly', () => {
   expect(screen.getByText('One moment.').tagName).toBe('S');
   expect(screen.getByText('(withdrawn)')).toBeTruthy();
 });
-test('appendix bookmarks open and close a placeholder without losing composition', () => {
+test('appendix bookmarks open and close the drawer without losing composition', () => {
   setup();
   fireEvent.change(screen.getByRole('textbox'), {
     target: { value: 'Keep this thought.' },
@@ -156,7 +160,11 @@ test('appendix bookmarks open and close a placeholder without losing composition
 
 test('requests each committed trace once and links critic fallback to the Trace appendix', () => {
   const { store, send } = setup();
-  act(() => store.getState().receive(result(), 1));
+  act(() =>
+    store
+      .getState()
+      .receive({ ...result(), groundTruth: { nodes: [], edges: [] } }, 1),
+  );
   expect(send).toHaveBeenCalledWith({
     type: 'debug_request',
     kind: 'trace',

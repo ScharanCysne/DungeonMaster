@@ -47,7 +47,13 @@ function setup() {
     },
     0,
   );
-  store.setState({ journal: { entries: journalEntries, reveal: null } });
+  store.setState({
+    journal: {
+      ...store.getState().journal,
+      entries: journalEntries,
+      reveal: null,
+    },
+  });
   render(<App store={store} />);
   return store;
 }

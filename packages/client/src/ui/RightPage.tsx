@@ -1,6 +1,4 @@
-import type { ComponentProps } from 'react';
-import type { DebugKind } from '@dungeon/shared';
-import { AppendixDrawer } from './Appendix';
+import type { ComponentProps, ReactNode } from 'react';
 import { Composer } from './Composer';
 import { Journal } from './Journal';
 
@@ -8,18 +6,16 @@ export function RightPage({
   journal,
   composer,
   appendix,
-  onCloseAppendix,
   error,
 }: {
   journal: ComponentProps<typeof Journal>;
   composer: ComponentProps<typeof Composer>;
-  appendix: DebugKind | null;
-  onCloseAppendix: () => void;
+  appendix?: ReactNode;
   error: string | null;
 }) {
   return (
     <section className="page right-page" aria-label="Your story">
-      <div className="story-content" inert={appendix !== null}>
+      <div className="story-content" inert={!!appendix}>
         <Journal {...journal} />
         {error && (
           <p className="connection-error" role="alert">
@@ -28,7 +24,7 @@ export function RightPage({
         )}
         <Composer {...composer} />
       </div>
-      {appendix && <AppendixDrawer tab={appendix} onClose={onCloseAppendix} />}
+      {appendix}
     </section>
   );
 }

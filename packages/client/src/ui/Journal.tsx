@@ -16,6 +16,9 @@ export function Journal({
   traces = {},
   onTrace = () => {},
   onRevealComplete,
+  scrollPosition,
+  onScrollPosition,
+  rawIds = false,
 }: {
   entries: JournalEntry[];
   entities: Record<string, Node>;
@@ -26,6 +29,9 @@ export function Journal({
   traces?: Record<string, BeatTrace>;
   onTrace?: (traceId: string) => void;
   onRevealComplete?: (beat: number) => void;
+  scrollPosition?: ClientState['journal']['scroll'];
+  rawIds?: boolean;
+  onScrollPosition?: (scroll: ClientState['journal']['scroll']) => void;
 }) {
   const duration = revealSchedule(entries, reveal?.beat ?? null, 0).durationMs;
   const { elapsed, instant, skip } = useJournalReveal(reveal, duration);
@@ -44,7 +50,7 @@ export function Journal({
         entry.status === 'provisional',
     );
   const contentKey = JSON.stringify([visible.entries, waiting]);
-  const scroll = useJournalScroll(contentKey);
+  const scroll = useJournalScroll(contentKey, scrollPosition, onScrollPosition);
   useEffect(() => {
     if (visible.complete && reveal?.status === 'revealing')
       onRevealComplete?.(reveal.beat);
@@ -86,6 +92,7 @@ export function Journal({
                 traces[entry.traceId]?.outcome === 'fallback'
               }
               onTrace={onTrace}
+              rawIds={rawIds}
             />
           ))}
           {waiting && (

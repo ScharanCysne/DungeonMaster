@@ -70,6 +70,7 @@ export interface ClientState {
   journal: {
     entries: JournalEntry[];
     reveal: { beat: number; status: 'revealing' | 'complete' } | null;
+    scroll: { top: number; following: boolean };
   };
   beat: BeatState;
   mapCues: MapCue[];
@@ -82,6 +83,12 @@ export interface ClientState {
   };
   dev: {
     devTools: boolean;
+    revision: number;
+    beat: number;
+    error: ErrorMessage | null;
+    traceFocus: string | null;
+    previousGraph: Graph | null;
+    changes: { nodes: EntityId[]; edges: string[] };
     dmView: boolean;
     inspector: boolean;
     appendixTab: DebugKind | null;
@@ -112,14 +119,20 @@ export function createInitialState(): ClientState {
       acquiredAt: {},
       equipped: [],
     },
-    journal: { entries: [], reveal: null },
+    journal: { entries: [], reveal: null, scroll: { top: 0, following: true } },
     beat: { status: 'idle', number: 0 },
     mapCues: [],
     mapFeedback: { beat: 0, changed: [], moves: [] },
     selection: { ids: [], tooMany: false },
     composer: { text: '', history: [], pending: null },
     dev: {
-      devTools: true,
+      devTools: false,
+      revision: 0,
+      beat: 0,
+      error: null,
+      traceFocus: null,
+      previousGraph: null,
+      changes: { nodes: [], edges: [] },
       dmView: false,
       inspector: false,
       appendixTab: null,

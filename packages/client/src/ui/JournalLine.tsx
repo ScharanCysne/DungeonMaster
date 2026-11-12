@@ -10,6 +10,7 @@ export function JournalLine({
   stamping,
   fallback,
   onTrace,
+  rawIds = false,
 }: {
   entry: JournalEntry;
   entities: Record<string, Node>;
@@ -17,6 +18,7 @@ export function JournalLine({
   stamping: boolean;
   fallback: boolean;
   onTrace: (traceId: string) => void;
+  rawIds?: boolean;
 }) {
   const name = (id: string) => entities[id]?.name ?? id;
   switch (entry.kind) {
@@ -36,7 +38,7 @@ export function JournalLine({
                 disabled={!entities[id]}
                 onClick={() => onToggle(id)}
               >
-                {name(id)}
+                {rawIds ? id : name(id)}
               </button>
             ))}
           </div>
