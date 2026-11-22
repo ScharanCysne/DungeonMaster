@@ -1,0 +1,12 @@
+export const schemaQueries = [
+  'CREATE CONSTRAINT character_id IF NOT EXISTS FOR (n:Character) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT item_id IF NOT EXISTS FOR (n:Item) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT location_id IF NOT EXISTS FOR (n:Location) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT container_id IF NOT EXISTS FOR (n:Container) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT faction_id IF NOT EXISTS FOR (n:Faction) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT quest_id IF NOT EXISTS FOR (n:Quest) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT fact_id IF NOT EXISTS FOR (n:Fact) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT event_id IF NOT EXISTS FOR (n:Event) REQUIRE n.id IS UNIQUE',
+  'CREATE CONSTRAINT entity_id IF NOT EXISTS FOR (n:Entity) REQUIRE n.id IS UNIQUE',
+  'CREATE INDEX event_beat IF NOT EXISTS FOR (n:Event) ON (n.beat)',
+];

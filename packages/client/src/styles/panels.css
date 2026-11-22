@@ -1,0 +1,184 @@
+.possessions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  flex: 1;
+  min-height: 220px;
+  overflow: hidden;
+}
+.possessions > section {
+  min-height: 0;
+  overflow-y: auto;
+  padding-bottom: 12px;
+  scrollbar-gutter: stable;
+}
+.section-label {
+  font: 12px var(--font-label);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--color-red-ink);
+  margin: 0 0 10px;
+}
+.party-list {
+  display: grid;
+  gap: 6px;
+}
+.party-card {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  padding: 7px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper);
+}
+.party-card:hover,
+.item-row:hover {
+  border-color: var(--color-red-ink);
+}
+[aria-pressed='true'].party-card,
+[aria-pressed='true'].item-row {
+  outline: 2px solid var(--color-red-ink);
+  outline-offset: -2px;
+}
+.portrait {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 36px;
+  flex-shrink: 0;
+  font: 24px var(--font-label);
+  background: var(--color-paper-deep);
+  border-bottom: 3px solid var(--role-color, var(--color-rule));
+}
+.role-player {
+  --role-color: var(--color-player);
+}
+.role-peer {
+  --role-color: var(--color-peer);
+}
+.role-npc {
+  --role-color: var(--color-npc);
+}
+.speaker {
+  color: color-mix(
+    in srgb,
+    var(--role-color, var(--color-ink)) 35%,
+    var(--color-ink)
+  );
+}
+.party-detail {
+  flex: 1;
+  min-width: 0;
+}
+.card-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+.card-heading strong {
+  font-weight: normal;
+}
+.card-heading > span,
+.health-row {
+  font: 10px var(--font-label);
+}
+.health-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+.health-row > span {
+  white-space: nowrap;
+}
+progress {
+  height: 6px;
+  width: 100%;
+  min-width: 20px;
+  appearance: none;
+  border: 0;
+  background: var(--color-paper-deep);
+}
+progress::-webkit-progress-bar {
+  background: var(--color-paper-deep);
+}
+progress::-webkit-progress-value {
+  background: var(--color-red-ink);
+}
+progress::-moz-progress-bar {
+  background: var(--color-red-ink);
+}
+.down {
+  filter: grayscale(1);
+  color: var(--color-ink-soft);
+}
+.item-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 7px 4px;
+  width: 100%;
+  text-align: left;
+  border-bottom: 1px dashed var(--color-rule-light);
+}
+.item-row small {
+  display: block;
+  color: var(--color-ink-soft);
+  font-size: 11px;
+}
+.item-symbol {
+  color: var(--color-binding);
+  font-size: 24px;
+}
+.gold {
+  margin: 12px 0;
+  color: var(--color-ink-soft);
+}
+.empty-panel {
+  font-size: 14px;
+  color: var(--color-ink-soft);
+  font-style: italic;
+}
+
+.sprite {
+  display: inline-block;
+  flex-shrink: 0;
+  background-repeat: no-repeat;
+}
+.character-details {
+  display: block;
+  font-size: 12px;
+  color: var(--color-ink-soft);
+  text-transform: capitalize;
+}
+.item-badge {
+  display: inline-block;
+  font: 10px var(--font-label);
+  padding: 1px 4px;
+  margin: 2px 4px 0 0;
+  background: var(--color-paper-deep);
+  color: var(--color-ink-soft);
+}
+.item-badge.new {
+  color: var(--color-red-ink);
+}
+.rarity-common {
+  --rarity-color: var(--color-ink);
+}
+.rarity-uncommon {
+  --rarity-color: #32613a;
+}
+.rarity-rare {
+  --rarity-color: #305b80;
+}
+.rarity-very_rare {
+  --rarity-color: #74437e;
+}
+.rarity-legendary {
+  --rarity-color: #825320;
+}
+.item-name {
+  color: var(--rarity-color, var(--color-ink));
+}

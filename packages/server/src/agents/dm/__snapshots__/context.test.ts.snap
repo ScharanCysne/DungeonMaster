@@ -1,0 +1,18 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`matches the reviewed seed excerpt, including hidden state and true quill placement 1`] = `
+"Current state (DM ground truth; hidden is not player knowledge). Player char:kael; room loc:common-room.
+container:floorboard Loose floorboard: A nail head catches the light beside the rug. {"hidden":true,"findDc":10,"locked":false,"opened":false,"tile":{"x":16,"y":9}}
+container:old-barrel Old barrel by the hatch: Dust disguises the seam of a locked lid among the old stock. {"hidden":true,"findDc":15,"locked":true,"lockDc":15,"opened":false,"tile":{"x":24,"y":13}}
+item:quill The Inkless Quill: A raven-black quill that writes without ink. {"kind":"tool","hidden":true,"questCritical":true,"tags":["quill","feather","magical"],"properties":["writes without ink","advantage on forgery checks"],"rarity":"rare","magical":true,"value":500}
+container:floorboard -CONTAINS-> item:wax-letter
+container:old-barrel -CONTAINS-> item:quill
+container:floorboard -LOCATED_IN-> loc:common-room
+container:old-barrel -LOCATED_IN-> loc:kitchen
+quest:quill Find the quill: Bring the Inkless Quill into the player’s or a peer’s possession. [episode, active] Bring the Inkless Quill into the player’s or a peer’s possession.
+Combat: none
+Player char:kael: {"selection":["container:floorboard","char:brann"],"text":"While Brann is busy with Tobb, I pry up the loose floorboard."}
+container:floorboard -CONTAINS-> item:wax-letter
+container:floorboard -LOCATED_IN-> loc:common-room
+Peer char:ilsa: {"kind":"intent","text":"I keep Brann talking so he does not notice.","say":"Brann, love, is that a new keg? Tell me all about it. Slowly.","refs":["char:brann"],"private":false}"
+`;

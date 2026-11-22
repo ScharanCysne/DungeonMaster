@@ -1,0 +1,218 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`commits a golden beat with exact events, narration and witnessed rolls 1`] = `
+[
+  {
+    "actor": null,
+    "beat": 1,
+    "createdBy": "engine",
+    "payload": {
+      "attempt": 0,
+    },
+    "private": false,
+    "seq": 0,
+    "sessionId": "test-session",
+    "traceId": "beat-1-0",
+    "type": "BeatStarted",
+    "v": 1,
+    "witnesses": [],
+  },
+  {
+    "actor": "char:kael",
+    "beat": 1,
+    "createdBy": "engine",
+    "payload": {
+      "selection": [],
+      "text": "I listen.",
+    },
+    "private": true,
+    "seq": 1,
+    "sessionId": "test-session",
+    "traceId": "beat-1-0",
+    "type": "IntentReceived",
+    "v": 1,
+    "witnesses": [
+      "char:kael",
+    ],
+  },
+  {
+    "actor": "char:kael",
+    "beat": 1,
+    "createdBy": "engine",
+    "payload": {
+      "actor": "char:kael",
+      "advantage": "none",
+      "checkId": "chk_1_1",
+      "dc": 10,
+      "kind": "skill",
+      "reason": "Listen for a clue.",
+      "roll": {
+        "dc": 10,
+        "expr": "1d20+5",
+        "outcome": "success",
+        "rolls": [
+          11,
+        ],
+        "total": 16,
+      },
+      "skill": "perception",
+    },
+    "private": false,
+    "seq": 2,
+    "sessionId": "test-session",
+    "traceId": "beat-1-0",
+    "type": "CheckRolled",
+    "v": 1,
+    "witnesses": [
+      "char:kael",
+      "char:ilsa",
+      "char:doran",
+      "char:mael",
+      "char:brann",
+      "char:tobb",
+      "char:wren",
+      "char:stranger",
+    ],
+  },
+  {
+    "actor": null,
+    "beat": 1,
+    "createdBy": "dm",
+    "payload": {
+      "lines": [],
+      "text": "You listen to the murmur of the room.",
+    },
+    "private": false,
+    "seq": 3,
+    "sessionId": "test-session",
+    "traceId": "beat-1-0",
+    "type": "NarrationCommitted",
+    "v": 1,
+    "witnesses": [
+      "char:kael",
+    ],
+  },
+  {
+    "actor": null,
+    "beat": 1,
+    "createdBy": "engine",
+    "payload": {
+      "rotation": {
+        "consecutivePasses": {
+          "char:doran": 1,
+          "char:ilsa": 1,
+        },
+        "nextPeer": "char:mael",
+        "pending": [],
+      },
+    },
+    "private": false,
+    "seq": 4,
+    "sessionId": "test-session",
+    "traceId": "beat-1-0",
+    "type": "BeatCommitted",
+    "v": 1,
+    "witnesses": [],
+  },
+]
+`;
+
+exports[`commits a golden beat with exact events, narration and witnessed rolls 2`] = `
+{
+  "beat": 1,
+  "events": [
+    {
+      "actor": "char:kael",
+      "beat": 1,
+      "createdBy": "engine",
+      "payload": {
+        "selection": [],
+        "text": "I listen.",
+      },
+      "private": true,
+      "seq": 1,
+      "sessionId": "test-session",
+      "traceId": "beat-1-0",
+      "type": "IntentReceived",
+      "v": 1,
+      "witnesses": [
+        "char:kael",
+      ],
+    },
+    {
+      "actor": "char:kael",
+      "beat": 1,
+      "createdBy": "engine",
+      "payload": {
+        "actor": "char:kael",
+        "advantage": "none",
+        "checkId": "chk_1_1",
+        "dc": 10,
+        "kind": "skill",
+        "reason": "Listen for a clue.",
+        "roll": {
+          "dc": 10,
+          "expr": "1d20+5",
+          "outcome": "success",
+          "rolls": [
+            11,
+          ],
+          "total": 16,
+        },
+        "skill": "perception",
+      },
+      "private": false,
+      "seq": 2,
+      "sessionId": "test-session",
+      "traceId": "beat-1-0",
+      "type": "CheckRolled",
+      "v": 1,
+      "witnesses": [
+        "char:kael",
+        "char:ilsa",
+        "char:doran",
+        "char:mael",
+        "char:brann",
+        "char:tobb",
+        "char:wren",
+        "char:stranger",
+      ],
+    },
+    {
+      "actor": null,
+      "beat": 1,
+      "createdBy": "dm",
+      "payload": {
+        "lines": [],
+        "text": "You listen to the murmur of the room.",
+      },
+      "private": false,
+      "seq": 3,
+      "sessionId": "test-session",
+      "traceId": "beat-1-0",
+      "type": "NarrationCommitted",
+      "v": 1,
+      "witnesses": [
+        "char:kael",
+      ],
+    },
+  ],
+  "narration": {
+    "lines": [],
+    "text": "You listen to the murmur of the room.",
+  },
+  "rolls": [
+    {
+      "dc": 10,
+      "expr": "1d20+5",
+      "outcome": "success",
+      "rolls": [
+        11,
+      ],
+      "total": 16,
+    },
+  ],
+  "traceId": "beat-1-0",
+  "type": "beat_result",
+}
+`;

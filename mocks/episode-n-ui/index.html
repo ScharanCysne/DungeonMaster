@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Episode N — UI mock</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;600&family=Pixelify+Sans:wght@400;600&family=VT323&display=swap" rel="stylesheet" />
+  <script>
+  // ---------------------------------------------------------------- map data
+  const W = 26, H = 16, U = 1 / 8;
+
+  function buildTiles() {
+    const t = [...Array(H)].map(() => Array(W).fill('.'));
+    for (let x = 0; x < W; x++) { t[0][x] = '#'; t[H - 1][x] = '#'; }
+    for (let y = 0; y < H; y++) { t[y][0] = '#'; t[y][W - 1] = '#'; }
+    for (let x = 1; x <= 9; x++) { t[1][x] = 'k'; t[3][x] = 'B'; }
+    t[1][2] = '.'; t[2][2] = '.';
+    t[0][14] = 'H'; t[0][15] = 'H';
+    for (let x = 20; x <= 24; x++) for (let y = 1; y <= 3; y++) t[y][x] = 'p';
+    for (let x = 18; x <= 24; x++) t[8][x] = '#';
+    for (let y = 8; y <= 14; y++) t[y][18] = '#';
+    for (let x = 19; x <= 24; x++) for (let y = 9; y <= 14; y++) t[y][x] = ',';
+    t[11][18] = 'd';
+    for (let x = 20; x <= 23; x++) t[9][x] = 'C';
+    t[6][1] = 'S'; t[7][1] = 'S';
+    t[15][12] = 'D';
+    for (let x = 10; x <= 14; x++) for (let y = 8; y <= 11; y++) t[y][x] = 'r';
+    [[5,6],[6,6],[5,10],[6,10],[15,5],[16,5],[2,12],[3,12],[9,13],[10,13],[15,12],[16,12]].forEach(([x, y]) => t[y][x] = 'T');
+    t[13][21] = 't';
+    return t;
+  }
+  const TILES = buildTiles();
+
+  const TPL = {
+    char:  ['..hhhh..', '.hhhhhh.', '.hseesh.', '.hssssh.', '..bbbb..', '.bbbbbb.', '..bddb..', '..d..d..'],
+    hood:  ['..hhhh..', '.hhhhhh.', 'hhseeshh', 'hhssssh.', 'hbbbbbbh', 'hbbbbbbh', '.hbddbh.', '..d..d..'],
+    barrel:['.kkkkkk.', 'kwwwwwwk', 'wwwwwwww', 'kkkkkkkk', 'wwwwwwww', 'wwwwwwww', 'kkkkkkkk', '.wwwwww.'],
+    strongbox: ['........', '.kkkkkk.', 'kggggggk', 'kgggyggk', 'kkkkkkkk', 'kggggggk', 'kggggggk', 'kkkkkkkk'],
+    floorboard:['pppppppp', 'pppppppp', 'kkkkkkkk', 'pppppppp', 'pppkpppp', 'kkkkkkkk', 'kkkkkkkk', 'pppppppp'],
+    brick: ['........', '........', '..rrrr..', '.rkkkkr.', '.rkyykr.', '.rkkkkr.', '..rrrr..', '........'],
+  };
+  const ICON = {
+    bow:    ['......k.', '.....k.w', '....k..w', '...k...w', '..k...w.', '.k...w..', 'k..ww...', '.ww.....'],
+    rope:   ['..yyyy..', '.y....y.', 'y..yy..y', 'y.y..y.y', 'y.y..y.y', 'y..yy..y', '.y....y.', '..yyyy..'],
+    potion: ['...kk...', '...ww...', '..wrrw..', '.wrrrrw.', '.wrrrrw.', '.wrrrrw.', '..wwww..', '........'],
+    letter: ['........', 'pppppppp', 'pkppppkp', 'ppkppkpp', 'pppkkppp', 'ppprrppp', 'pppppppp', '........'],
+    map:    ['........', '.pppppp.', '.pkppkp.', '.ppkppp.', '.pkpprp.', '.ppkkpp.', '.pppppp.', '........'],
+  };
+  const ICON_COLORS = { k: '#3b2a1a', w: '#c9a46a', y: '#c8a24a', r: '#c0392b', p: '#e8d9b0' };
+
+  const ENTITIES = [
+    { id: 'char:player', name: 'Kael Varn', short: 'Kael', kind: 'char', role: 'player', cls: 'Half-elf Ranger · Lv 5', hp: 31, maxHp: 38, ac: 15, x: 12, y: 9, tpl: 'char', c: { h: '#4a3020', s: '#e0b48c', e: '#1b1b1b', b: '#2f6b3a', d: '#3a2a1e' } },
+    { id: 'char:ilsa', name: 'Ilsa Quickfingers', short: 'Ilsa', kind: 'char', role: 'peer', cls: 'Halfling Rogue · Lv 5', hp: 22, maxHp: 27, ac: 14, x: 11, y: 10, tpl: 'char', c: { h: '#151515', s: '#d9a27a', e: '#1b1b1b', b: '#5b2a6e', d: '#222' } },
+    { id: 'char:doran', name: 'Doran Ashby', short: 'Doran', kind: 'char', role: 'peer', cls: 'Human Fighter · Lv 5', hp: 44, maxHp: 44, ac: 18, x: 13, y: 10, tpl: 'char', c: { h: '#c46a2c', s: '#e8b896', e: '#1b1b1b', b: '#8a8f99', d: '#4a3a2a' } },
+    { id: 'char:mael', name: 'Sister Mael', short: 'Mael', kind: 'char', role: 'peer', cls: 'Human Cleric · Lv 5', hp: 18, maxHp: 33, ac: 16, x: 12, y: 11, tpl: 'char', c: { h: '#f0f0f0', s: '#f1c9a5', e: '#1b1b1b', b: '#e8e2d0', d: '#b8962e' } },
+    { id: 'char:brann', name: 'Brann, the barkeep', short: 'Brann', kind: 'char', role: 'npc', x: 5, y: 2, tpl: 'char', c: { h: '#6b4a2b', s: '#e6b58f', e: '#1b1b1b', b: '#e5e0d0', d: '#5a3b22' } },
+    { id: 'char:tobb', name: 'Old Tobb', short: 'Tobb', kind: 'char', role: 'npc', x: 7, y: 4, tpl: 'char', c: { h: '#8a8a8a', s: '#d99b7f', e: '#1b1b1b', b: '#7b5a3a', d: '#3e2c1e' } },
+    { id: 'char:wren', name: 'Wren the bard', short: 'Wren', kind: 'char', role: 'npc', x: 22, y: 2, tpl: 'char', c: { h: '#e3b23c', s: '#f0c8a0', e: '#1b1b1b', b: '#b83a4b', d: '#2c3e66' } },
+    { id: 'char:stranger', name: 'Hooded stranger', short: 'Stranger', kind: 'char', role: 'npc', x: 3, y: 13, tpl: 'hood', c: { h: '#2a2a33', s: '#6b5a50', e: '#d4af37', b: '#2a2a33', d: '#1a1a20' } },
+    { id: 'container:strongbox', name: 'Iron strongbox', short: 'Strongbox', kind: 'container', note: 'locked · DC 15', x: 2, y: 2, tpl: 'strongbox', c: { k: '#2b2b2b', g: '#7a5230', y: '#d4af37' } },
+    { id: 'container:floorboard', name: 'Loose floorboard', short: 'Floorboard', kind: 'container', note: 'opened · empty', x: 16, y: 9, tpl: 'floorboard', c: { p: '#7a5434', k: '#140b05' } },
+    { id: 'container:barrel-1', name: 'Ale barrel', short: 'Barrel', kind: 'container', x: 23, y: 12, tpl: 'barrel', c: { k: '#3a3a3a', w: '#8b5a2b' } },
+    { id: 'container:barrel-2', name: 'Ale barrel', short: 'Barrel', kind: 'container', x: 24, y: 12, tpl: 'barrel', c: { k: '#3a3a3a', w: '#8b5a2b' } },
+    { id: 'container:barrel-3', name: 'Old barrel by the hatch', short: 'Old barrel', kind: 'container', dmNote: 'holds item:quill', x: 24, y: 13, tpl: 'barrel', c: { k: '#3a3a3a', w: '#6e4420' } },
+    { id: 'container:loose-brick', name: 'Loose hearth brick', short: 'Brick', kind: 'container', hidden: true, dmNote: 'hidden · findDc 15', x: 13, y: 1, tpl: 'brick', c: { r: '#6a2b1f', k: '#1a0f0a', y: '#d4af37' } },
+    { id: 'feature:trapdoor', name: 'Cellar trapdoor', short: 'Trapdoor', kind: 'feature', x: 21, y: 13 },
+  ];
+
+  const ITEMS = [
+    { id: 'item:longbow', name: 'Yew longbow', short: 'Longbow', rarity: 'common', icon: 'bow', equipped: true },
+    { id: 'item:rope', name: 'Silk rope (50 ft)', short: 'Rope', rarity: 'common', icon: 'rope' },
+    { id: 'item:potion', name: 'Healing potion ×2', short: 'Potion', rarity: 'common', icon: 'potion' },
+    { id: 'item:map-fragment', name: 'Torn map fragment', short: 'Map fragment', rarity: 'uncommon', icon: 'map' },
+    { id: 'item:wax-letter', name: 'Wax-sealed letter', short: 'Letter', rarity: 'common', icon: 'letter', isNew: true },
+  ];
+
+  const FACTS = {
+    'fact:odo-hid-quill':   { label: 'Odo hid the quill', statement: 'Odo the forger hid the quill near the cellar before he fled.', truth: true, kind: 'lore' },
+    'fact:letter-cellar':   { label: 'Letter: old barrel', statement: "The letter says Odo's last stock went to “the old barrel by the hatch”.", truth: true, kind: 'observation' },
+    'fact:rumour-stranger': { label: 'Stranger is Odo?', statement: 'The hooded stranger is Odo himself, returned in disguise.', truth: false, kind: 'rumour' },
+    'fact:ilsa-debt':       { label: 'Ilsa owes Brann', statement: 'Ilsa owes Brann 40 gold from a rigged card game.', truth: true, kind: 'secret' },
+    'fact:mael-orders':     { label: "Mael's orders", statement: "Mael's abbess ordered her to bring the quill to the temple, by any means.", truth: true, kind: 'secret' },
+    'fact:doran-grudge':    { label: "Doran's grudge", statement: "Doran's brother was killed by the Ashen Hand.", truth: true, kind: 'secret' },
+    'fact:stranger-ashen':  { label: 'Ashen signet', statement: 'The stranger wears an Ashen Hand signet under his glove.', truth: true, kind: 'secret' },
+    'fact:quill-origin':    { label: 'Quill origin', statement: 'The quill was cut from a raven that only ever spoke lies.', truth: true, kind: 'backstory' },
+    'fact:key-brann':       { label: 'Key on belt', statement: 'Brann keeps the cellar key on his belt.', truth: true, kind: 'observation' },
+  };
+
+  const OTHER_NODES = {
+    'item:quill': { label: 'Inkless Quill', type: 'item', hidden: true },
+    'item:cellar-key': { label: 'Cellar key', type: 'item' },
+    'item:ledger': { label: "Brann's ledger", type: 'item' },
+    'quest:quill': { label: 'Find the quill', type: 'quest' },
+    'quest:ilsa-debt': { label: 'Clear the debt', type: 'quest' },
+    'quest:doran-hand': { label: 'Unmask the stranger', type: 'quest' },
+    'quest:mael-quill': { label: 'Quill for the temple', type: 'quest' },
+    'faction:temple': { label: 'Temple of the Dawn', type: 'faction' },
+    'faction:ashen': { label: 'Ashen Hand', type: 'faction' },
+    'faction:guild': { label: 'Thieves’ guild', type: 'faction' },
+    'loc:tavern': { label: 'Crooked Lantern', type: 'loc' },
+    'loc:common-room': { label: 'Common room', type: 'loc' },
+    'loc:bar': { label: 'Bar', type: 'loc' },
+    'loc:kitchen': { label: 'Kitchen', type: 'loc' },
+  };
+
+  const EDGES = [
+    ['char:player', 'CARRIES', 'item:wax-letter', { isNew: true }], ['char:player', 'CARRIES', 'item:longbow'], ['char:player', 'CARRIES', 'item:rope'], ['char:player', 'CARRIES', 'item:potion'], ['char:player', 'CARRIES', 'item:map-fragment'],
+    ['char:player', 'KNOWS', 'fact:letter-cellar', { isNew: true }], ['char:player', 'KNOWS', 'fact:rumour-stranger'], ['char:player', 'KNOWS', 'fact:key-brann'], ['char:player', 'PURSUES', 'quest:quill'], ['char:player', 'LOCATED_IN', 'loc:common-room'],
+    ['char:ilsa', 'ATTITUDE −40', 'char:brann'], ['char:ilsa', 'HAS_SECRET', 'fact:ilsa-debt'], ['char:ilsa', 'KNOWS', 'fact:rumour-stranger'], ['char:ilsa', 'KNOWS', 'fact:key-brann'], ['char:ilsa', 'PURSUES', 'quest:ilsa-debt'], ['char:ilsa', 'MEMBER_OF', 'faction:guild'],
+    ['char:doran', 'ATTITUDE −20', 'char:stranger'], ['char:doran', 'HAS_SECRET', 'fact:doran-grudge'], ['char:doran', 'PURSUES', 'quest:doran-hand'], ['char:doran', 'KNOWS', 'fact:key-brann'],
+    ['char:mael', 'MEMBER_OF', 'faction:temple'], ['char:mael', 'WANTS', 'item:quill'], ['char:mael', 'HAS_SECRET', 'fact:mael-orders'], ['char:mael', 'ATTITUDE +35', 'char:player'], ['char:mael', 'PURSUES', 'quest:mael-quill'], ['char:mael', 'KNOWS', 'fact:quill-origin'],
+    ['char:brann', 'CARRIES', 'item:cellar-key'], ['char:brann', 'KNOWS', 'fact:odo-hid-quill'], ['char:brann', 'KNOWS', 'fact:ilsa-debt'], ['char:brann', 'ATTITUDE −25', 'char:ilsa'], ['char:brann', 'LOCATED_IN', 'loc:bar'],
+    ['char:stranger', 'MEMBER_OF', 'faction:ashen'], ['char:stranger', 'WANTS', 'item:quill'], ['char:stranger', 'KNOWS', 'fact:odo-hid-quill'], ['char:stranger', 'HAS_SECRET', 'fact:stranger-ashen'],
+    ['char:wren', 'KNOWS', 'fact:rumour-stranger'], ['char:wren', 'ATTITUDE +10', 'char:player'], ['char:tobb', 'KNOWS', 'fact:odo-hid-quill'],
+    ['container:barrel-3', 'CONTAINS', 'item:quill', { dm: true }], ['container:barrel-3', 'LOCATED_IN', 'loc:kitchen'],
+    ['container:strongbox', 'CONTAINS', 'item:ledger'], ['container:strongbox', 'LOCATED_IN', 'loc:bar'], ['container:floorboard', 'LOCATED_IN', 'loc:common-room'],
+    ['fact:letter-cellar', 'ABOUT', 'container:barrel-3', { isNew: true }], ['fact:letter-cellar', 'ABOUT', 'item:wax-letter', { isNew: true }],
+    ['fact:odo-hid-quill', 'ABOUT', 'item:quill', { dm: true }], ['fact:quill-origin', 'ORIGIN_OF', 'item:quill', { dm: true }],
+    ['fact:doran-grudge', 'ABOUT', 'faction:ashen'], ['fact:stranger-ashen', 'ABOUT', 'char:stranger'], ['fact:rumour-stranger', 'ABOUT', 'char:stranger'],
+    ['quest:quill', 'TARGETS', 'item:quill', { dm: true }], ['loc:bar', 'PART_OF', 'loc:tavern'], ['loc:common-room', 'PART_OF', 'loc:tavern'], ['loc:kitchen', 'PART_OF', 'loc:tavern'],
+  ].map(([from, type, to, o = {}]) => ({ from, type, to, ...o }));
+
+  const KNOWLEDGE = {
+    'char:player':   { goal: 'Find the Inkless Quill', knows: [['fact:letter-cellar', 'read', 1.0, 12], ['fact:rumour-stranger', 'told by Wren', 0.5, 11], ['fact:key-brann', 'witnessed', 0.9, 9]], secrets: [], attitudes: [] },
+    'char:ilsa':     { goal: 'Clear her debt with Brann without paying', knows: [['fact:rumour-stranger', 'told by Wren', 0.7, 11], ['fact:key-brann', 'witnessed', 1.0, 9]], secrets: ['fact:ilsa-debt'], attitudes: [['Brann', -40, 'the debt']] },
+    'char:doran':    { goal: 'Find out who the stranger works for', knows: [['fact:key-brann', 'witnessed', 1.0, 9]], secrets: ['fact:doran-grudge'], attitudes: [['Stranger', -20, 'suspicious glove']] },
+    'char:mael':     { goal: 'Secure the quill for the temple', knows: [['fact:quill-origin', 'seed', 0.8, 0]], secrets: ['fact:mael-orders'], attitudes: [['Kael', 35, 'saved her at Greywater']] },
+    'char:brann':    { goal: 'Keep the tavern out of trouble', knows: [['fact:odo-hid-quill', 'seed', 0.6, 0], ['fact:ilsa-debt', 'seed', 1.0, 0], ['fact:key-brann', 'seed', 1.0, 0]], secrets: [], attitudes: [['Ilsa', -25, 'unpaid debt']] },
+    'char:stranger': { goal: 'Get the quill before anyone else', knows: [['fact:odo-hid-quill', 'seed', 0.9, 0]], secrets: ['fact:stranger-ashen'], attitudes: [] },
+    'char:wren':     { goal: 'Hear a story worth a song', knows: [['fact:rumour-stranger', 'seed', 0.8, 0]], secrets: [], attitudes: [['Kael', 10, 'generous tipper']] },
+    'char:tobb':     { goal: 'Another drink', knows: [['fact:odo-hid-quill', 'seed', 0.3, 0]], secrets: [], attitudes: [] },
+  };
+
+  const INITIAL_LOG = [
+    { k: 'system', text: 'Episode N · The Crooked Lantern' },
+    { k: 'dm', text: 'Rain hammers the shutters of the Crooked Lantern. Brann wipes the same mug for the third time, eyes flicking toward the hooded figure in the corner. Wren’s lute stumbles over a sour note.' },
+    { k: 'system', text: 'Beat 12' },
+    { k: 'player', text: 'While Brann is busy with Tobb, I pry up the loose floorboard.', refs: ['container:floorboard', 'char:brann'] },
+    { k: 'peer', who: 'char:ilsa', text: '“Brann, love, is that a new keg? Tell me all about it. Slowly.”' },
+    { k: 'roll', actor: 'Ilsa', skill: 'Deception vs Insight', d20: 13, mod: 4, total: 17, dc: 'Brann 9', ok: true },
+    { k: 'roll', actor: 'Kael', skill: 'Sleight of Hand', d20: 12, mod: 2, total: 14, dc: 10, ok: true },
+    { k: 'dm', text: 'The board gives with a dry creak, masked by Ilsa’s laughter. Beneath it, wrapped in oilcloth, lies a letter sealed in red wax: a quill crossed with a key.' },
+    { k: 'npc', who: 'char:brann', text: '“…and Odo always swore that keg was cursed. Wouldn’t touch the old stock if I were you.”' },
+    { k: 'event', text: 'Wax-sealed letter → your inventory' },
+    { k: 'event', text: 'You learned: the letter points to “the old barrel by the hatch”' },
+  ];
+
+  const INITIAL_TRACE = [
+    { beat: 12, intents: ['player: pry up the floorboard', 'ilsa: distract Brann'], tools: [
+        { name: 'contested_check', args: 'ilsa deception vs brann insight', ok: true, result: '17 vs 9 → ilsa wins · chk_12a' },
+        { name: 'skill_check', args: 'player sleight_of_hand dc 10', ok: true, result: '14 → success · chk_12b' },
+        { name: 'transfer_item', args: 'item:wax-letter → char:player (pick_up)', ok: false, result: 'ITEM_NOT_REACHABLE: item:wax-letter is inside container:floorboard, which is closed. Open it first.' },
+        { name: 'open_container', args: 'player · container:floorboard', ok: true, result: 'revealed [item:wax-letter]' },
+        { name: 'transfer_item', args: 'item:wax-letter → char:player (pick_up)', ok: true, result: 'ItemTransferred' },
+        { name: 'share_fact', args: 'fact:letter-cellar → player (read)', ok: true, result: 'FactLearned' },
+        { name: 'narrate', args: '74 words · 1 line (brann)', ok: true, result: 'handed to critic' },
+      ], critic: { ok: true, notes: 'pre-check ok · llm ok' }, tokens: { in: 11240, cached: 8010, out: 382 }, ms: 7900 },
+    { beat: 11, intents: ['player: ask Wren about the stranger', 'doran: pass'], tools: [
+        { name: 'skill_check', args: 'player persuasion dc 10', ok: true, result: '15 → success · chk_11a' },
+        { name: 'share_fact', args: 'fact:rumour-stranger wren → player (told)', ok: true, result: 'FactLearned' },
+        { name: 'set_attitude', args: 'wren → player +10 (good tip)', ok: true, result: 'AttitudeChanged' },
+        { name: 'narrate', args: '91 words · 2 lines (wren)', ok: true, result: 'handed to critic' },
+      ], critic: { ok: false, retried: true, notes: 'npc_knowledge_leak: Wren mentions “Odo’s cellar”, but Wren has no KNOWS edge to fact:odo-hid-quill → retry ok' }, tokens: { in: 9820, cached: 7100, out: 641 }, ms: 9400 },
+  ];
+
+  const TYPE_COLORS = { player: '#f5b041', peer: '#5dade2', npc: '#af7ac5', item: '#58d68d', container: '#cd9b5f', feature: '#cd9b5f', fact: '#f4d03f', quest: '#ec7063', faction: '#a3a3a3', loc: '#48c9b0' };
+
+  // ---------------------------------------------------------------- themes
+  const PAL = {
+    1: { floor: '#5a3a24', floorAlt: '#53351f', floorLine: '#3d2716', stone: '#4a4440', stoneAlt: '#454039', stoneLine: '#36312c', wall: '#2b1d16', wallLine: '#160e09', wallTop: '#3d2a1f', shelf: '#3b2617', shelfEdge: '#24170d', bottle1: '#2e7d4f', bottle2: '#8e3b2e', bottle3: '#c9a227', keg: '#5e3b1e', counterFront: '#4a2c17', counterTop: '#7a4b2a', counterEdge: '#2a180c', fire1: '#e67e22', fire2: '#f9e79f', stage: '#6e4a2c', stageLine: '#553820', table: '#7d5233', tableEdge: '#4b2f1a', kcounter: '#6b6259', stairA: '#4b3322', stairB: '#3a2718', door: '#5e3b1e', doorLine: '#3a2412', knob: '#d4af37', rug: '#7a2a22', rugBorder: '#c8a24a', trap: '#5a3a1e', trapBand: '#2b2b2b', accent: '#f5b041', label: '#fff3d6', labelStroke: '#1a0f05', graphText: '#e8d5b5', graphEdge: '#6d5a44', graphBg: '#120c08' },
+    2: { floor: '#3a3352', floorAlt: '#363050', floorLine: '#28233f', stone: '#3c3f55', stoneAlt: '#383b50', stoneLine: '#2b2d40', wall: '#1b1830', wallLine: '#0f0d1e', wallTop: '#2b2750', shelf: '#2a2545', shelfEdge: '#171430', bottle1: '#38b2a3', bottle2: '#9b59b6', bottle3: '#e5c07b', keg: '#463c66', counterFront: '#2f2850', counterTop: '#4a4178', counterEdge: '#1a1633', fire1: '#e67e22', fire2: '#fde68a', stage: '#41396a', stageLine: '#322b55', table: '#4d4580', tableEdge: '#2e2858', kcounter: '#4b4f68', stairA: '#2f2a4c', stairB: '#25213d', door: '#3e3666', doorLine: '#262046', knob: '#5eead4', rug: '#4b2b6b', rugBorder: '#5eead4', trap: '#3e3666', trapBand: '#15132b', accent: '#5eead4', label: '#e9fffb', labelStroke: '#0b0a1a', graphText: '#e2e0f5', graphEdge: '#4b4680', graphBg: '#0b0a1a' },
+    3: { floor: '#d9b98a', floorAlt: '#d3b281', floorLine: '#b8935f', stone: '#cfc6b3', stoneAlt: '#c9bfab', stoneLine: '#a99d86', wall: '#6b4f3a', wallLine: '#4a3423', wallTop: '#86654b', shelf: '#8a6646', shelfEdge: '#5e432c', bottle1: '#3f7d5a', bottle2: '#a8432f', bottle3: '#c49b2c', keg: '#9a6e45', counterFront: '#7a5232', counterTop: '#a8774b', counterEdge: '#553820', fire1: '#d35400', fire2: '#f7dc6f', stage: '#c49a6c', stageLine: '#a57c51', table: '#b5875a', tableEdge: '#7f5a37', kcounter: '#b0a690', stairA: '#a37b54', stairB: '#8d6844', door: '#8a5d36', doorLine: '#5e3d22', knob: '#9b1c1c', rug: '#a8432f', rugBorder: '#e8c56b', trap: '#8a5d36', trapBand: '#4a3423', accent: '#9b1c1c', label: '#2b1d12', labelStroke: '#f6ecd6', graphText: '#2b1d12', graphEdge: '#a08868', graphBg: '#f6ecd6' },
+    4: { floor: '#44403c', floorAlt: '#403c38', floorLine: '#2e2a27', stone: '#475569', stoneAlt: '#434f62', stoneLine: '#334155', wall: '#1e293b', wallLine: '#0f172a', wallTop: '#334155', shelf: '#292524', shelfEdge: '#1c1917', bottle1: '#34d399', bottle2: '#f87171', bottle3: '#fbbf24', keg: '#57534e', counterFront: '#3f3a36', counterTop: '#57534e', counterEdge: '#1c1917', fire1: '#f97316', fire2: '#fde68a', stage: '#52525b', stageLine: '#3f3f46', table: '#57534e', tableEdge: '#292524', kcounter: '#64748b', stairA: '#3f3f46', stairB: '#27272a', door: '#57534e', doorLine: '#292524', knob: '#34d399', rug: '#14532d', rugBorder: '#34d399', trap: '#57534e', trapBand: '#18181b', accent: '#34d399', label: '#ecfdf5', labelStroke: '#0f1115', graphText: '#d1d5db', graphEdge: '#374151', graphBg: '#0f1115' },
+  };
+
+  const TH = {
+    1: { name: 'Lantern', root: "bg-[#120c08] text-[#e8d5b5] font-['Pixelify_Sans']", panel: 'bg-[#1d140e] border border-[#3a2a1c] rounded', head: 'text-[#f5b041] uppercase tracking-widest text-xs', muted: 'text-[#9c8466]', accent: 'text-[#f5b041]', chip: 'bg-[#3a2614] text-[#f5d08a] border border-[#f5b041]/60', input: 'bg-[#0d0805] border border-[#3a2a1c] text-[#f3e3c3] placeholder-[#6d5a44] focus:border-[#f5b041] outline-none', btn: 'bg-[#f5b041] text-[#1a0f05] hover:bg-[#ffc861]', ghost: 'border border-[#3a2a1c] hover:border-[#f5b041] text-[#e8d5b5]', tabOn: 'bg-[#3a2614] text-[#f5b041]', tabOff: 'text-[#9c8466] hover:text-[#e8d5b5]', dm: "font-['IM_Fell_English'] text-[17px] leading-relaxed text-[#efe0c4]", player: 'border-l-2 border-[#f5b041] pl-3 text-[#f5d08a]', roll: 'bg-[#2a1c10] border border-[#5a3f22] rounded px-2 py-1 text-sm', die: 'bg-[#f5b041] text-[#1a0f05] px-1.5 rounded-sm', ok: 'text-[#82e0aa]', fail: 'text-[#ec7063]', event: 'text-[#c9a86a] text-sm', card: 'bg-[#1d140e] border border-[#3a2a1c] hover:border-[#f5b041]/70 rounded', sel: 'ring-2 ring-[#f5b041]', hp: 'bg-[#c0392b]', hpBg: 'bg-[#2a1a12]', row: 'border-b border-[#2a1e14]', badge: 'bg-[#2a1c10] text-[#c9a86a]' },
+    2: { name: 'Stage', root: "bg-[#0b0a1a] text-[#e2e0f5] font-['VT323'] text-[19px]", panel: 'bg-[#15132b]/90 border-2 border-[#3b3666] rounded-lg backdrop-blur', head: 'text-[#5eead4] uppercase tracking-widest text-base', muted: 'text-[#8f8ab8]', accent: 'text-[#5eead4]', chip: 'bg-[#1f3b44] text-[#a7f3e4] border border-[#5eead4]/60', input: 'bg-[#0b0a1a] border-2 border-[#3b3666] text-[#e2e0f5] placeholder-[#5f5a8a] focus:border-[#5eead4] outline-none', btn: 'bg-[#5eead4] text-[#0b0a1a] hover:bg-[#99f6e4]', ghost: 'border-2 border-[#3b3666] hover:border-[#5eead4] text-[#e2e0f5]', tabOn: 'bg-[#1f3b44] text-[#5eead4]', tabOff: 'text-[#8f8ab8] hover:text-[#e2e0f5]', dm: 'text-[22px] leading-snug text-[#f1efff]', player: 'border-l-4 border-[#5eead4] pl-3 text-[#a7f3e4]', roll: 'bg-[#1b1838] border-2 border-[#3b3666] rounded px-2 py-0.5', die: 'bg-[#5eead4] text-[#0b0a1a] px-1.5 rounded-sm', ok: 'text-[#86efac]', fail: 'text-[#fda4af]', event: 'text-[#c4b5fd]', card: 'bg-[#15132b]/90 border-2 border-[#3b3666] hover:border-[#5eead4] rounded-lg', sel: 'ring-2 ring-[#5eead4]', hp: 'bg-[#f472b6]', hpBg: 'bg-[#2a2550]', row: 'border-b border-[#29254a]', badge: 'bg-[#1f3b44] text-[#a7f3e4]' },
+    3: { name: 'Codex', root: "bg-[#e9dcc0] text-[#2b1d12] font-['IM_Fell_English']", panel: 'bg-[#f6ecd6] border-2 border-[#5a3e2b] rounded-sm', head: "text-[#9b1c1c] uppercase tracking-[0.25em] text-xs font-['Pixelify_Sans']", muted: 'text-[#7a6248]', accent: 'text-[#9b1c1c]', chip: 'bg-[#f3d9c9] text-[#7a1414] border border-[#9b1c1c]', input: 'bg-transparent border-b-2 border-[#5a3e2b] text-[#2b1d12] placeholder-[#a08868] focus:border-[#9b1c1c] outline-none italic', btn: "bg-[#2b1d12] text-[#f6ecd6] hover:bg-[#4a3322] font-['Pixelify_Sans']", ghost: 'border border-[#5a3e2b] hover:bg-[#f3e4c6] text-[#2b1d12]', tabOn: 'bg-[#2b1d12] text-[#f6ecd6]', tabOff: 'bg-[#e2d1ad] text-[#5a3e2b] hover:bg-[#d8c49b]', dm: 'text-[18px] leading-relaxed text-[#2b1d12]', player: 'italic text-[#7a1414] pl-6 border-l border-[#9b1c1c]', roll: "inline-block bg-[#efe1c3] border border-[#a08868] px-2 py-0.5 text-sm font-['Pixelify_Sans']", die: 'bg-[#9b1c1c] text-[#f6ecd6] px-1.5', ok: 'text-[#2f6b3a]', fail: 'text-[#9b1c1c]', event: 'text-[#7a6248] text-sm italic', card: 'bg-[#f6ecd6] border border-[#a08868] hover:border-[#9b1c1c]', sel: 'ring-2 ring-[#9b1c1c]', hp: 'bg-[#9b1c1c]', hpBg: 'bg-[#e2d1ad]', row: 'border-b border-dashed border-[#c4b08a]', badge: 'bg-[#efe1c3] text-[#7a6248]' },
+    4: { name: 'Inspector', root: "bg-[#0f1115] text-[#d1d5db] font-['JetBrains_Mono'] text-[13px]", panel: 'bg-[#161a21] border border-[#262c36] rounded-md', head: 'text-[#34d399] uppercase tracking-wider text-[11px]', muted: 'text-[#6b7280]', accent: 'text-[#34d399]', chip: 'bg-[#0f2a22] text-[#6ee7b7] border border-[#34d399]/50', input: 'bg-[#0b0d11] border border-[#262c36] text-[#e5e7eb] placeholder-[#4b5563] focus:border-[#34d399] outline-none', btn: 'bg-[#34d399] text-[#04120c] hover:bg-[#6ee7b7]', ghost: 'border border-[#262c36] hover:border-[#34d399] text-[#d1d5db]', tabOn: 'bg-[#0f2a22] text-[#34d399]', tabOff: 'text-[#6b7280] hover:text-[#d1d5db]', dm: "font-['IM_Fell_English'] text-[16px] leading-relaxed text-[#e5e7eb]", player: 'border-l-2 border-[#34d399] pl-3 text-[#a7f3d0]', roll: 'bg-[#0b0d11] border border-[#262c36] rounded px-2 py-1', die: 'bg-[#34d399] text-[#04120c] px-1.5 rounded-sm', ok: 'text-[#34d399]', fail: 'text-[#f87171]', event: 'text-[#93c5fd]', card: 'bg-[#161a21] border border-[#262c36] hover:border-[#34d399]/60 rounded-md', sel: 'ring-1 ring-[#34d399]', hp: 'bg-[#f87171]', hpBg: 'bg-[#262c36]', row: 'border-b border-[#1f242d]', badge: 'bg-[#1f242d] text-[#9ca3af]' },
+  };
+
+  // ---------------------------------------------------------------- svg helpers
+  const px = (x, y, w, h, c) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"/>`;
+
+  function sprite(tpl, colors, x, y, size = 1) {
+    let s = '';
+    const u = size / 8;
+    tpl.forEach((row, j) => [...row].forEach((ch, i) => {
+      if (ch !== '.') s += px(x + i * u, y + j * u, u + 0.004, u + 0.004, colors[ch]);
+    }));
+    return s;
+  }
+
+  function miniSvg(tpl, colors, cls) {
+    return `<svg viewBox="0 0 1 1" class="${cls}" shape-rendering="crispEdges">${sprite(tpl, colors, 0, 0)}</svg>`;
+  }
+
+  function tileSvg(t, x, y, P) {
+    const v = (x * 31 + y * 17) % 5;
+    let s = '';
+    const floor = () => {
+      s += px(x, y, 1, 1, v < 2 ? P.floorAlt : P.floor);
+      s += px(x, y + 0.5 - U / 4, 1, U / 2, P.floorLine);
+      s += px(x + (y % 2 ? 0.3 : 0.7), y, U / 2, 0.5, P.floorLine);
+      s += px(x + (y % 2 ? 0.65 : 0.2), y + 0.5, U / 2, 0.5, P.floorLine);
+    };
+    const stone = () => {
+      s += px(x, y, 1, 1, v < 2 ? P.stoneAlt : P.stone);
+      s += px(x, y, 1, U / 2, P.stoneLine);
+      s += px(x, y, U / 2, 1, P.stoneLine);
+      if (v === 3) s += px(x + 0.5, y + 0.5, U, U, P.stoneLine);
+    };
+    switch (t) {
+      case '.': floor(); break;
+      case ',': stone(); break;
+      case '#':
+        s += px(x, y, 1, 1, P.wall);
+        s += px(x, y + 0.5, 1, U / 2, P.wallLine);
+        s += px(x, y + 1 - U / 2, 1, U / 2, P.wallLine);
+        s += px(x + ((x + y) % 2 ? 0.25 : 0.75), y, U / 2, 0.5, P.wallLine);
+        s += px(x + ((x + y) % 2 ? 0.75 : 0.25), y + 0.5, U / 2, 0.5, P.wallLine);
+        s += px(x, y, 1, U / 2, P.wallTop);
+        break;
+      case 'k':
+        s += px(x, y, 1, 1, P.shelf);
+        s += px(x, y + 0.45, 1, U, P.shelfEdge);
+        [[0.12, P.bottle1], [0.42, P.bottle2], [0.7, P.bottle3]].forEach(([o, c]) => {
+          s += px(x + o, y + 0.15, U * 1.3, 0.3, c);
+          s += px(x + o + U * 0.4, y + 0.06, U * 0.5, U, c);
+        });
+        s += px(x + 0.2, y + 0.62, 0.6, 0.3, P.keg);
+        break;
+      case 'B':
+        s += px(x, y, 1, 1, P.counterFront);
+        s += px(x, y, 1, 0.42, P.counterTop);
+        s += px(x, y + 0.42, 1, U / 2, P.counterEdge);
+        s += px(x + 0.45, y + 0.55, U / 2, 0.45, P.counterEdge);
+        break;
+      case 'H':
+        s += px(x, y, 1, 1, P.wall);
+        s += px(x + 0.08, y + 0.15, 0.84, 0.85, '#0a0605');
+        s += px(x + 0.2, y + 0.6, 0.6, 0.35, P.fire1);
+        s += px(x + 0.32, y + 0.42, 0.36, 0.3, P.fire1);
+        s += px(x + 0.4, y + 0.55, 0.2, 0.3, P.fire2);
+        s += px(x + 0.45, y + 0.32, U, U * 1.5, P.fire2);
+        break;
+      case 'p':
+        s += px(x, y, 1, 1, P.stage);
+        s += px(x, y + 0.33, 1, U / 2, P.stageLine);
+        s += px(x, y + 0.66, 1, U / 2, P.stageLine);
+        break;
+      case 'T':
+        floor();
+        s += px(x + 0.04, y + 0.12, 0.92, 0.76, P.tableEdge);
+        s += px(x + 0.08, y + 0.14, 0.84, 0.62, P.table);
+        if (v % 2) s += px(x + 0.3, y + 0.3, U * 1.5, U * 1.5, P.bottle3);
+        break;
+      case 'C':
+        stone();
+        s += px(x, y, 1, 0.7, P.kcounter);
+        s += px(x, y + 0.7, 1, U / 2, P.counterEdge);
+        if (x === 21) s += px(x + 0.25, y + 0.15, 0.5, 0.35, P.keg);
+        break;
+      case 'S':
+        for (let i = 0; i < 4; i++) s += px(x, y + i * 0.25, 1, 0.25, i % 2 ? P.stairA : P.stairB);
+        break;
+      case 'D': case 'd':
+        s += px(x, y, 1, 1, P.door);
+        s += px(x + 0.5 - U / 4, y, U / 2, 1, P.doorLine);
+        s += px(x + 0.72, y + 0.5, U, U, P.knob);
+        break;
+      case 'r': {
+        floor();
+        s += px(x, y, 1, 1, P.rug);
+        const n = (dx, dy) => TILES[y + dy]?.[x + dx] === 'r';
+        if (!n(0, -1)) s += px(x, y + 0.08, 1, U / 2, P.rugBorder);
+        if (!n(0, 1)) s += px(x, y + 0.86, 1, U / 2, P.rugBorder);
+        if (!n(-1, 0)) s += px(x + 0.08, y, U / 2, 1, P.rugBorder);
+        if (!n(1, 0)) s += px(x + 0.86, y, U / 2, 1, P.rugBorder);
+        break;
+      }
+      case 't':
+        stone();
+        s += px(x + 0.08, y + 0.08, 0.84, 0.84, P.trap);
+        s += px(x + 0.08, y + 0.3, 0.84, U / 1.5, P.trapBand);
+        s += px(x + 0.08, y + 0.65, 0.84, U / 1.5, P.trapBand);
+        s += px(x + 0.45, y + 0.45, U, U, P.knob);
+        break;
+    }
+    return s;
+  }
+
+  function lookup(id) {
+    const e = ENTITIES.find(x => x.id === id);
+    if (e) return { label: e.short, full: e.name, type: e.kind === 'char' ? e.role : e.kind };
+    const i = ITEMS.find(x => x.id === id);
+    if (i) return { label: i.short, full: i.name, type: 'item' };
+    if (FACTS[id]) return { label: FACTS[id].label, full: FACTS[id].statement, type: 'fact' };
+    if (OTHER_NODES[id]) return { label: OTHER_NODES[id].label, full: OTHER_NODES[id].label, type: OTHER_NODES[id].type };
+    return { label: id, full: id, type: 'loc' };
+  }
+
+  const PEER_LINES = {
+    'char:ilsa': ['“I’ll keep watch. Make it quick.”', '“Ooh, that looks expensive. Just saying.”', '*Ilsa drifts toward the bar, humming.*'],
+    'char:doran': ['“The stranger hasn’t touched his drink. Nobody nurses ale that long.”', '“I’ve got your back.”'],
+    'char:mael': ['“Careful. Whatever Odo left behind, it isn’t meant for just anyone.”', '“May the Dawn guide your hand.”'],
+  };
+
+  function pickSkill(text) {
+    const t = text.toLowerCase();
+    if (/search|look|inspect|examine|check/.test(t)) return { name: 'Investigation', key: 'investigation', mod: 3 };
+    if (/steal|pocket|lift|swipe/.test(t)) return { name: 'Sleight of Hand', key: 'sleight_of_hand', mod: 2 };
+    if (/sneak|hide|creep/.test(t)) return { name: 'Stealth', key: 'stealth', mod: 5 };
+    if (/lie|bluff|trick/.test(t)) return { name: 'Deception', key: 'deception', mod: 1 };
+    if (/talk|ask|persuade|bribe|charm|flirt/.test(t)) return { name: 'Persuasion', key: 'persuasion', mod: 2 };
+    if (/open|force|break|pry|lift/.test(t)) return { name: 'Athletics', key: 'athletics', mod: 2 };
+    return { name: 'Perception', key: 'perception', mod: 5 };
+  }
+
+  // ---------------------------------------------------------------- app
+  function app() {
+    return {
+      variant: 1,
+      selection: [],
+      text: '',
+      thinking: false,
+      beat: 12,
+      dmView: false,
+      debugOpen: true,
+      debugTab: 'graph',
+      agent: 'char:ilsa',
+      fullLog: false,
+      log: structuredClone(INITIAL_LOG),
+      trace: structuredClone(INITIAL_TRACE),
+      changed: ['container:floorboard', 'item:wax-letter', 'fact:letter-cellar', 'char:player'],
+      gold: 34,
+      variants: [
+        { n: 1, name: 'Lantern', blurb: 'Warm candlelit dark · classic three-column + debug drawer' },
+        { n: 2, name: 'Stage', blurb: 'Moonlit indigo · full-bleed map, JRPG dialogue box, slide-over debug' },
+        { n: 3, name: 'Codex', blurb: 'Light parchment · book spread, journal log, appendix tabs' },
+        { n: 4, name: 'Inspector', blurb: 'Dev console · everything visible at once for mechanics testing' },
+      ],
+
+      init() {
+        this.$watch('variant', v => { this.debugOpen = v === 1; this.scrollLogs(); });
+      },
+
+      th() { return TH[this.variant]; },
+      pal() { return PAL[this.variant]; },
+      label(id) { return lookup(id).label; },
+      party() { return ENTITIES.filter(e => e.role === 'player' || e.role === 'peer'); },
+      agents() { return Object.keys(KNOWLEDGE); },
+      lastRoll() { return [...this.log].reverse().find(e => e.k === 'roll'); },
+      lastNarration() { return [...this.log].reverse().find(e => e.k === 'dm'); },
+      lastLines() {
+        const idx = this.log.lastIndexOf(this.lastNarration());
+        return this.log.slice(idx + 1).filter(e => e.k === 'npc' || e.k === 'peer' || e.k === 'event');
+      },
+
+      toggle(id) {
+        const i = this.selection.indexOf(id);
+        if (i >= 0) this.selection.splice(i, 1); else this.selection.push(id);
+      },
+      pick(ev) {
+        const el = ev.target.closest('[data-id]');
+        if (el) this.toggle(el.dataset.id);
+      },
+      clearSelection() { this.selection = []; },
+
+      submit() {
+        const text = this.text.trim();
+        if (!text || this.thinking) return;
+        const refs = [...this.selection];
+        this.log.push({ k: 'player', text, refs });
+        console.log('player_intent', { selection: refs, text });
+        this.text = '';
+        this.selection = [];
+        this.thinking = true;
+        this.beat += 1;
+        this.scrollLogs();
+        setTimeout(() => this.resolveBeat(text, refs), 1200);
+      },
+
+      resolveBeat(text, refs) {
+        const skill = pickSkill(text);
+        const d20 = 1 + Math.floor(Math.random() * 20);
+        const total = d20 + skill.mod;
+        const dc = refs.length > 1 ? 15 : 10;
+        const ok = total >= dc;
+        const names = refs.map(id => lookup(id).full).join(' and ') || 'the room';
+        const peerIds = Object.keys(PEER_LINES);
+        const peer = refs.find(id => PEER_LINES[id]) || peerIds[Math.floor(Math.random() * peerIds.length)];
+        const npc = refs.find(id => lookup(id).type === 'npc');
+
+        this.log.push({ k: 'system', text: `Beat ${this.beat}` });
+        if (Math.random() < 0.7) this.log.push({ k: 'peer', who: peer, text: PEER_LINES[peer][Math.floor(Math.random() * PEER_LINES[peer].length)] });
+        this.log.push({ k: 'roll', actor: 'Kael', skill: skill.name, d20, mod: skill.mod, total, dc, ok });
+        this.log.push({ k: 'dm', text: ok
+          ? `You turn your attention to ${names}. It goes better than you hoped: something small but telling catches your eye, a detail the others in the room have missed.`
+          : `You try your luck with ${names}, but the moment slips away. A floorboard creaks, a head turns, and whatever you were after stays just out of reach.` });
+        if (npc) this.log.push({ k: 'npc', who: npc, text: ok ? '“Fine, fine. But you didn’t hear it from me.”' : '“I don’t know what you’re on about, friend.”' });
+        if (ok && refs.length) this.log.push({ k: 'event', text: `You learned something about ${lookup(refs[0]).label}` });
+
+        const tools = [{ name: 'skill_check', args: `player ${skill.key} dc ${dc}`, ok: true, result: `${total} → ${ok ? 'success' : 'failure'} · chk_${this.beat}a` }];
+        if (ok && npc) tools.push({ name: 'set_attitude', args: `${npc} → player +5`, ok: true, result: 'AttitudeChanged' });
+        if (ok && refs.length) tools.push({ name: 'create_fact', args: `observation about ${refs[0]}`, ok: true, result: 'FactCreated, FactLearned' });
+        tools.push({ name: 'narrate', args: `${40 + Math.floor(Math.random() * 60)} words${npc ? ' · 1 line' : ''}`, ok: true, result: 'handed to critic' });
+        this.trace.unshift({ beat: this.beat, intents: [`player: ${text.slice(0, 48)}${text.length > 48 ? '…' : ''}`, `${peer.split(':')[1]}: react`], tools, critic: { ok: true, notes: 'pre-check ok · llm ok' }, tokens: { in: 10000 + Math.floor(Math.random() * 3000), cached: 8000, out: 300 + Math.floor(Math.random() * 300) }, ms: 5000 + Math.floor(Math.random() * 4000) });
+        this.changed = refs.length ? refs : ['char:player'];
+        this.thinking = false;
+        this.scrollLogs();
+      },
+
+      scrollLogs() {
+        this.$nextTick(() => document.querySelectorAll('[data-log]').forEach(el => { el.scrollTop = el.scrollHeight; }));
+      },
+
+      // ------------------------------------------------ renderers (return HTML)
+      mapSvg() {
+        const P = this.pal();
+        let s = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-full block" shape-rendering="crispEdges" preserveAspectRatio="xMidYMid meet">`;
+        for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) s += tileSvg(TILES[y][x], x, y, P);
+        for (const e of ENTITIES) {
+          if (e.hidden && !this.dmView) continue;
+          const sel = this.selection.includes(e.id);
+          const isChanged = this.changed.includes(e.id);
+          s += `<g data-id="${e.id}" class="cursor-pointer hover:opacity-80" opacity="${e.hidden ? 0.6 : 1}">`;
+          s += `<rect x="${e.x}" y="${e.y}" width="1" height="1" fill="transparent"/>`;
+          if (e.kind === 'char') s += `<ellipse cx="${e.x + 0.5}" cy="${e.y + 0.95}" rx="0.32" ry="0.08" fill="rgba(0,0,0,0.35)"/>`;
+          if (e.tpl) s += sprite(TPL[e.tpl], e.c, e.x, e.y);
+          if (e.hidden || (this.dmView && e.dmNote)) s += `<rect x="${e.x - 0.05}" y="${e.y - 0.05}" width="1.1" height="1.1" fill="none" stroke="#d4af37" stroke-width="0.05" stroke-dasharray="0.15 0.1"/>`;
+          if (sel) {
+            s += `<rect x="${e.x - 0.08}" y="${e.y - 0.08}" width="1.16" height="1.16" fill="none" stroke="${P.accent}" stroke-width="0.09"/>`;
+            s += `<text x="${e.x + 0.5}" y="${e.y - 0.2}" text-anchor="middle" font-size="0.42" font-family="monospace" fill="${P.label}" stroke="${P.labelStroke}" stroke-width="0.1" paint-order="stroke">${e.short}</text>`;
+          }
+          if (isChanged) s += `<rect x="${e.x + 0.78}" y="${e.y - 0.12}" width="0.22" height="0.22" fill="${P.accent}" transform="rotate(45 ${e.x + 0.89} ${e.y - 0.01})"/>`;
+          if (this.dmView && e.dmNote) s += `<text x="${e.x + 0.5}" y="${e.y + 1.45}" text-anchor="middle" font-size="0.32" font-family="monospace" fill="#d4af37" stroke="#000" stroke-width="0.08" paint-order="stroke">${e.dmNote}</text>`;
+          s += '</g>';
+        }
+        return s + '</svg>';
+      },
+
+      graphSvg() {
+        const P = this.pal();
+        const focus = this.selection.length ? [...this.selection] : ['char:player'];
+        const edges = EDGES.filter(e => (this.dmView || !e.dm) && (focus.includes(e.from) || focus.includes(e.to)));
+        const neigh = [...new Set(edges.flatMap(e => [e.from, e.to]).filter(id => !focus.includes(id)))].slice(0, 16);
+        const pos = {};
+        focus.forEach((id, i) => { pos[id] = [210 + (i - (focus.length - 1) / 2) * 70, 150]; });
+        neigh.forEach((id, i) => { const a = (i / Math.max(neigh.length, 1)) * Math.PI * 2 - Math.PI / 2; pos[id] = [210 + Math.cos(a) * 165, 150 + Math.sin(a) * 112]; });
+        let s = `<svg viewBox="0 0 420 300" class="w-full h-full block">`;
+        for (const e of edges) {
+          const a = pos[e.from], b = pos[e.to];
+          if (!a || !b) continue;
+          const col = e.isNew ? P.accent : P.graphEdge;
+          s += `<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${col}" stroke-width="${e.isNew ? 1.8 : 1}" ${e.dm ? 'stroke-dasharray="4 3"' : ''}/>`;
+          s += `<text x="${(a[0] + b[0]) / 2}" y="${(a[1] + b[1]) / 2 - 2}" text-anchor="middle" font-size="7" font-family="monospace" fill="${col}">${e.type}</text>`;
+        }
+        for (const id of [...neigh, ...focus]) {
+          const [x, y] = pos[id];
+          const info = lookup(id);
+          const r = focus.includes(id) ? 13 : 9;
+          const isChanged = this.changed.includes(id) || EDGES.some(e => e.isNew && (e.to === id || e.from === id) && focus.includes(e.from === id ? e.to : e.from));
+          s += `<g data-id="${id}" class="cursor-pointer hover:opacity-80">`;
+          if (isChanged) s += `<circle cx="${x}" cy="${y}" r="${r + 5}" fill="none" stroke="${P.accent}" stroke-width="1.5" stroke-dasharray="3 2" class="animate-pulse"/>`;
+          s += `<circle cx="${x}" cy="${y}" r="${r}" fill="${TYPE_COLORS[info.type] || '#888'}" stroke="${P.graphBg}" stroke-width="2"/>`;
+          s += `<text x="${x}" y="${y + r + 10}" text-anchor="middle" font-size="9" font-family="monospace" fill="${P.graphText}">${info.label}</text>`;
+          s += '</g>';
+        }
+        return s + '</svg>';
+      },
+
+      graphLegend() {
+        const th = this.th();
+        return Object.entries({ player: 'player', peer: 'peer', npc: 'npc', item: 'item', container: 'container', fact: 'fact', quest: 'quest', faction: 'faction', loc: 'location' })
+          .map(([k, v]) => `<span class="inline-flex items-center gap-1 mr-2"><span class="inline-block w-2 h-2 rounded-full" style="background:${TYPE_COLORS[k]}"></span><span class="${th.muted}">${v}</span></span>`).join('')
+          + `<span class="inline-flex items-center gap-1"><span class="inline-block w-3 border-t-2 border-dashed" style="border-color:${this.pal().accent}"></span><span class="${th.muted}">changed this beat</span></span>`;
+      },
+
+      logHtml() {
+        const th = this.th();
+        return this.log.map(e => {
+          switch (e.k) {
+            case 'system': return `<div class="text-xs uppercase tracking-widest ${th.muted} text-center my-3">— ${e.text} —</div>`;
+            case 'dm': return `<p class="${th.dm} my-2">${e.text}</p>`;
+            case 'player': return `<div class="${th.player} my-2"><span class="opacity-70">You:</span> ${e.text}${e.refs?.length ? `<div class="mt-1 flex flex-wrap gap-1">${e.refs.map(r => `<span class="${th.chip} text-xs px-1.5 py-0.5 rounded">${lookup(r).label}</span>`).join('')}</div>` : ''}</div>`;
+            case 'peer': case 'npc': {
+              const ent = ENTITIES.find(x => x.id === e.who);
+              return `<div class="my-2 flex gap-2 items-start">${miniSvg(TPL[ent.tpl], ent.c, 'w-6 h-6 shrink-0 mt-0.5')}<div><span class="font-semibold" style="color:${TYPE_COLORS[ent.role]}">${ent.short}</span> <span class="${th.muted} text-xs">${e.k === 'peer' ? 'peer' : 'npc'}</span><div>${e.text}</div></div></div>`;
+            }
+            case 'roll': return `<div class="my-1"><span class="${th.roll}"><span class="${th.die}">d20 ${e.d20}</span> ${e.actor} · ${e.skill} ${e.mod >= 0 ? '+' : ''}${e.mod} = <b>${e.total}</b> vs ${e.dc} → <span class="${e.ok ? th.ok : th.fail}">${e.ok ? 'success' : 'failure'}</span></span></div>`;
+            case 'event': return `<div class="${th.event} my-1">◆ ${e.text}</div>`;
+          }
+          return '';
+        }).join('');
+      },
+
+      partyHtml(compact = false) {
+        const th = this.th();
+        return this.party().map(p => {
+          const pct = Math.round((p.hp / p.maxHp) * 100);
+          const sel = this.selection.includes(p.id) ? th.sel : '';
+          return `<div data-id="${p.id}" class="${th.card} ${sel} p-2 cursor-pointer flex gap-2 items-center">
+            ${miniSvg(TPL[p.tpl], p.c, compact ? 'w-8 h-8 shrink-0' : 'w-10 h-10 shrink-0')}
+            <div class="min-w-0 flex-1">
+              <div class="flex justify-between gap-2"><span class="font-semibold truncate" style="color:${TYPE_COLORS[p.role]}">${p.short}</span><span class="${th.muted} text-xs">AC ${p.ac}</span></div>
+              ${compact ? '' : `<div class="${th.muted} text-xs truncate">${p.cls}</div>`}
+              <div class="h-1.5 ${th.hpBg} rounded mt-1 overflow-hidden"><div class="h-full ${th.hp}" style="width:${pct}%"></div></div>
+              <div class="${th.muted} text-[11px]">${p.hp}/${p.maxHp} HP</div>
+            </div></div>`;
+        }).join('');
+      },
+
+      inventoryHtml() {
+        const th = this.th();
+        const rarity = { common: th.muted, uncommon: 'text-[#58d68d]', rare: 'text-[#5dade2]' };
+        return ITEMS.map(i => {
+          const sel = this.selection.includes(i.id) ? th.sel : '';
+          return `<div data-id="${i.id}" class="${th.card} ${sel} p-1.5 cursor-pointer flex items-center gap-2">
+            ${miniSvg(ICON[i.icon], ICON_COLORS, 'w-6 h-6 shrink-0')}
+            <div class="min-w-0"><div class="truncate text-sm">${i.name}${i.isNew ? ` <span class="${th.accent} text-xs">new</span>` : ''}${i.equipped ? ` <span class="${th.muted} text-xs">equipped</span>` : ''}</div><div class="text-[11px] ${rarity[i.rarity]}">${i.rarity}</div></div></div>`;
+        }).join('') + `<div class="${th.muted} text-xs mt-1">◎ ${this.gold} gold</div>`;
+      },
+
+      traceHtml() {
+        const th = this.th();
+        return this.trace.map(b => `
+          <div class="${th.card} p-2 mb-2">
+            <div class="flex justify-between text-xs"><span class="${th.accent} font-semibold">Beat ${b.beat}</span><span class="${th.muted}">${(b.ms / 1000).toFixed(1)}s · ${b.tokens.in.toLocaleString()} in (${Math.round(b.tokens.cached / b.tokens.in * 100)}% cached) · ${b.tokens.out} out · ${b.tools.length} tools</span></div>
+            <div class="${th.muted} text-xs mt-1">intents: ${b.intents.join(' | ')}</div>
+            <div class="mt-1 space-y-0.5">${b.tools.map(t => `<div class="text-xs flex gap-1"><span class="${t.ok ? th.ok : th.fail}">${t.ok ? '✓' : '✗'}</span><span class="font-semibold">${t.name}</span><span class="${th.muted} truncate">${t.args}</span></div>${t.ok ? `<div class="text-[11px] ${th.muted} pl-4 truncate">→ ${t.result}</div>` : `<div class="text-[11px] ${th.fail} pl-4">→ ${t.result}</div>`}`).join('')}</div>
+            <div class="text-xs mt-1 ${b.critic.ok ? th.ok : th.fail}">critic: ${b.critic.ok ? 'OK' : 'REJECTED'}${b.critic.retried ? ' → retried' : ''} <span class="${th.muted}">· ${b.critic.notes}</span></div>
+          </div>`).join('');
+      },
+
+      knowledgeHtml() {
+        const th = this.th();
+        const k = KNOWLEDGE[this.agent];
+        const ent = ENTITIES.find(e => e.id === this.agent);
+        const known = new Set([...k.knows.map(f => f[0]), ...k.secrets]);
+        const unknown = Object.keys(FACTS).filter(f => !known.has(f));
+        const truth = id => this.dmView ? ` <span class="text-[10px] px-1 rounded ${FACTS[id].truth ? th.badge : 'bg-[#7f1d1d] text-[#fecaca]'}">${FACTS[id].truth ? 'true' : 'false'}</span>` : '';
+        return `
+          <div class="flex items-center gap-2 mb-2">${miniSvg(TPL[ent.tpl], ent.c, 'w-8 h-8')}<div><div class="font-semibold" style="color:${TYPE_COLORS[ent.role]}">${ent.name}</div><div class="${th.muted} text-xs">goal: ${k.goal}</div></div></div>
+          <div class="${th.head} mt-2 mb-1">Knows</div>
+          ${k.knows.map(([id, src, conf, beat]) => `<div class="${th.row} py-1 text-sm">${FACTS[id].statement}${truth(id)}<div class="text-[11px] ${th.muted}">${src} · confidence ${conf.toFixed(1)} · since beat ${beat}</div></div>`).join('') || `<div class="${th.muted} text-sm">nothing yet</div>`}
+          ${k.secrets.length ? `<div class="${th.head} mt-3 mb-1">Secrets held</div>${k.secrets.map(id => `<div class="${th.row} py-1 text-sm">🔒 ${FACTS[id].statement}</div>`).join('')}` : ''}
+          ${k.attitudes.length ? `<div class="${th.head} mt-3 mb-1">Attitudes</div>${k.attitudes.map(([who, v, why]) => `<div class="text-sm flex justify-between"><span>${who} <span class="${th.muted} text-xs">(${why})</span></span><span class="${v < 0 ? th.fail : th.ok}">${v > 0 ? '+' : ''}${v}</span></div>`).join('')}` : ''}
+          ${this.dmView ? `<div class="${th.head} mt-3 mb-1">Does NOT know (DM view)</div>${unknown.map(id => `<div class="text-xs ${th.muted} py-0.5 line-through">${FACTS[id].label}</div>`).join('')}` : ''}
+          <div class="mt-3 text-xs ${th.ok}">✓ leak check: last prompt contained only known facts</div>`;
+      },
+    };
+  }
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+</head>
+
+<body x-data="app()" :class="th().root" class="h-screen overflow-hidden">
+
+  <!-- ============================================================ VERSION SWITCHER -->
+  <div class="h-10 flex items-center gap-2 px-3 bg-black text-white text-xs font-['JetBrains_Mono'] border-b border-white/10">
+    <span class="opacity-60 mr-2">Episode N · UI mock</span>
+    <template x-for="v in variants" :key="v.n">
+      <button @click="variant = v.n" class="px-2 py-1 rounded" :class="variant === v.n ? 'bg-white text-black' : 'hover:bg-white/10'" x-text="`V${v.n} ${v.name}`"></button>
+    </template>
+    <span class="opacity-60 ml-2 truncate" x-text="variants[variant - 1].blurb"></span>
+    <label class="ml-auto flex items-center gap-1 cursor-pointer"><input type="checkbox" x-model="dmView" class="accent-amber-400"> DM view (show hidden truth)</label>
+  </div>
+
+  <!-- ============================================================ V1 LANTERN -->
+  <div x-show="variant === 1" class="h-[calc(100vh-40px)] flex flex-col p-2 gap-2">
+    <div class="flex-1 min-h-0 grid grid-cols-[230px_1fr_400px] gap-2">
+      <!-- left: party + inventory -->
+      <aside class="flex flex-col gap-2 min-h-0" @click="pick($event)">
+        <div :class="th().panel" class="p-2">
+          <div :class="th().head" class="mb-2">Party</div>
+          <div class="space-y-1.5" x-html="partyHtml()"></div>
+        </div>
+        <div :class="th().panel" class="p-2 flex-1 min-h-0 overflow-auto">
+          <div :class="th().head" class="mb-2">Kael’s pack</div>
+          <div class="space-y-1" x-html="inventoryHtml()"></div>
+        </div>
+      </aside>
+
+      <!-- center: map + action bar -->
+      <main class="flex flex-col gap-2 min-h-0">
+        <div :class="th().panel" class="flex items-center justify-between px-3 py-1.5">
+          <div><span :class="th().accent" class="text-lg">The Crooked Lantern</span> <span :class="th().muted" class="text-sm">· common room · night, raining</span></div>
+          <div :class="th().muted" class="text-sm">beat <span :class="th().accent" x-text="beat"></span></div>
+        </div>
+        <div class="relative flex-1 min-h-0 rounded overflow-hidden border border-[#3a2a1c] bg-black">
+          <div class="absolute inset-0 p-2" @click="pick($event)" x-html="mapSvg()"></div>
+          <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_50%_55%,transparent_45%,rgba(0,0,0,0.7)_100%)]"></div>
+          <div x-show="thinking" class="absolute top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded bg-black/70 text-[#f5b041] text-sm animate-pulse">The DM is thinking…</div>
+        </div>
+        <div :class="th().panel" class="p-2">
+          <div class="flex items-center gap-1 flex-wrap mb-2 min-h-[26px]">
+            <span :class="th().muted" class="text-xs mr-1">Focus:</span>
+            <template x-for="id in selection" :key="id">
+              <button @click="toggle(id)" :class="th().chip" class="text-xs px-2 py-0.5 rounded flex items-center gap-1"><span x-text="label(id)"></span><span class="opacity-60">×</span></button>
+            </template>
+            <span x-show="!selection.length" :class="th().muted" class="text-xs italic">click things in the tavern, your party or your pack to focus on them</span>
+            <button x-show="selection.length" @click="clearSelection()" :class="th().muted" class="text-xs ml-auto hover:underline">clear</button>
+          </div>
+          <form @submit.prevent="submit()" class="flex gap-2">
+            <input x-model="text" :disabled="thinking" :class="th().input" class="flex-1 px-3 py-2 rounded text-base" placeholder="What do you do? e.g. “Ask Brann about the old barrel while Ilsa watches the stranger”">
+            <button :class="th().btn" class="px-4 rounded font-semibold" :disabled="thinking">Act</button>
+          </form>
+        </div>
+      </main>
+
+      <!-- right: story log -->
+      <section :class="th().panel" class="flex flex-col min-h-0">
+        <div :class="th().head" class="px-3 pt-2">Story</div>
+        <div data-log class="flex-1 overflow-auto px-3 pb-3" x-html="logHtml()" x-init="scrollLogs()"></div>
+      </section>
+    </div>
+
+    <!-- bottom: debug drawer -->
+    <div :class="th().panel" class="flex flex-col transition-all" :style="debugOpen ? 'height: 270px' : 'height: 34px'">
+      <div class="flex items-center gap-1 px-2 py-1 border-b border-[#3a2a1c]">
+        <span :class="th().head" class="mr-2">Debug</span>
+        <template x-for="t in ['graph','trace','knowledge']" :key="t">
+          <button @click="debugTab = t; debugOpen = true" class="px-2 py-0.5 rounded text-sm capitalize" :class="debugTab === t && debugOpen ? th().tabOn : th().tabOff" x-text="t"></button>
+        </template>
+        <button @click="debugOpen = !debugOpen" :class="th().muted" class="ml-auto text-sm" x-text="debugOpen ? '▾ collapse' : '▴ expand'"></button>
+      </div>
+      <div x-show="debugOpen" class="flex-1 min-h-0 overflow-hidden">
+        <div x-show="debugTab === 'graph'" class="h-full grid grid-cols-[1fr_240px]">
+          <div class="relative h-full"><div class="absolute inset-0 p-1" @click="pick($event)" x-html="graphSvg()"></div></div>
+          <div class="p-2 text-xs overflow-auto border-l border-[#3a2a1c]">
+            <div :class="th().muted" class="mb-2">Neighbourhood of the current focus (or Kael). Click a node to add it to the focus. Dashed edges are ground truth only the DM sees.</div>
+            <div x-html="graphLegend()"></div>
+          </div>
+        </div>
+        <div x-show="debugTab === 'trace'" class="h-full overflow-auto p-2 grid grid-cols-2 gap-2 items-start" x-html="traceHtml()"></div>
+        <div x-show="debugTab === 'knowledge'" class="h-full grid grid-cols-[180px_1fr]">
+          <div class="p-2 border-r border-[#3a2a1c] overflow-auto space-y-0.5">
+            <template x-for="a in agents()" :key="a">
+              <button @click="agent = a" class="block w-full text-left px-2 py-0.5 rounded text-sm" :class="agent === a ? th().tabOn : th().tabOff" x-text="label(a)"></button>
+            </template>
+          </div>
+          <div class="p-2 overflow-auto" x-html="knowledgeHtml()"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ V2 STAGE -->
+  <div x-show="variant === 2" class="h-[calc(100vh-40px)] relative overflow-hidden bg-[#06050f]">
+    <div class="absolute inset-0 p-4 pb-56" @click="pick($event)" x-html="mapSvg()"></div>
+    <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_50%_45%,transparent_35%,rgba(6,5,15,0.85)_100%)]"></div>
+
+    <!-- HUD: party top-left -->
+    <div class="absolute top-3 left-3 w-60 space-y-1.5" @click="pick($event)" x-html="partyHtml(true)"></div>
+
+    <!-- HUD: location + last roll top-center -->
+    <div class="absolute top-3 left-1/2 -translate-x-1/2 text-center">
+      <div class="text-3xl text-[#5eead4] drop-shadow">The Crooked Lantern</div>
+      <div :class="th().muted">beat <span x-text="beat"></span> · rain on the shutters</div>
+      <template x-if="lastRoll()">
+        <div class="mt-2 inline-flex items-center gap-2 px-3 py-1 rounded-lg bg-[#15132b]/90 border-2 border-[#3b3666]">
+          <div class="w-10 h-10 grid place-items-center bg-[#5eead4] text-[#0b0a1a] text-2xl rotate-45"><span class="-rotate-45" x-text="lastRoll().d20"></span></div>
+          <div class="text-left leading-tight"><div x-text="`${lastRoll().actor} · ${lastRoll().skill}`"></div><div><span x-text="`= ${lastRoll().total} vs ${lastRoll().dc} → `"></span><span :class="lastRoll().ok ? th().ok : th().fail" x-text="lastRoll().ok ? 'success' : 'failure'"></span></div></div>
+        </div>
+      </template>
+    </div>
+
+    <!-- HUD: right icon rail -->
+    <div class="absolute top-3 right-3 flex flex-col gap-1.5">
+      <template x-for="t in [['inventory','🎒'],['graph','🕸'],['trace','📜'],['knowledge','👁']]" :key="t[0]">
+        <button @click="debugTab === t[0] && debugOpen ? debugOpen = false : (debugTab = t[0], debugOpen = true)" class="w-11 h-11 rounded-lg border-2 text-xl grid place-items-center" :class="debugTab === t[0] && debugOpen ? 'bg-[#1f3b44] border-[#5eead4]' : 'bg-[#15132b]/90 border-[#3b3666] hover:border-[#5eead4]'" :title="t[0]" x-text="t[1]"></button>
+      </template>
+      <button @click="fullLog = !fullLog" class="w-11 h-11 rounded-lg border-2 text-xl grid place-items-center bg-[#15132b]/90 border-[#3b3666] hover:border-[#5eead4]" title="full story log">📖</button>
+    </div>
+
+    <!-- slide-over panel -->
+    <div class="absolute top-3 bottom-56 right-16 w-[440px] transition-transform duration-300" :class="debugOpen ? 'translate-x-0' : 'translate-x-[520px]'">
+      <div :class="th().panel" class="h-full flex flex-col">
+        <div class="flex items-center justify-between px-3 py-1 border-b-2 border-[#3b3666]"><span :class="th().head" x-text="debugTab"></span><button @click="debugOpen = false" :class="th().muted">✕</button></div>
+        <div class="flex-1 min-h-0 overflow-auto p-2" @click="pick($event)">
+          <div x-show="debugTab === 'inventory'" class="space-y-1" x-html="inventoryHtml()"></div>
+          <div x-show="debugTab === 'graph'" class="h-full flex flex-col"><div class="flex-1 min-h-0" x-html="graphSvg()"></div><div class="text-sm" x-html="graphLegend()"></div></div>
+          <div x-show="debugTab === 'trace'" x-html="traceHtml()"></div>
+          <div x-show="debugTab === 'knowledge'">
+            <select x-model="agent" :class="th().input" class="w-full mb-2 px-2 py-1 rounded"><template x-for="a in agents()" :key="a"><option :value="a" :selected="a === agent" x-text="label(a)"></option></template></select>
+            <div x-html="knowledgeHtml()"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- full log overlay -->
+    <div x-show="fullLog" x-transition.opacity class="absolute inset-0 bg-black/70 grid place-items-center" @click.self="fullLog = false">
+      <div :class="th().panel" class="w-[720px] h-[75%] flex flex-col">
+        <div class="flex justify-between px-4 py-2 border-b-2 border-[#3b3666]"><span :class="th().head">Story so far</span><button @click="fullLog = false" :class="th().muted">✕</button></div>
+        <div data-log class="flex-1 overflow-auto px-4 pb-4" x-html="logHtml()"></div>
+      </div>
+    </div>
+
+    <!-- dialogue box -->
+    <div class="absolute bottom-3 left-1/2 -translate-x-1/2 w-[min(980px,calc(100%-24px))]">
+      <div class="rounded-xl border-4 border-double border-[#5eead4]/70 bg-[#0f0d22]/95 p-4 shadow-2xl">
+        <div x-show="!thinking">
+          <p :class="th().dm" x-text="lastNarration()?.text"></p>
+          <div class="mt-1 space-y-0.5 text-[18px]">
+            <template x-for="(l, i) in lastLines()" :key="i">
+              <div><span x-show="l.who" class="text-[#c4b5fd]" x-text="l.who ? label(l.who) + ':' : ''"></span> <span :class="l.k === 'event' ? th().event : ''" x-text="l.k === 'event' ? '◆ ' + l.text : l.text"></span></div>
+            </template>
+          </div>
+        </div>
+        <div x-show="thinking" class="text-[22px] text-[#5eead4] animate-pulse">The DM considers your move…</div>
+        <div class="mt-3 flex items-center gap-1 flex-wrap">
+          <template x-for="id in selection" :key="id">
+            <button @click="toggle(id)" :class="th().chip" class="px-2 rounded flex items-center gap-1"><span x-text="label(id)"></span><span class="opacity-60">×</span></button>
+          </template>
+          <span x-show="!selection.length" :class="th().muted" class="italic">▸ click anything on the map to focus it</span>
+        </div>
+        <form @submit.prevent="submit()" class="mt-2 flex gap-2">
+          <span class="text-[#5eead4] text-2xl">❯</span>
+          <input x-model="text" :disabled="thinking" :class="th().input" class="flex-1 px-3 py-1 rounded text-[20px]" placeholder="say or do anything…">
+          <button :class="th().btn" class="px-5 rounded text-[20px]" :disabled="thinking">ACT</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================ V3 CODEX (light) -->
+  <div x-show="variant === 3" class="h-[calc(100vh-40px)] p-4 bg-[radial-gradient(ellipse_at_center,#efe3c8_0%,#d9c7a0_100%)] flex gap-0">
+    <!-- book -->
+    <div class="flex-1 min-w-0 grid grid-cols-2 shadow-[0_10px_40px_rgba(60,40,20,0.35)] rounded-sm overflow-hidden border-2 border-[#5a3e2b]">
+      <!-- left page -->
+      <div class="bg-[#f6ecd6] bg-[linear-gradient(to_left,rgba(90,62,43,0.18),transparent_8%)] p-5 flex flex-col gap-3 min-h-0">
+        <div class="flex items-baseline justify-between">
+          <div class="text-3xl">The Crooked Lantern</div>
+          <div :class="th().muted" class="italic">beat <span x-text="beat"></span></div>
+        </div>
+        <div class="relative flex-1 min-h-0 border-2 border-[#5a3e2b] p-1 bg-[#efe1c3]">
+          <div class="absolute inset-1" @click="pick($event)" x-html="mapSvg()"></div>
+          <div class="absolute bottom-2 right-3 text-xs italic text-[#5a3e2b] bg-[#f6ecd6]/80 px-1">✠ ground floor · kitchen east</div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 min-h-0" @click="pick($event)">
+          <div>
+            <div :class="th().head" class="mb-1">Companions</div>
+            <div class="space-y-1" x-html="partyHtml(true)"></div>
+          </div>
+          <div>
+            <div :class="th().head" class="mb-1">Satchel</div>
+            <div class="space-y-1" x-html="inventoryHtml()"></div>
+          </div>
+        </div>
+      </div>
+      <!-- right page -->
+      <div class="bg-[#f6ecd6] bg-[linear-gradient(to_right,rgba(90,62,43,0.18),transparent_8%)] p-5 flex flex-col min-h-0 relative">
+        <div :class="th().head" class="mb-1">Journal</div>
+        <div data-log class="flex-1 overflow-auto pr-2 first-letter:text-5xl" x-html="logHtml()"></div>
+        <div x-show="thinking" class="italic text-[#9b1c1c] animate-pulse my-2">The Dungeon Master’s quill scratches…</div>
+        <div class="pt-3 border-t border-[#c4b08a]">
+          <div class="flex items-center gap-1 flex-wrap mb-2 min-h-[24px]">
+            <template x-for="id in selection" :key="id">
+              <button @click="toggle(id)" :class="th().chip" class="text-sm px-2 py-0.5 rounded-sm flex items-center gap-1"><span x-text="label(id)"></span><span class="opacity-60">×</span></button>
+            </template>
+            <span x-show="!selection.length" class="italic text-[#a08868] text-sm">Mark people and things on the map to write about them…</span>
+          </div>
+          <form @submit.prevent="submit()" class="flex gap-3 items-end">
+            <span class="text-2xl text-[#9b1c1c]">✒</span>
+            <input x-model="text" :disabled="thinking" :class="th().input" class="flex-1 py-1 text-lg" placeholder="I would like to…">
+            <button :class="th().btn" class="px-4 py-1.5 rounded-sm" :disabled="thinking">Write</button>
+          </form>
+        </div>
+
+        <!-- appendix drawer -->
+        <div x-show="debugOpen" x-transition class="absolute inset-0 bg-[#f6ecd6] p-5 flex flex-col border-l-4 border-[#9b1c1c]" @click="pick($event)">
+          <div class="flex justify-between items-baseline mb-2"><div class="text-2xl">Appendix · <span class="capitalize" x-text="debugTab"></span></div><button @click="debugOpen = false" class="italic text-[#9b1c1c]">close ✕</button></div>
+          <div class="flex-1 min-h-0 overflow-auto">
+            <div x-show="debugTab === 'graph'" class="h-full flex flex-col"><div class="flex-1 min-h-0 border border-[#a08868] bg-[#fbf4e4]" x-html="graphSvg()"></div><div class="text-sm mt-1" x-html="graphLegend()"></div></div>
+            <div x-show="debugTab === 'trace'" class="font-['JetBrains_Mono']" x-html="traceHtml()"></div>
+            <div x-show="debugTab === 'knowledge'">
+              <div class="flex flex-wrap gap-1 mb-2"><template x-for="a in agents()" :key="a"><button @click="agent = a" class="px-2 py-0.5 text-sm" :class="agent === a ? th().tabOn : th().tabOff" x-text="label(a)"></button></template></div>
+              <div x-html="knowledgeHtml()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- appendix tabs -->
+    <div class="flex flex-col gap-1 pt-6">
+      <template x-for="t in ['graph','trace','knowledge']" :key="t">
+        <button @click="debugTab === t && debugOpen ? debugOpen = false : (debugTab = t, debugOpen = true)" class="[writing-mode:vertical-rl] px-1.5 py-4 text-sm font-['Pixelify_Sans'] rounded-r border-y border-r border-[#5a3e2b] capitalize" :class="debugTab === t && debugOpen ? 'bg-[#9b1c1c] text-[#f6ecd6]' : 'bg-[#e2d1ad] text-[#5a3e2b] hover:bg-[#d8c49b]'" x-text="t"></button>
+      </template>
+    </div>
+  </div>
+
+  <!-- ============================================================ V4 INSPECTOR -->
+  <div x-show="variant === 4" class="h-[calc(100vh-40px)] p-2 grid grid-cols-[250px_1fr_440px] grid-rows-[1fr] gap-2">
+    <!-- left -->
+    <aside class="flex flex-col gap-2 min-h-0">
+      <div :class="th().panel" class="p-2" @click="pick($event)">
+        <div :class="th().head" class="mb-1.5">party</div>
+        <div class="space-y-1" x-html="partyHtml(true)"></div>
+      </div>
+      <div :class="th().panel" class="p-2" @click="pick($event)">
+        <div :class="th().head" class="mb-1.5">inventory · char:player</div>
+        <div class="space-y-1" x-html="inventoryHtml()"></div>
+      </div>
+      <div :class="th().panel" class="p-2 flex-1 min-h-0 flex flex-col">
+        <div class="flex items-center justify-between mb-1.5"><span :class="th().head">knowledge slice</span>
+          <select x-model="agent" :class="th().input" class="px-1 py-0.5 rounded text-[12px]"><template x-for="a in agents()" :key="a"><option :value="a" :selected="a === agent" x-text="a"></option></template></select>
+        </div>
+        <div class="flex-1 min-h-0 overflow-auto" x-html="knowledgeHtml()"></div>
+      </div>
+    </aside>
+
+    <!-- center -->
+    <main class="flex flex-col gap-2 min-h-0">
+      <div :class="th().panel" class="relative h-[52%] min-h-0">
+        <div class="absolute top-1 left-2 z-10 text-[11px]"><span :class="th().accent">scene</span> <span :class="th().muted">loc:common-room · beat <span x-text="beat"></span> · <span x-text="selection.length"></span> selected</span></div>
+        <div class="absolute inset-0 pt-5 p-1" @click="pick($event)" x-html="mapSvg()"></div>
+      </div>
+      <div :class="th().panel" class="flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between px-2 pt-1.5"><span :class="th().head">story log</span><span x-show="thinking" class="text-[11px] text-[#fbbf24] animate-pulse">● beat running: peers → dm tool loop → critic</span></div>
+        <div data-log class="flex-1 overflow-auto px-3" x-html="logHtml()"></div>
+        <div class="border-t border-[#262c36] p-2">
+          <div class="flex items-center gap-1 flex-wrap mb-1.5 min-h-[22px]">
+            <span :class="th().muted" class="text-[11px]">selection[]</span>
+            <template x-for="id in selection" :key="id">
+              <button @click="toggle(id)" :class="th().chip" class="text-[11px] px-1.5 py-0.5 rounded flex items-center gap-1"><span x-text="id"></span><span class="opacity-60">×</span></button>
+            </template>
+          </div>
+          <form @submit.prevent="submit()" class="flex gap-2">
+            <span class="text-[#34d399] py-1.5">&gt;</span>
+            <input x-model="text" :disabled="thinking" :class="th().input" class="flex-1 px-2 py-1.5 rounded" placeholder="player_intent.text">
+            <button :class="th().btn" class="px-3 rounded font-semibold" :disabled="thinking">send ⏎</button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+    <!-- right -->
+    <aside class="flex flex-col gap-2 min-h-0">
+      <div :class="th().panel" class="h-[48%] min-h-0 flex flex-col">
+        <div class="flex justify-between px-2 pt-1.5"><span :class="th().head">ontology · 1-hop of selection</span><span :class="th().muted" class="text-[11px]">neo4j://localhost:7687</span></div>
+        <div class="flex-1 min-h-0" @click="pick($event)" x-html="graphSvg()"></div>
+        <div class="px-2 pb-1.5 text-[11px]" x-html="graphLegend()"></div>
+      </div>
+      <div :class="th().panel" class="flex-1 min-h-0 flex flex-col">
+        <div class="flex justify-between px-2 pt-1.5"><span :class="th().head">beat trace</span><span :class="th().muted" class="text-[11px]">data/sessions/…/traces</span></div>
+        <div class="flex-1 min-h-0 overflow-auto p-2" x-html="traceHtml()"></div>
+      </div>
+    </aside>
+  </div>
+
+</body>
+</html>

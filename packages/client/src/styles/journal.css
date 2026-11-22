@@ -1,0 +1,162 @@
+.journal {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-color: var(--color-rule-light) transparent;
+}
+.journal-empty {
+  display: flex;
+  min-height: 340px;
+  height: 80%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  font-style: italic;
+  gap: 8px;
+}
+.chapter-ornament {
+  font-size: 52px;
+  color: var(--color-red-ink);
+  margin-bottom: 10px;
+}
+.beat-header {
+  font: 13px var(--font-label);
+  color: var(--color-ink-soft);
+  margin: 22px 0 14px;
+  text-align: center;
+}
+.intent-entry {
+  border-left: 1px solid var(--color-red-ink);
+  padding-left: 20px;
+  color: var(--color-red-ink);
+  font-style: italic;
+  margin-bottom: 12px;
+}
+.journal-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+.narration {
+  font-size: 18px;
+  line-height: 1.65;
+  margin: 16px 0;
+  white-space: pre-wrap;
+}
+.dialogue {
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 10px 0;
+}
+.provisional,
+.struck {
+  color: var(--color-ink-soft);
+}
+.provisional .speaker,
+.struck .speaker {
+  color: inherit;
+}
+.dialogue small {
+  font-size: 12px;
+  font-style: italic;
+}
+.roll-stamp {
+  display: table;
+  font: 14px/1.4 var(--font-label);
+  padding: 4px 8px;
+  border: 1px solid var(--color-rule);
+  background: var(--color-paper-deep);
+  margin: 8px 0;
+}
+.roll-stamp.success {
+  color: var(--color-good);
+}
+.roll-stamp.failure {
+  color: var(--color-bad);
+}
+.event-note {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-ink-soft);
+  font-style: italic;
+  margin: 8px 0;
+}
+.episode-end {
+  text-align: center;
+  padding: 28px 8px;
+}
+.episode-end h3 {
+  font-size: 28px;
+  color: var(--color-red-ink);
+}
+.episode-end p {
+  margin-top: 12px;
+}
+.journal-panel {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+.journal-content {
+  display: flow-root;
+  padding-bottom: 24px;
+  overflow-wrap: anywhere;
+}
+.new-entries {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid var(--color-red-ink);
+  border-radius: 20px;
+  padding: 5px 14px;
+  color: var(--color-red-ink);
+  background: var(--color-paper);
+  box-shadow: 0 2px 8px var(--color-rule-light);
+}
+.dialogue {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.dialogue-portrait {
+  flex-shrink: 0;
+}
+.provisional .dialogue-portrait,
+.struck .dialogue-portrait {
+  opacity: 0.55;
+}
+.narration-entry {
+  position: relative;
+}
+.critic-fallback {
+  display: block;
+  margin: -12px 0 12px auto;
+  color: var(--color-red-ink);
+  font-size: 12px;
+  font-style: italic;
+  text-decoration: underline;
+}
+.quill-wait {
+  color: var(--color-ink-soft);
+  font-style: italic;
+  margin: 14px 0;
+}
+.stamping {
+  animation: ink-stamp 150ms ease-out;
+}
+@keyframes ink-stamp {
+  from {
+    opacity: 0;
+    transform: scale(1.08) rotate(-2deg);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) rotate(0);
+  }
+}
